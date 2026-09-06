@@ -65,7 +65,6 @@ button {
     cursor: pointer;
 }
 
-/* Navigation */
 
 header {
     position: sticky;
@@ -119,7 +118,6 @@ nav div a:hover {
     color: var(--text);
 }
 
-/* Layout */
 
 main {
     width: min(var(--content-width), calc(100% - 32px));
@@ -184,8 +182,6 @@ section > p:not(:first-child) {
     color: var(--text-muted);
     font-size: 1rem;
 }
-
-/* Buttons */
 
 section > a,
 button {
@@ -264,7 +260,6 @@ article span {
     color: var(--text-muted);
 }
 
-/* Forms */
 
 form {
     max-width: 680px;
@@ -315,7 +310,6 @@ form button {
     justify-self: start;
 }
 
-/* PnL calculator */
 
 #pnl-calculator {
     max-width: 760px;
@@ -386,7 +380,6 @@ dd {
     font-weight: 650;
 }
 
-/* Footer */
 
 footer {
     width: min(var(--content-width), calc(100% - 32px));
@@ -407,20 +400,37 @@ footer p + p {
     margin-top: 3px;
 }
 
-/* Mobile */
 
 @media (max-width: 760px) {
+    header {
+        position: static;
+    }
+
     nav {
-        min-height: 62px;
+        min-height: auto;
+        padding: 16px 0;
+
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
     }
 
     nav div {
-        gap: 0;
+        width: 100%;
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
     }
 
     nav div a {
-        padding: 6px 7px;
-        font-size: 0.8rem;
+        padding: 8px 4px;
+
+        text-align: center;
+        font-size: 0.82rem;
+
+        background: var(--surface);
+        border: 1px solid var(--border);
     }
 
     section {
@@ -461,7 +471,7 @@ footer p + p {
     }
 
     nav div a {
-        padding: 5px;
-        font-size: 0.74rem;
+        padding: 7px 3px;
+        font-size: 0.75rem;
     }
 }

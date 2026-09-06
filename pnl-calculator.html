@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Calculate trading profit and loss with the Trading Tools PnL Calculator."
+    >
+    <title>PnL Calculator — Trading Tools</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html">Trading Tools</a>
+
+            <div>
+                <a href="index.html">Home</a>
+                <a href="tools.html">Tools</a>
+                <a href="guide.html">Guide</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section>
+            <p>TRADING CALCULATOR</p>
+
+            <h1>PnL Calculator</h1>
+
+            <p>
+                Calculate your potential profit or loss based on your
+                trade direction, entry price, exit price, position size,
+                and fees.
+            </p>
+        </section>
+
+        <section id="pnl-calculator">
+
+            <div>
+                <label for="pnl-direction">Direction</label>
+
+                <select id="pnl-direction">
+                    <option value="long">Long</option>
+                    <option value="short">Short</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="pnl-entry">Entry Price</label>
+
+                <input
+                    id="pnl-entry"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="100"
+                >
+            </div>
+
+            <div>
+                <label for="pnl-exit">Exit Price</label>
+
+                <input
+                    id="pnl-exit"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="120"
+                >
+            </div>
+
+            <div>
+                <label for="pnl-size">Position Size</label>
+
+                <input
+                    id="pnl-size"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="10"
+                >
+            </div>
+
+            <div>
+                <label for="pnl-fees">Fees</label>
+
+                <input
+                    id="pnl-fees"
+                    type="number"
+                    min="0"
+                    step="any"
+                    value="0"
+                    placeholder="0"
+                >
+            </div>
+
+            <button id="calculate-pnl" type="button">
+                Calculate PnL
+            </button>
+
+            <div id="pnl-results">
+
+                <h2>Result</h2>
+
+                <p>
+                    Net PnL:
+                    <strong id="pnl-result">—</strong>
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>Price Difference</dt>
+                        <dd id="pnl-price-difference">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Gross PnL</dt>
+                        <dd id="pnl-gross">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Fees</dt>
+                        <dd id="pnl-fees-result">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Net PnL</dt>
+                        <dd id="pnl-net">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Return</dt>
+                        <dd id="pnl-return">—</dd>
+                    </div>
+                </dl>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Trading Tools</p>
+        <p>Understand. Calculate. Evaluate. Improve.</p>
+    </footer>
+
+</body>
+</html>

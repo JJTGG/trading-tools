@@ -1,0 +1,159 @@
+:root {
+    --bg: #ffffff;
+    --surface: #f6f7f9;
+    --text: #111318;
+    --muted: #626873;
+    --border: #e4e7eb;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+nav {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    min-height: 72px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+nav > a {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+nav div {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+nav div a {
+    color: var(--muted);
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+nav div a:hover {
+    color: var(--text);
+}
+
+main {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+section {
+    max-width: 760px;
+    padding: 120px 0 140px;
+}
+
+section > p:first-child {
+    margin-bottom: 18px;
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+h1 {
+    max-width: 720px;
+    font-size: clamp(2.5rem, 6vw, 4.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+}
+
+section > p:not(:first-child) {
+    max-width: 650px;
+    margin-top: 24px;
+    color: var(--muted);
+    font-size: 1.08rem;
+}
+
+section > a {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 13px 20px;
+
+    border-radius: 10px;
+    background: var(--accent);
+    color: #ffffff;
+
+    font-weight: 600;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+section > a:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+footer {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+footer p + p {
+    margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+    nav {
+        min-height: 64px;
+    }
+
+    nav div {
+        gap: 14px;
+    }
+
+    nav div a {
+        font-size: 0.85rem;
+    }
+
+    section {
+        padding: 80px 0 100px;
+    }
+
+    h1 {
+        font-size: clamp(2.4rem, 12vw, 3.5rem);
+    }
+}

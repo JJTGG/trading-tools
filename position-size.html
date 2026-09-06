@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Calculate trading position size based on account risk, entry price, and stop-loss."
+    >
+    <title>Position Size Calculator — Trading Tools</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="position-size.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html">Trading Tools</a>
+
+            <div>
+                <a href="index.html">Home</a>
+                <a href="tools.html">Tools</a>
+                <a href="guide.html">Guide</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section>
+            <p>TRADING CALCULATOR</p>
+
+            <h1>Position Size Calculator</h1>
+
+            <p>
+                Set your account risk and stop-loss to calculate
+                the position size for a trade.
+            </p>
+        </section>
+
+        <section id="position-size-calculator">
+
+            <div>
+                <label for="account-balance">Account Balance</label>
+
+                <input
+                    id="account-balance"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="1000"
+                >
+            </div>
+
+            <div>
+                <label for="risk-percent">Risk per Trade (%)</label>
+
+                <input
+                    id="risk-percent"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="1"
+                >
+            </div>
+
+            <div>
+                <label for="entry-price">Entry Price</label>
+
+                <input
+                    id="entry-price"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="100"
+                >
+            </div>
+
+            <div>
+                <label for="stop-loss">Stop-Loss Price</label>
+
+                <input
+                    id="stop-loss"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="95"
+                >
+            </div>
+
+            <button id="calculate-position-size" type="button">
+                Calculate Position Size
+            </button>
+
+            <div id="position-size-results">
+
+                <h2>Result</h2>
+
+                <p>
+                    Position Size
+                    <strong id="position-size-result">—</strong>
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>Risk Amount</dt>
+                        <dd id="risk-amount">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Risk per Unit</dt>
+                        <dd id="risk-per-unit">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Position Size</dt>
+                        <dd id="position-size-value">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Position Value</dt>
+                        <dd id="position-value">—</dd>
+                    </div>
+                </dl>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Trading Tools</p>
+        <p>Understand. Calculate. Evaluate. Improve.</p>
+    </footer>
+
+</body>
+</html>

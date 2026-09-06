@@ -161,11 +161,15 @@ h1 {
 }
 
 h2 {
-    margin-bottom: 22px;
+    margin-bottom: 24px;
 
-    font-size: 2rem;
+    font-size: 1.75rem;
     line-height: 1.2;
     letter-spacing: -0.035em;
+}
+
+section + section h2 {
+    margin-bottom: 20px;
 }
 
 h3 {

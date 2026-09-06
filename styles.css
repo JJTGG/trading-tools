@@ -247,6 +247,7 @@ transition:
 }
 
 .tool-card p {
+    max-width: 34rem;
     margin: 8px 0 0;
 
     color: var(--text-muted);
@@ -256,7 +257,7 @@ transition:
 .tool-card a,
 .tool-card span {
     display: inline-block;
-    margin-top: 18px;
+    margin-top: 22px;
 
     font-size: 0.85rem;
     font-weight: 650;

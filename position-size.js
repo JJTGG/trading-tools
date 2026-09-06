@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const riskPercent = document.querySelector("#risk-percent");
     const entryPrice = document.querySelector("#entry-price");
     const stopLoss = document.querySelector("#stop-loss");
+    const direction = document.querySelector("#position-direction");
     const calculateButton = document.querySelector("#calculate-position-size");
 
     const result = document.querySelector("#position-size-result");
@@ -28,6 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const risk = Number(riskPercent.value);
         const entry = Number(entryPrice.value);
         const stop = Number(stopLoss.value);
+        const validStop =
+            direction.value === "long"
+                ? stop < entry
+                : stop > entry;
 
         if (
             !Number.isFinite(balance) ||
@@ -39,7 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
             risk >= 100 ||
             entry <= 0 ||
             stop <= 0 ||
-            entry === stop
+            entry === stop ||
+            !validStop
         ) {
             result.textContent = "Enter valid values";
             riskAmountResult.textContent = "—";
@@ -66,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resetButton = document.querySelector("#reset-position-size");
 
     resetButton.addEventListener("click", () => {
+        direction.value = "long";
         accountBalance.value = "";
         riskPercent.value = "";
         entryPrice.value = "";

@@ -378,12 +378,9 @@ form button {
 }
 
 #position-size-calculator > div {
-    margin-bottom: 16px;
-}
-
-#position-size-calculator > div > div {
     display: grid;
     gap: 6px;
+    margin-bottom: 16px;
 }
 
 #position-size-calculator > button {

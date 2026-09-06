@@ -219,7 +219,7 @@ button:active {
     transform: translateY(0);
 }
 
-/* Tool cards */
+
 
 .tools-list {
     display: grid;
@@ -228,12 +228,22 @@ button:active {
 }
 
 .tool-card {
-    padding: 22px;
+    padding: 24px;
 
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+border: 1px solid var(--border);
+border-radius: var(--radius-md);
 
-    background: var(--surface);
+background: var(--surface);
+
+transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+.tool-card:hover {
+    border-color: #d3d7dc;
+    box-shadow: 0 8px 24px rgba(17, 19, 24, 0.06);
+    transform: translateY(-2px);
 }
 
 .tool-card p {

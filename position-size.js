@@ -63,6 +63,21 @@ document.addEventListener("DOMContentLoaded", () => {
         result.textContent = formatNumber(positionSize);
     };
 
+    const resetButton = document.querySelector("#reset-position-size");
+
+    resetButton.addEventListener("click", () => {
+        accountBalance.value = "";
+        riskPercent.value = "";
+        entryPrice.value = "";
+        stopLoss.value = "";
+
+        result.textContent = "—";
+        riskAmountResult.textContent = "—";
+        riskPerUnitResult.textContent = "—";
+        positionSizeResult.textContent = "—";
+        positionValueResult.textContent = "—";
+    });
+
     calculateButton.addEventListener("click", calculatePositionSize);
 
     calculator.addEventListener("keydown", (event) => {

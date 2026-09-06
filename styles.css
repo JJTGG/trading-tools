@@ -339,7 +339,9 @@ form button {
     margin-bottom: 16px;
 }
 
-#pnl-calculator > button {
+#pnl-calculator > button,
+#pnl-calculator > div > button:first-child,
+#position-size-calculator > div > button:first-child {
     margin-top: 2px;
 }
 
@@ -396,10 +398,6 @@ form button {
     display: grid;
     gap: 6px;
     margin-bottom: 16px;
-}
-
-#position-size-calculator > button {
-    margin-top: 2px;
 }
 
 #position-size-results {

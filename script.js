@@ -74,6 +74,23 @@ document.addEventListener("DOMContentLoaded", () => {
         result.textContent = formatNumber(netPnL);
     };
 
+    const resetButton = document.querySelector("#reset-pnl");
+
+resetButton.addEventListener("click", () => {
+    direction.value = "long";
+    entry.value = "";
+    exit.value = "";
+    size.value = "";
+    fees.value = "0";
+
+    result.textContent = "—";
+    priceDifference.textContent = "—";
+    gross.textContent = "—";
+    feesResult.textContent = "—";
+    net.textContent = "—";
+    returnValue.textContent = "—";
+});
+
     calculateButton.addEventListener("click", calculatePnL);
 
     calculator.addEventListener("keydown", (event) => {

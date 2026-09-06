@@ -125,13 +125,13 @@ main {
 }
 
 section {
-    padding: 64px 0;
+    padding: 56px 0;
 }
 
 section:first-child {
     max-width: 820px;
-    padding-top: 96px;
-    padding-bottom: 56px;
+    padding-top: 88px;
+    padding-bottom: 48px;
 }
 
 section > p:first-child {

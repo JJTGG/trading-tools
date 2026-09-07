@@ -10,7 +10,7 @@ form.addEventListener("submit", async (event) => {
     message.textContent = "Signing you in...";
 
     try {
-        const { error } = await supabaseClient.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
             email,
             password
         });
@@ -21,7 +21,28 @@ form.addEventListener("submit", async (event) => {
             return;
         }
 
+        const user = data.user;
+
+        const { data: profile, error: profileError } = await supabaseClient
+            .from("profiles")
+            .select("onboarding_completed")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (profileError) {
+            console.error("Profile lookup error:", profileError);
+            message.textContent = "Signed in, but we couldn't load your workspace.";
+            return;
+        }
+
         message.textContent = "Signed in successfully.";
+
+        if (!profile || !profile.onboarding_completed) {
+            window.location.href = "onboarding.html";
+            return;
+        }
+
+        window.location.href = "index.html";
     } catch (error) {
         console.error("Login request failed:", error);
         message.textContent =

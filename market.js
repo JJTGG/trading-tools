@@ -21,44 +21,177 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let searchTimer;
     let currentSymbol = "";
+    let currentInterval = "1day";
+    let chartValues = [];
+
+    const formatPrice = (value) => {
+        return Number(value).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    };
+
+    const formatDate = (datetime) => {
+        const date = new Date(`${datetime}T00:00:00`);
+
+        if (Number.isNaN(date.getTime())) {
+            return datetime;
+        }
+
+        return date.toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric"
+        });
+    };
 
     const drawChart = (values) => {
         const rect = chartCanvas.getBoundingClientRect();
         const ratio = window.devicePixelRatio || 1;
 
-        chartCanvas.width = rect.width * ratio;
-        chartCanvas.height = rect.height * ratio;
+        const width = rect.width;
+        const height = rect.height;
+
+        chartCanvas.width = Math.max(1, width * ratio);
+        chartCanvas.height = Math.max(1, height * ratio);
 
         chartContext.setTransform(ratio, 0, 0, ratio, 0, 0);
-        chartContext.clearRect(0, 0, rect.width, rect.height);
+        chartContext.clearRect(0, 0, width, height);
 
         const prices = values
             .slice()
             .reverse()
-            .map((item) => item.close);
+            .map((item) => Number(item.close))
+            .filter((price) => Number.isFinite(price));
 
         if (prices.length < 2) {
+            chartContext.fillStyle = "#69707d";
+            chartContext.font = "14px system-ui";
+            chartContext.textAlign = "center";
+            chartContext.textBaseline = "middle";
+
+            chartContext.fillText(
+                "Not enough data to display chart",
+                width / 2,
+                height / 2
+            );
+
             return;
         }
 
-        const padding = 24;
-        const width = rect.width - padding * 2;
-        const height = rect.height - padding * 2;
+        const padding = {
+            top: 20,
+            right: 62,
+            bottom: 30,
+            left: 12
+        };
+
+        const chartWidth =
+            width - padding.left - padding.right;
+
+        const chartHeight =
+            height - padding.top - padding.bottom;
 
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
         const priceRange = maxPrice - minPrice || 1;
 
+        const xForIndex = (index) => {
+            return (
+                padding.left +
+                (index / (prices.length - 1)) * chartWidth
+            );
+        };
+
+        const yForPrice = (price) => {
+            return (
+                padding.top +
+                (1 - (price - minPrice) / priceRange) *
+                    chartHeight
+            );
+        };
+
+        /*
+         * Grid
+         */
+        chartContext.lineWidth = 1;
+        chartContext.strokeStyle = "#e2e5e9";
+        chartContext.fillStyle = "#69707d";
+        chartContext.font = "11px system-ui";
+        chartContext.textAlign = "left";
+        chartContext.textBaseline = "middle";
+
+        const gridLines = 4;
+
+        for (let i = 0; i <= gridLines; i++) {
+            const y =
+                padding.top +
+                (i / gridLines) * chartHeight;
+
+            chartContext.beginPath();
+            chartContext.moveTo(
+                padding.left,
+                y
+            );
+            chartContext.lineTo(
+                width - padding.right,
+                y
+            );
+            chartContext.stroke();
+
+            const price =
+                maxPrice -
+                (i / gridLines) * priceRange;
+
+            chartContext.fillText(
+                formatPrice(price),
+                width - padding.right + 8,
+                y
+            );
+        }
+
+        /*
+         * Date labels
+         */
+        chartContext.textAlign = "center";
+        chartContext.textBaseline = "top";
+
+        const dateCount = Math.min(
+            5,
+            values.length
+        );
+
+        for (let i = 0; i < dateCount; i++) {
+            const valueIndex =
+                Math.round(
+                    (i / Math.max(1, dateCount - 1)) *
+                        (prices.length - 1)
+                );
+
+            const originalIndex =
+                values.length - 1 - valueIndex;
+
+            const value =
+                values[originalIndex];
+
+            if (!value) {
+                continue;
+            }
+
+            chartContext.fillText(
+                formatDate(value.datetime),
+                xForIndex(valueIndex),
+                height - padding.bottom + 10
+            );
+        }
+
+        /*
+         * Chart line
+         */
         chartContext.beginPath();
 
         prices.forEach((price, index) => {
-            const x =
-                padding +
-                (index / (prices.length - 1)) * width;
-
-            const y =
-                padding +
-                (1 - (price - minPrice) / priceRange) * height;
+            const x = xForIndex(index);
+            const y = yForPrice(price);
 
             if (index === 0) {
                 chartContext.moveTo(x, y);
@@ -69,13 +202,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
         chartContext.strokeStyle = "#2563eb";
         chartContext.lineWidth = 2;
+        chartContext.lineJoin = "round";
+        chartContext.lineCap = "round";
         chartContext.stroke();
+
+        /*
+         * Latest price marker
+         */
+        const latestPrice =
+            prices[prices.length - 1];
+
+        const latestX =
+            xForIndex(prices.length - 1);
+
+        const latestY =
+            yForPrice(latestPrice);
+
+        chartContext.beginPath();
+        chartContext.arc(
+            latestX,
+            latestY,
+            4,
+            0,
+            Math.PI * 2
+        );
+
+        chartContext.fillStyle = "#2563eb";
+        chartContext.fill();
+
+        /*
+         * Latest price label
+         */
+        chartContext.fillStyle = "#111318";
+        chartContext.font = "650 11px system-ui";
+        chartContext.textAlign = "right";
+        chartContext.textBaseline = "bottom";
+
+        chartContext.fillText(
+            formatPrice(latestPrice),
+            latestX,
+            latestY - 8
+        );
     };
 
     const loadMarketHistory = async (
         symbol,
-        interval = "1day"
+        interval = currentInterval
     ) => {
+        currentInterval = interval;
+
         try {
             const response = await fetch(
                 `/api/time-series?symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}`
@@ -85,11 +260,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to load market history"
+                    data.error ||
+                        "Unable to load market history"
                 );
             }
 
-            drawChart(data.values);
+            chartValues = data.values || [];
+
+            drawChart(chartValues);
             chartSection.hidden = false;
         } catch {
             chartSection.hidden = true;
@@ -97,7 +275,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const loadMarket = async () => {
-        const symbol = symbolInput.value.trim().toUpperCase();
+        const symbol =
+            symbolInput.value.trim().toUpperCase();
 
         if (!symbol) {
             return;
@@ -117,18 +296,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to load market data"
+                    data.error ||
+                        "Unable to load market data"
                 );
             }
 
             marketName.textContent = data.name;
+
             marketDetails.textContent =
                 `${data.exchange} · ${data.currency}`;
 
             marketPrice.textContent =
                 `${data.currency} ${data.price.toLocaleString()}`;
 
-            const changeSign = data.change > 0 ? "+" : "";
+            const changeSign =
+                data.change > 0 ? "+" : "";
 
             marketChange.textContent =
                 `${changeSign}${data.change.toFixed(2)} (${changeSign}${data.changePercent.toFixed(2)}%)`;
@@ -140,45 +322,72 @@ document.addEventListener("DOMContentLoaded", () => {
                         ? "var(--negative)"
                         : "var(--text-muted)";
 
-            marketSymbol.textContent = data.symbol;
-            marketExchange.textContent = data.exchange;
-            marketCurrency.textContent = data.currency;
+            marketSymbol.textContent =
+                data.symbol;
 
-            const marketIsOpen = Boolean(data.marketOpen);
+            marketExchange.textContent =
+                data.exchange;
+
+            marketCurrency.textContent =
+                data.currency;
+
+            const marketIsOpen =
+                Boolean(data.marketOpen);
 
             marketStatus.textContent =
-                marketIsOpen ? "Open" : "Closed";
+                marketIsOpen
+                    ? "Open"
+                    : "Closed";
 
             marketStatus.dataset.status =
-                marketIsOpen ? "open" : "closed";
+                marketIsOpen
+                    ? "open"
+                    : "closed";
 
             marketResult.hidden = false;
 
-            await loadMarketHistory(symbol);
+            /*
+             * Load the currently selected timeframe
+             * instead of always falling back to 1D.
+             */
+            await loadMarketHistory(
+                symbol,
+                currentInterval
+            );
         } catch (error) {
             marketResult.hidden = false;
 
-            marketName.textContent = "Unable to load market";
-            marketDetails.textContent = error.message;
+            marketName.textContent =
+                "Unable to load market";
+
+            marketDetails.textContent =
+                error.message;
 
             marketPrice.textContent = "—";
             marketChange.textContent = "—";
-            marketChange.style.color = "var(--text-muted)";
+            marketChange.style.color =
+                "var(--text-muted)";
+
             marketSymbol.textContent = "—";
             marketExchange.textContent = "—";
             marketCurrency.textContent = "—";
-            marketStatus.textContent = "—";
 
-            marketStatus.removeAttribute("data-status");
+            marketStatus.textContent = "—";
+            marketStatus.removeAttribute(
+                "data-status"
+            );
+
             chartSection.hidden = true;
         } finally {
             loadButton.disabled = false;
-            loadButton.textContent = "Check Market";
+            loadButton.textContent =
+                "Check Market";
         }
     };
 
     const searchMarkets = async () => {
-        const query = symbolInput.value.trim();
+        const query =
+            symbolInput.value.trim();
 
         if (query.length < 2) {
             suggestions.hidden = true;
@@ -191,36 +400,55 @@ document.addEventListener("DOMContentLoaded", () => {
                 `/api/search?query=${encodeURIComponent(query)}`
             );
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to search markets"
+                    data.error ||
+                        "Unable to search markets"
                 );
             }
 
             suggestions.innerHTML = "";
 
-            data.results.slice(0, 6).forEach((market) => {
-                const button = document.createElement("button");
+            data.results
+                .slice(0, 6)
+                .forEach((market) => {
+                    const button =
+                        document.createElement(
+                            "button"
+                        );
 
-                button.type = "button";
-                button.className = "market-suggestion";
+                    button.type = "button";
+                    button.className =
+                        "market-suggestion";
 
-                button.innerHTML = `
-                    <strong>${market.symbol}</strong>
-                    <span>${market.instrument_name} · ${market.exchange}</span>
-                `;
+                    button.innerHTML = `
+                        <strong>${market.symbol}</strong>
+                        <span>${market.instrument_name} · ${market.exchange}</span>
+                    `;
 
-                button.addEventListener("click", () => {
-                    symbolInput.value = market.symbol;
-                    suggestions.hidden = true;
-                    suggestions.innerHTML = "";
-                    loadMarket();
+                    button.addEventListener(
+                        "click",
+                        () => {
+                            symbolInput.value =
+                                market.symbol;
+
+                            suggestions.hidden =
+                                true;
+
+                            suggestions.innerHTML =
+                                "";
+
+                            loadMarket();
+                        }
+                    );
+
+                    suggestions.appendChild(
+                        button
+                    );
                 });
-
-                suggestions.appendChild(button);
-            });
 
             suggestions.hidden =
                 data.results.length === 0;
@@ -230,33 +458,77 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    /*
+     * Timeframe controls
+     */
     timeframeButtons.forEach((button) => {
-        button.addEventListener("click", async () => {
-            if (!currentSymbol) {
-                return;
+        button.addEventListener(
+            "click",
+            async () => {
+                if (!currentSymbol) {
+                    return;
+                }
+
+                timeframeButtons.forEach(
+                    (item) => {
+                        item.classList.remove(
+                            "active"
+                        );
+                    }
+                );
+
+                button.classList.add("active");
+
+                await loadMarketHistory(
+                    currentSymbol,
+                    button.dataset.interval
+                );
             }
-
-            timeframeButtons.forEach((item) => {
-                item.classList.remove("active");
-            });
-
-            button.classList.add("active");
-
-            await loadMarketHistory(
-                currentSymbol,
-                button.dataset.interval
-            );
-        });
-    });
-
-    symbolInput.addEventListener("input", () => {
-        clearTimeout(searchTimer);
-
-        searchTimer = setTimeout(
-            searchMarkets,
-            300
         );
     });
+
+    /*
+     * Make the first timeframe active on load.
+     */
+    const activeTimeframe =
+        document.querySelector(
+            "#market-timeframes button.active"
+        );
+
+    if (!activeTimeframe) {
+        const defaultTimeframe =
+            document.querySelector(
+                "#market-timeframes button"
+            );
+
+        if (defaultTimeframe) {
+            defaultTimeframe.classList.add(
+                "active"
+            );
+
+            if (defaultTimeframe.dataset.interval) {
+                currentInterval =
+                    defaultTimeframe.dataset.interval;
+            }
+        }
+    } else if (
+        activeTimeframe.dataset.interval
+    ) {
+        currentInterval =
+            activeTimeframe.dataset.interval;
+    }
+
+    symbolInput.addEventListener(
+        "input",
+        () => {
+            clearTimeout(searchTimer);
+
+            searchTimer = setTimeout(
+                searchMarkets,
+                300
+            );
+        }
+    );
 
     loadButton.addEventListener(
         "click",
@@ -273,11 +545,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     );
 
+    /*
+     * Redraw the existing data on resize.
+     * Do NOT fetch 1D again.
+     */
     window.addEventListener(
         "resize",
         () => {
-            if (!chartSection.hidden && currentSymbol) {
-                loadMarketHistory(currentSymbol);
+            if (
+                !chartSection.hidden &&
+                chartValues.length
+            ) {
+                drawChart(chartValues);
             }
         }
     );

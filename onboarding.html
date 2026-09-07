@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Up Your Workspace — Trading Tools</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main class="auth-page">
+        <section class="auth-panel">
+            <a href="index.html" class="auth-brand">Trading Tools</a>
+
+            <div class="auth-header">
+                <h1>Set up your workspace</h1>
+                <p>Tell us a little about how you trade so we can make Trading Tools fit you.</p>
+            </div>
+
+            <form id="onboarding-form">
+                <div class="form-group">
+                    <label for="display-name">What should we call you?</label>
+                    <input
+                        type="text"
+                        id="display-name"
+                        name="display-name"
+                        placeholder="Your display name"
+                        autocomplete="name"
+                        maxlength="50"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="preferred-currency">Preferred currency</label>
+                    <select id="preferred-currency" name="preferred-currency" required>
+                        <option value="">Select a currency</option>
+                        <option value="USD">USD — US Dollar</option>
+                        <option value="EUR">EUR — Euro</option>
+                        <option value="GBP">GBP — British Pound</option>
+                        <option value="NGN">NGN — Nigerian Naira</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="markets-traded">What do you trade?</label>
+                    <select id="markets-traded" name="markets-traded" required>
+                        <option value="">Select a market</option>
+                        <option value="crypto">Crypto</option>
+                        <option value="forex">Forex</option>
+                        <option value="stocks">Stocks</option>
+                        <option value="multiple">Multiple markets</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="experience-level">Experience level</label>
+                    <select id="experience-level" name="experience-level" required>
+                        <option value="">Select your experience</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="primary-button">
+                    Continue
+                </button>
+
+                <p id="onboarding-message" class="form-message"></p>
+            </form>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="onboarding.js"></script>
+</body>
+</html>

@@ -1034,13 +1034,12 @@ footer p + p {
 
 
 
-main > section:not(:first-child) > article {
-    padding: 22px 0;
-    border-top: 1px solid var(--border);
-}
 
-main > section:not(:first-child) > article:last-child {
-    border-bottom: 1px solid var(--border);
+main > section:not(:first-child) > article {
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
 }
 
 main > section:not(:first-child) > article p {
@@ -1061,13 +1060,33 @@ main > section:not(:first-child) > article a:hover {
     color: var(--primary-hover);
 }
 
+main > section:not(:first-child) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+main > section:not(:first-child) > h2 {
+    grid-column: 1 / -1;
+}
+
 main > section:last-child {
+    display: block;
     max-width: 820px;
 }
 
 
-main > section:nth-child(2) {
+
+main > section:nth-child(2),
+main > section:nth-child(3) {
     max-width: 760px;
+}
+
+main > section:nth-child(2) {
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
 }
 
 main > section:nth-child(2) > p:first-of-type {
@@ -1083,10 +1102,6 @@ main > section:nth-child(2) > p:first-of-type a {
 
 main > section:nth-child(2) > p:first-of-type a:hover {
     color: var(--primary-hover);
-}
-
-main > section:nth-child(3) {
-    max-width: 760px;
 }
 
 main > section:nth-child(3) ul {
@@ -1108,8 +1123,24 @@ main > section:nth-child(3) li {
 }
 
 @media (max-width: 760px) {
+    main > section:not(:first-child) {
+        display: block;
+    }
+
     main > section:not(:first-child) > article {
         padding: 20px 0;
+        border: 0;
+        border-top: 1px solid var(--border);
+        border-radius: 0;
+        background: transparent;
+    }
+
+    main > section:not(:first-child) > article:last-child {
+        border-bottom: 1px solid var(--border);
+    }
+
+    main > section:nth-child(2) {
+        padding: 20px;
     }
 
     main > section:nth-child(3) ul {

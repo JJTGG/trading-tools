@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadButton = document.querySelector("#load-market");
     const suggestions = document.querySelector("#market-suggestions");
     const marketResult = document.querySelector("#market-result");
+    const chartSection = document.querySelector("#market-chart-section");
+    const chartCanvas = document.querySelector("#market-chart-canvas");
+    const chartContext = chartCanvas.getContext("2d");
 
     const marketName = document.querySelector("#market-name");
     const marketDetails = document.querySelector("#market-details");
@@ -14,6 +17,77 @@ document.addEventListener("DOMContentLoaded", () => {
     const marketStatus = document.querySelector("#market-status");
 
     let searchTimer;
+
+    const drawChart = (values) => {
+        const rect = chartCanvas.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1;
+
+        chartCanvas.width = rect.width * ratio;
+        chartCanvas.height = rect.height * ratio;
+
+        chartContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+        chartContext.clearRect(0, 0, rect.width, rect.height);
+
+        const prices = values
+            .slice()
+            .reverse()
+            .map((item) => item.close);
+
+        if (prices.length < 2) {
+            return;
+        }
+
+        const padding = 24;
+        const width = rect.width - padding * 2;
+        const height = rect.height - padding * 2;
+
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        const priceRange = maxPrice - minPrice || 1;
+
+        chartContext.beginPath();
+
+        prices.forEach((price, index) => {
+            const x =
+                padding +
+                (index / (prices.length - 1)) * width;
+
+            const y =
+                padding +
+                (1 - (price - minPrice) / priceRange) * height;
+
+            if (index === 0) {
+                chartContext.moveTo(x, y);
+            } else {
+                chartContext.lineTo(x, y);
+            }
+        });
+
+        chartContext.strokeStyle = "#2563eb";
+        chartContext.lineWidth = 2;
+        chartContext.stroke();
+    };
+
+    const loadMarketHistory = async (symbol) => {
+        try {
+            const response = await fetch(
+                `/api/time-series?symbol=${encodeURIComponent(symbol)}&interval=1day`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "Unable to load market history"
+                );
+            }
+
+            drawChart(data.values);
+            chartSection.hidden = false;
+        } catch {
+            chartSection.hidden = true;
+        }
+    };
 
     const loadMarket = async () => {
         const symbol = symbolInput.value.trim().toUpperCase();
@@ -33,7 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || "Unable to load market data");
+                throw new Error(
+                    data.error || "Unable to load market data"
+                );
             }
 
             marketName.textContent = data.name;
@@ -45,27 +121,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const changeSign = data.change > 0 ? "+" : "";
 
-marketChange.textContent =
-    `${changeSign}${data.change.toFixed(2)} (${changeSign}${data.changePercent.toFixed(2)}%)`;
+            marketChange.textContent =
+                `${changeSign}${data.change.toFixed(2)} (${changeSign}${data.changePercent.toFixed(2)}%)`;
 
-marketChange.style.color =
-    data.change > 0
-        ? "var(--positive)"
-        : data.change < 0
-            ? "var(--negative)"
-            : "var(--text-muted)";
+            marketChange.style.color =
+                data.change > 0
+                    ? "var(--positive)"
+                    : data.change < 0
+                        ? "var(--negative)"
+                        : "var(--text-muted)";
 
             marketSymbol.textContent = data.symbol;
             marketExchange.textContent = data.exchange;
             marketCurrency.textContent = data.currency;
+
             const marketIsOpen = Boolean(data.marketOpen);
 
-marketStatus.textContent = marketIsOpen ? "Open" : "Closed";
-marketStatus.dataset.status = marketIsOpen ? "open" : "closed";
+            marketStatus.textContent =
+                marketIsOpen ? "Open" : "Closed";
+
+            marketStatus.dataset.status =
+                marketIsOpen ? "open" : "closed";
 
             marketResult.hidden = false;
+
+            await loadMarketHistory(symbol);
         } catch (error) {
             marketResult.hidden = false;
+
             marketName.textContent = "Unable to load market";
             marketDetails.textContent = error.message;
 
@@ -76,7 +159,9 @@ marketStatus.dataset.status = marketIsOpen ? "open" : "closed";
             marketExchange.textContent = "—";
             marketCurrency.textContent = "—";
             marketStatus.textContent = "—";
+
             marketStatus.removeAttribute("data-status");
+            chartSection.hidden = true;
         } finally {
             loadButton.disabled = false;
             loadButton.textContent = "Check Market";
@@ -100,7 +185,9 @@ marketStatus.dataset.status = marketIsOpen ? "open" : "closed";
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || "Unable to search markets");
+                throw new Error(
+                    data.error || "Unable to search markets"
+                );
             }
 
             suggestions.innerHTML = "";
@@ -110,6 +197,7 @@ marketStatus.dataset.status = marketIsOpen ? "open" : "closed";
 
                 button.type = "button";
                 button.className = "market-suggestion";
+
                 button.innerHTML = `
                     <strong>${market.symbol}</strong>
                     <span>${market.instrument_name} · ${market.exchange}</span>
@@ -144,6 +232,12 @@ marketStatus.dataset.status = marketIsOpen ? "open" : "closed";
         if (event.key === "Enter") {
             event.preventDefault();
             loadMarket();
+        }
+    });
+
+    window.addEventListener("resize", () => {
+        if (!chartSection.hidden) {
+            loadMarketHistory(symbolInput.value.trim().toUpperCase());
         }
     });
 });

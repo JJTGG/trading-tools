@@ -15,16 +15,31 @@ form.addEventListener("submit", async (event) => {
 
     message.textContent = "Creating your account...";
 
-    const { error } = await supabase.auth.signUp({
-        email,
-        password
-    });
+    try {
+        const { error } = await supabase.auth.signUp({
+            email,
+            password
+        });
 
-    if (error) {
-        console.error(error);
-        message.textContent = error.message;
-        return;
+        if (error) {
+            console.error("Signup error:", error);
+
+            const details = [
+                error.message,
+                error.code ? `Code: ${error.code}` : "",
+                error.status ? `Status: ${error.status}` : ""
+            ].filter(Boolean).join(" — ");
+
+            message.textContent = details;
+            return;
+        }
+
+        message.textContent =
+            "Account created. Check your email to confirm your account.";
+    } catch (error) {
+        console.error("Signup request failed:", error);
+
+        message.textContent =
+            `Signup request failed: ${error.message || "Unknown error"}`;
     }
-
-    message.textContent = "Account created. Check your email to confirm your account.";
-});
+});w

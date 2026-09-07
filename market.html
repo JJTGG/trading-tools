@@ -44,26 +44,24 @@
         </section>
 
         <section id="market-search">
+    <div>
+        <label for="market-symbol">Search Market</label>
+        <div>
+            <input
+                id="market-symbol"
+                type="text"
+                value="AAPL"
+                placeholder="Search a company, asset, or symbol"
+                autocomplete="off"
+            >
+            <button id="load-market" type="button">
+                Check Market
+            </button>
+        </div>
+    </div>
 
-            <div>
-                <label for="market-symbol">Search Market</label>
-
-                <div>
-                    <input
-                        id="market-symbol"
-                        type="text"
-                        value="AAPL"
-                        placeholder="AAPL"
-                        autocomplete="off"
-                    >
-
-                    <button id="load-market" type="button">
-                        Check Market
-                    </button>
-                </div>
-            </div>
-
-        </section>
+    <div id="market-suggestions" hidden></div>
+</section>
 
         <section id="market-result" hidden>
 

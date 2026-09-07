@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Calculate trade risk, reward, and risk-to-reward ratio."
+    >
+    <title>Risk/Reward Calculator — Trading Tools</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="risk-reward.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html">Trading Tools</a>
+
+            <div>
+                <a href="index.html">Home</a>
+                <a href="tools.html">Tools</a>
+                <a href="guide.html">Guide</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section>
+            <p>RISK MANAGEMENT</p>
+
+            <h1>Risk/Reward Calculator</h1>
+
+            <p>
+                Measure the potential risk and reward of a trade
+                before entering the position.
+            </p>
+        </section>
+
+        <section id="risk-reward-calculator">
+
+            <div>
+                <label for="risk-reward-direction">
+                    Direction
+                </label>
+
+                <select id="risk-reward-direction">
+                    <option value="long">Long</option>
+                    <option value="short">Short</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="risk-reward-entry">
+                    Entry Price
+                </label>
+
+                <input
+                    id="risk-reward-entry"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="100"
+                >
+            </div>
+
+            <div>
+                <label for="risk-reward-stop">
+                    Stop-Loss Price
+                </label>
+
+                <input
+                    id="risk-reward-stop"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="95"
+                >
+            </div>
+
+            <div>
+                <label for="risk-reward-target">
+                    Take-Profit Price
+                </label>
+
+                <input
+                    id="risk-reward-target"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="110"
+                >
+            </div>
+
+            <div>
+                <button
+                    id="calculate-risk-reward"
+                    type="button"
+                >
+                    Calculate Risk/Reward
+                </button>
+
+                <button
+                    id="reset-risk-reward"
+                    type="button"
+                >
+                    Reset
+                </button>
+            </div>
+
+            <div id="risk-reward-results">
+
+                <h2>Result</h2>
+
+                <p>
+                    Risk/Reward
+                    <strong id="risk-reward-ratio">—</strong>
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>Risk per Unit</dt>
+                        <dd id="risk-per-unit">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Reward per Unit</dt>
+                        <dd id="reward-per-unit">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Break-even Win Rate</dt>
+                        <dd id="breakeven-win-rate">—</dd>
+                    </div>
+                </dl>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Trading Tools</p>
+        <p>Understand. Calculate. Evaluate. Improve.</p>
+    </footer>
+
+</body>
+</html>

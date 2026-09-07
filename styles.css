@@ -791,3 +791,59 @@ footer p + p {
         padding: 7px 8px;
     }
 }
+
+#currency-converter {
+    max-width: 760px;
+    padding: 26px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+}
+
+#currency-converter > div {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+#currency-results {
+    margin-top: 28px;
+    padding-top: 26px;
+    border-top: 1px solid var(--border);
+}
+
+#currency-results > p {
+    margin: 0;
+    padding: 18px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+}
+
+#currency-results > p strong {
+    display: block;
+    margin-top: 3px;
+    font-size: 1.8rem;
+    line-height: 1.2;
+}
+
+#currency-results dl {
+    margin-top: 16px;
+}
+
+#currency-converter > div > button + button {
+    margin-left: 8px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+#currency-converter > div > button + button:hover {
+    background: var(--surface-alt);
+    border-color: #d3d7dc;
+}
+
+@media (max-width: 640px) {
+    #currency-converter {
+        padding: 20px;
+    }
+}

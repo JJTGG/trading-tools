@@ -621,3 +621,82 @@ footer p + p {
         font-size: 0.75rem;
     }
 }
+
+
+#market-result {
+    max-width: 760px;
+    padding: 26px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    background: var(--surface);
+}
+
+#market-result > div:first-child {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+#market-name {
+    margin: 0;
+
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+#market-details {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+#market-result > div:nth-child(2) {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+
+    margin-top: 20px;
+}
+
+#market-price {
+    font-size: 2.25rem;
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+}
+
+#market-change {
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+#market-result dl {
+    margin-top: 24px;
+}
+
+#market-result dd {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 760px) {
+    #market-result {
+        padding: 20px;
+    }
+
+    #market-result > div:first-child {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    #market-result > div:nth-child(2) {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    #market-price {
+        font-size: 2rem;
+    }
+}

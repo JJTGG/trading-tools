@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Calculate effective trading leverage and margin requirements."
+    >
+    <title>Leverage Calculator — Trading Tools</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="leverage.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html">Trading Tools</a>
+
+            <div>
+                <a href="index.html">Home</a>
+                <a href="tools.html">Tools</a>
+                <a href="guide.html">Guide</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section>
+            <p>RISK MANAGEMENT</p>
+
+            <h1>Leverage Calculator</h1>
+
+            <p>
+                Calculate effective leverage and understand how much
+                market exposure your capital is controlling.
+            </p>
+        </section>
+
+        <section id="leverage-calculator">
+
+            <div>
+                <label for="position-value">
+                    Position Value
+                </label>
+
+                <input
+                    id="position-value"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="10000"
+                >
+            </div>
+
+            <div>
+                <label for="account-equity">
+                    Account Equity
+                </label>
+
+                <input
+                    id="account-equity"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="1000"
+                >
+            </div>
+
+            <div>
+                <button
+                    id="calculate-leverage"
+                    type="button"
+                >
+                    Calculate Leverage
+                </button>
+
+                <button
+                    id="reset-leverage"
+                    type="button"
+                >
+                    Reset
+                </button>
+            </div>
+
+            <div id="leverage-results">
+
+                <h2>Result</h2>
+
+                <p>
+                    Effective Leverage
+                    <strong id="leverage-ratio">—</strong>
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>Position Value</dt>
+                        <dd id="leverage-position-value">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Account Equity</dt>
+                        <dd id="leverage-equity">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Margin Requirement</dt>
+                        <dd id="margin-requirement">—</dd>
+                    </div>
+                </dl>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Trading Tools</p>
+        <p>Understand. Calculate. Evaluate. Improve.</p>
+    </footer>
+
+</body>
+</html>

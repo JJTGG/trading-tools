@@ -43,10 +43,17 @@ document.addEventListener("DOMContentLoaded", () => {
             marketPrice.textContent =
                 `${data.currency} ${data.price.toLocaleString()}`;
 
-            const changeSign = data.change >= 0 ? "+" : "";
+            const changeSign = data.change > 0 ? "+" : "";
 
-            marketChange.textContent =
-                `${changeSign}${data.change.toFixed(2)} (${changeSign}${data.changePercent.toFixed(2)}%)`;
+marketChange.textContent =
+    `${changeSign}${data.change.toFixed(2)} (${changeSign}${data.changePercent.toFixed(2)}%)`;
+
+marketChange.style.color =
+    data.change > 0
+        ? "var(--positive)"
+        : data.change < 0
+            ? "var(--negative)"
+            : "var(--text-muted)";
 
             marketSymbol.textContent = data.symbol;
             marketExchange.textContent = data.exchange;
@@ -62,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             marketPrice.textContent = "—";
             marketChange.textContent = "—";
+            marketChange.style.color = "var(--text-muted)";
             marketSymbol.textContent = "—";
             marketExchange.textContent = "—";
             marketCurrency.textContent = "—";

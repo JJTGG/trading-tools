@@ -19,16 +19,42 @@ document.addEventListener("DOMContentLoaded", () => {
     const marketCurrency = document.querySelector("#market-currency");
     const marketStatus = document.querySelector("#market-status");
 
+    const marketOpen = document.querySelector("#market-open");
+    const marketPreviousClose =
+        document.querySelector("#market-previous-close");
+    const marketHigh = document.querySelector("#market-high");
+    const marketLow = document.querySelector("#market-low");
+    const marketVolume =
+        document.querySelector("#market-volume");
+    const marketAverageVolume =
+        document.querySelector("#market-average-volume");
+    const market52WeekHigh =
+        document.querySelector("#market-52w-high");
+    const market52WeekLow =
+        document.querySelector("#market-52w-low");
+
     let searchTimer;
     let currentSymbol = "";
     let currentInterval = "1day";
     let chartValues = [];
 
     const formatPrice = (value) => {
+        if (value == null || !Number.isFinite(Number(value))) {
+            return "—";
+        }
+
         return Number(value).toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
+    };
+
+    const formatVolume = (value) => {
+        if (value == null || !Number.isFinite(Number(value))) {
+            return "—";
+        }
+
+        return Number(value).toLocaleString();
     };
 
     const formatDate = (datetime) => {
@@ -110,9 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         };
 
-        /*
-         * Grid
-         */
         chartContext.lineWidth = 1;
         chartContext.strokeStyle = "#e2e5e9";
         chartContext.fillStyle = "#69707d";
@@ -149,9 +172,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
-        /*
-         * Date labels
-         */
         chartContext.textAlign = "center";
         chartContext.textBaseline = "top";
 
@@ -184,9 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
-        /*
-         * Chart line
-         */
         chartContext.beginPath();
 
         prices.forEach((price, index) => {
@@ -206,9 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
         chartContext.lineCap = "round";
         chartContext.stroke();
 
-        /*
-         * Latest price marker
-         */
         const latestPrice =
             prices[prices.length - 1];
 
@@ -230,9 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
         chartContext.fillStyle = "#2563eb";
         chartContext.fill();
 
-        /*
-         * Latest price label
-         */
         chartContext.fillStyle = "#111318";
         chartContext.font = "650 11px system-ui";
         chartContext.textAlign = "right";
@@ -274,6 +285,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    const resetMarketMetrics = () => {
+        marketOpen.textContent = "—";
+        marketPreviousClose.textContent = "—";
+        marketHigh.textContent = "—";
+        marketLow.textContent = "—";
+        marketVolume.textContent = "—";
+        marketAverageVolume.textContent = "—";
+        market52WeekHigh.textContent = "—";
+        market52WeekLow.textContent = "—";
+    };
+
     const loadMarket = async () => {
         const symbol =
             symbolInput.value.trim().toUpperCase();
@@ -307,7 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `${data.exchange} · ${data.currency}`;
 
             marketPrice.textContent =
-                `${data.currency} ${data.price.toLocaleString()}`;
+                `${data.currency} ${formatPrice(data.price)}`;
 
             const changeSign =
                 data.change > 0 ? "+" : "";
@@ -331,6 +353,30 @@ document.addEventListener("DOMContentLoaded", () => {
             marketCurrency.textContent =
                 data.currency;
 
+            marketOpen.textContent =
+                formatPrice(data.open);
+
+            marketPreviousClose.textContent =
+                formatPrice(data.previousClose);
+
+            marketHigh.textContent =
+                formatPrice(data.high);
+
+            marketLow.textContent =
+                formatPrice(data.low);
+
+            marketVolume.textContent =
+                formatVolume(data.volume);
+
+            marketAverageVolume.textContent =
+                formatVolume(data.averageVolume);
+
+            market52WeekHigh.textContent =
+                formatPrice(data.fiftyTwoWeek?.high);
+
+            market52WeekLow.textContent =
+                formatPrice(data.fiftyTwoWeek?.low);
+
             const marketIsOpen =
                 Boolean(data.marketOpen);
 
@@ -346,10 +392,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             marketResult.hidden = false;
 
-            /*
-             * Load the currently selected timeframe
-             * instead of always falling back to 1D.
-             */
             await loadMarketHistory(
                 symbol,
                 currentInterval
@@ -377,6 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 "data-status"
             );
 
+            resetMarketMetrics();
             chartSection.hidden = true;
         } finally {
             loadButton.disabled = false;
@@ -458,9 +501,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    /*
-     * Timeframe controls
-     */
     timeframeButtons.forEach((button) => {
         button.addEventListener(
             "click",
@@ -487,9 +527,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     });
 
-    /*
-     * Make the first timeframe active on load.
-     */
     const activeTimeframe =
         document.querySelector(
             "#market-timeframes button.active"
@@ -545,10 +582,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     );
 
-    /*
-     * Redraw the existing data on resize.
-     * Do NOT fetch 1D again.
-     */
     window.addEventListener(
         "resize",
         () => {

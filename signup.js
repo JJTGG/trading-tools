@@ -6,6 +6,12 @@ form.addEventListener("submit", async (event) => {
 
     const email = document.getElementById("signup-email").value.trim();
     const password = document.getElementById("signup-password").value;
+    const confirmPassword = document.getElementById("signup-confirm-password").value;
+
+    if (password !== confirmPassword) {
+        message.textContent = "Passwords do not match.";
+        return;
+    }
 
     message.textContent = "Creating your account...";
 
@@ -15,6 +21,7 @@ form.addEventListener("submit", async (event) => {
     });
 
     if (error) {
+        console.error(error);
         message.textContent = error.message;
         return;
     }

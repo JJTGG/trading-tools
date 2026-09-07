@@ -33,7 +33,9 @@ export default async function handler(request, response) {
 
         if (data.status === "error") {
             return response.status(400).json({
-                error: data.message || "Unable to retrieve market data"
+                error:
+                    data.message ||
+                    "Unable to retrieve market data"
             });
         }
 
@@ -51,7 +53,14 @@ export default async function handler(request, response) {
             high: Number(data.high),
             low: Number(data.low),
             previousClose: Number(data.previous_close),
+
             volume: Number(data.volume),
+            averageVolume: Number(data.average_volume),
+
+            fiftyTwoWeek: {
+                low: Number(data.fifty_two_week?.low),
+                high: Number(data.fifty_two_week?.high)
+            },
 
             marketOpen: Boolean(data.is_market_open)
         });

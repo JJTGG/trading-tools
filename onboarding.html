@@ -44,13 +44,27 @@
 
                 <div class="form-group">
                     <label for="markets-traded">What do you trade?</label>
-                    <select id="markets-traded" name="markets-traded" required>
-                        <option value="">Select a market</option>
-                        <option value="crypto">Crypto</option>
-                        <option value="forex">Forex</option>
-                        <option value="stocks">Stocks</option>
-                        <option value="multiple">Multiple markets</option>
-                    </select>
+                    <div class="market-options">
+    <label>
+        <input type="checkbox" name="markets-traded" value="crypto">
+        Crypto
+    </label>
+
+    <label>
+        <input type="checkbox" name="markets-traded" value="forex">
+        Forex
+    </label>
+
+    <label>
+        <input type="checkbox" name="markets-traded" value="stocks">
+        Stocks
+    </label>
+
+    <label>
+        <input type="checkbox" name="markets-traded" value="commodities">
+        Commodities
+    </label>
+</div>
                 </div>
 
                 <div class="form-group">

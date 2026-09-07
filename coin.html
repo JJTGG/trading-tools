@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="View cryptocurrency prices, market changes, volume, and trading information."
+    >
+    <title>Coin Viewer — Trading Tools</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="coin.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html">Trading Tools</a>
+
+            <div>
+                <a href="index.html">Home</a>
+                <a href="tools.html">Tools</a>
+                <a href="guide.html">Guide</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section>
+            <p>MARKET TOOL</p>
+
+            <h1>Coin Viewer</h1>
+
+            <p>
+                View current cryptocurrency prices, market changes,
+                volume, and trading information.
+            </p>
+        </section>
+
+        <section id="coin-search">
+            <div>
+                <label for="coin-symbol">Coin</label>
+
+                <div>
+                    <input
+                        id="coin-symbol"
+                        type="text"
+                        value="BTC"
+                        placeholder="BTC"
+                        autocomplete="off"
+                    >
+
+                    <button id="load-coin" type="button">
+                        View Coin
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="coin-result" hidden>
+
+            <div>
+                <p>CRYPTOCURRENCY</p>
+                <h2 id="coin-name">—</h2>
+                <p id="coin-details">—</p>
+            </div>
+
+            <div>
+                <strong id="coin-price">—</strong>
+                <p id="coin-change">—</p>
+            </div>
+
+            <dl>
+                <div>
+                    <dt>Symbol</dt>
+                    <dd id="coin-symbol-result">—</dd>
+                </div>
+
+                <div>
+                    <dt>Exchange</dt>
+                    <dd id="coin-exchange">—</dd>
+                </div>
+
+                <div>
+                    <dt>Currency</dt>
+                    <dd id="coin-currency">—</dd>
+                </div>
+
+                <div>
+                    <dt>Open</dt>
+                    <dd id="coin-open">—</dd>
+                </div>
+
+                <div>
+                    <dt>High</dt>
+                    <dd id="coin-high">—</dd>
+                </div>
+
+                <div>
+                    <dt>Low</dt>
+                    <dd id="coin-low">—</dd>
+                </div>
+
+                <div>
+                    <dt>Previous Close</dt>
+                    <dd id="coin-previous-close">—</dd>
+                </div>
+
+                <div>
+                    <dt>Volume</dt>
+                    <dd id="coin-volume">—</dd>
+                </div>
+            </dl>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Trading Tools</p>
+        <p>Understand. Calculate. Evaluate. Improve.</p>
+    </footer>
+
+</body>
+</html>

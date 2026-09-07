@@ -3,9 +3,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadButton = document.querySelector("#load-market");
     const suggestions = document.querySelector("#market-suggestions");
     const marketResult = document.querySelector("#market-result");
+
     const chartSection = document.querySelector("#market-chart-section");
     const chartCanvas = document.querySelector("#market-chart-canvas");
     const chartContext = chartCanvas.getContext("2d");
+    const timeframeButtons =
+        document.querySelectorAll("#market-timeframes button");
 
     const marketName = document.querySelector("#market-name");
     const marketDetails = document.querySelector("#market-details");
@@ -17,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const marketStatus = document.querySelector("#market-status");
 
     let searchTimer;
+    let currentSymbol = "";
 
     const drawChart = (values) => {
         const rect = chartCanvas.getBoundingClientRect();
@@ -68,10 +72,13 @@ document.addEventListener("DOMContentLoaded", () => {
         chartContext.stroke();
     };
 
-    const loadMarketHistory = async (symbol) => {
+    const loadMarketHistory = async (
+        symbol,
+        interval = "1day"
+    ) => {
         try {
             const response = await fetch(
-                `/api/time-series?symbol=${encodeURIComponent(symbol)}&interval=1day`
+                `/api/time-series?symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}`
             );
 
             const data = await response.json();
@@ -95,6 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!symbol) {
             return;
         }
+
+        currentSymbol = symbol;
 
         loadButton.disabled = true;
         loadButton.textContent = "Loading...";
@@ -213,31 +222,63 @@ document.addEventListener("DOMContentLoaded", () => {
                 suggestions.appendChild(button);
             });
 
-            suggestions.hidden = data.results.length === 0;
+            suggestions.hidden =
+                data.results.length === 0;
         } catch {
             suggestions.hidden = true;
             suggestions.innerHTML = "";
         }
     };
 
+    timeframeButtons.forEach((button) => {
+        button.addEventListener("click", async () => {
+            if (!currentSymbol) {
+                return;
+            }
+
+            timeframeButtons.forEach((item) => {
+                item.classList.remove("active");
+            });
+
+            button.classList.add("active");
+
+            await loadMarketHistory(
+                currentSymbol,
+                button.dataset.interval
+            );
+        });
+    });
+
     symbolInput.addEventListener("input", () => {
         clearTimeout(searchTimer);
 
-        searchTimer = setTimeout(searchMarkets, 300);
+        searchTimer = setTimeout(
+            searchMarkets,
+            300
+        );
     });
 
-    loadButton.addEventListener("click", loadMarket);
+    loadButton.addEventListener(
+        "click",
+        loadMarket
+    );
 
-    symbolInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            loadMarket();
+    symbolInput.addEventListener(
+        "keydown",
+        (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                loadMarket();
+            }
         }
-    });
+    );
 
-    window.addEventListener("resize", () => {
-        if (!chartSection.hidden) {
-            loadMarketHistory(symbolInput.value.trim().toUpperCase());
+    window.addEventListener(
+        "resize",
+        () => {
+            if (!chartSection.hidden && currentSymbol) {
+                loadMarketHistory(currentSymbol);
+            }
         }
-    });
+    );
 });

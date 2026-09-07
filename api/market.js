@@ -38,15 +38,23 @@ export default async function handler(request, response) {
         }
 
         return response.status(200).json({
-    symbol: data.symbol,
-    name: data.name,
-    exchange: data.exchange,
-    currency: data.currency,
-    price: Number(data.close),
-    change: Number(data.change),
-    changePercent: Number(data.percent_change),
-    marketOpen: data.is_market_open
-});
+            symbol: data.symbol,
+            name: data.name,
+            exchange: data.exchange,
+            currency: data.currency,
+
+            price: Number(data.close),
+            change: Number(data.change),
+            changePercent: Number(data.percent_change),
+
+            open: Number(data.open),
+            high: Number(data.high),
+            low: Number(data.low),
+            previousClose: Number(data.previous_close),
+            volume: Number(data.volume),
+
+            marketOpen: Boolean(data.is_market_open)
+        });
     } catch {
         return response.status(500).json({
             error: "Unable to retrieve market data"

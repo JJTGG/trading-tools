@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Convert currencies using live exchange rates."
+    >
+    <title>Currency Converter — Trading Tools</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="currency.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Trading Tools</a>
+            <div>
+                <a href="index.html">Home</a>
+                <a href="tools.html">Tools</a>
+                <a href="guide.html">Guide</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <p>TRADING TOOL</p>
+            <h1>Currency Converter</h1>
+            <p>
+                Convert between currencies using current exchange rates.
+            </p>
+        </section>
+
+        <section id="currency-converter">
+            <div>
+                <label for="currency-amount">Amount</label>
+                <input
+                    id="currency-amount"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="100"
+                >
+            </div>
+
+            <div>
+                <label for="from-currency">From</label>
+                <input
+                    id="from-currency"
+                    type="text"
+                    value="USD"
+                    maxlength="3"
+                    placeholder="USD"
+                >
+            </div>
+
+            <div>
+                <label for="to-currency">To</label>
+                <input
+                    id="to-currency"
+                    type="text"
+                    value="EUR"
+                    maxlength="3"
+                    placeholder="EUR"
+                >
+            </div>
+
+            <div>
+                <button id="convert-currency" type="button">
+                    Convert
+                </button>
+                <button id="reset-currency" type="button">
+                    Reset
+                </button>
+            </div>
+
+            <div id="currency-results">
+                <h2>Result</h2>
+
+                <p>
+                    Converted Amount
+                    <strong id="converted-amount">—</strong>
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>Exchange Rate</dt>
+                        <dd id="currency-rate">—</dd>
+                    </div>
+
+                    <div>
+                        <dt>Pair</dt>
+                        <dd id="currency-pair">—</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Trading Tools</p>
+        <p>Understand. Calculate. Evaluate. Improve.</p>
+    </footer>
+</body>
+</html>

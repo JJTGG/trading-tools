@@ -58,8 +58,10 @@ marketChange.style.color =
             marketSymbol.textContent = data.symbol;
             marketExchange.textContent = data.exchange;
             marketCurrency.textContent = data.currency;
-            marketStatus.textContent =
-                data.marketOpen ? "Open" : "Closed";
+            const marketIsOpen = Boolean(data.marketOpen);
+
+marketStatus.textContent = marketIsOpen ? "Open" : "Closed";
+marketStatus.dataset.status = marketIsOpen ? "open" : "closed";
 
             marketResult.hidden = false;
         } catch (error) {
@@ -74,6 +76,7 @@ marketChange.style.color =
             marketExchange.textContent = "—";
             marketCurrency.textContent = "—";
             marketStatus.textContent = "—";
+            marketStatus.removeAttribute("data-status");
         } finally {
             loadButton.disabled = false;
             loadButton.textContent = "Check Market";

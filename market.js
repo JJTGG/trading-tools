@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const symbolInput = document.querySelector("#market-symbol");
     const loadButton = document.querySelector("#load-market");
+    const suggestions = document.querySelector("#market-suggestions");
     const marketResult = document.querySelector("#market-result");
 
     const marketName = document.querySelector("#market-name");
@@ -11,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const marketExchange = document.querySelector("#market-exchange");
     const marketCurrency = document.querySelector("#market-currency");
     const marketStatus = document.querySelector("#market-status");
+
+    let searchTimer;
 
     const loadMarket = async () => {
         const symbol = symbolInput.value.trim().toUpperCase();
@@ -69,10 +72,66 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    const searchMarkets = async () => {
+        const query = symbolInput.value.trim();
+
+        if (query.length < 2) {
+            suggestions.hidden = true;
+            suggestions.innerHTML = "";
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/search?query=${encodeURIComponent(query)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Unable to search markets");
+            }
+
+            suggestions.innerHTML = "";
+
+            data.results.slice(0, 6).forEach((market) => {
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.className = "market-suggestion";
+                button.innerHTML = `
+                    <strong>${market.symbol}</strong>
+                    <span>${market.instrument_name} · ${market.exchange}</span>
+                `;
+
+                button.addEventListener("click", () => {
+                    symbolInput.value = market.symbol;
+                    suggestions.hidden = true;
+                    suggestions.innerHTML = "";
+                    loadMarket();
+                });
+
+                suggestions.appendChild(button);
+            });
+
+            suggestions.hidden = data.results.length === 0;
+        } catch {
+            suggestions.hidden = true;
+            suggestions.innerHTML = "";
+        }
+    };
+
+    symbolInput.addEventListener("input", () => {
+        clearTimeout(searchTimer);
+
+        searchTimer = setTimeout(searchMarkets, 300);
+    });
+
     loadButton.addEventListener("click", loadMarket);
 
     symbolInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
+            event.preventDefault();
             loadMarket();
         }
     });

@@ -679,6 +679,18 @@ footer p + p {
     font-size: 0.9rem;
 }
 
+#market-status {
+    font-weight: 650;
+}
+
+#market-status[data-status="open"] {
+    color: var(--positive);
+}
+
+#market-status[data-status="closed"] {
+    color: var(--text-muted);
+}
+
 @media (max-width: 760px) {
     #market-result {
         padding: 20px;

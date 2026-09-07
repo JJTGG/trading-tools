@@ -16,7 +16,7 @@ form.addEventListener("submit", async (event) => {
     message.textContent = "Creating your account...";
 
     try {
-        const { error } = await supabase.auth.signUp({
+        const { error } = await supabaseClient.auth.signUp({
             email,
             password
         });

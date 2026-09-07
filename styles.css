@@ -979,3 +979,55 @@ footer p + p {
         padding: 20px;
     }
 }
+
+ #leverage-calculator {
+    max-width: 760px;
+    padding: 26px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+}
+
+#leverage-calculator > div {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+#leverage-results {
+    margin-top: 28px;
+    padding-top: 26px;
+    border-top: 1px solid var(--border);
+}
+
+#leverage-results > p {
+    margin: 0;
+    padding: 18px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+}
+
+#leverage-results > p strong {
+    display: block;
+    margin-top: 3px;
+    font-size: 1.8rem;
+    line-height: 1.2;
+}
+
+#leverage-calculator > div > button + button {
+    margin-left: 8px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+#leverage-calculator > div > button + button:hover {
+    background: var(--surface-alt);
+    border-color: #d3d7dc;
+}
+
+@media (max-width: 640px) {
+    #leverage-calculator {
+        padding: 20px;
+    }
+}

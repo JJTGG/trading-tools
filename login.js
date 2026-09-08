@@ -25,7 +25,7 @@ form.addEventListener("submit", async (event) => {
 
         const { data: profile, error: profileError } = await supabaseClient
             .from("profiles")
-            .select("onboarding_completed")
+            .select("onboarding_completed, workspace_preferences")
             .eq("id", user.id)
             .maybeSingle();
 
@@ -35,14 +35,22 @@ form.addEventListener("submit", async (event) => {
             return;
         }
 
-        message.textContent = "Signed in successfully.";
-
         if (!profile || !profile.onboarding_completed) {
             window.location.href = "onboarding.html";
             return;
         }
 
-        window.location.href = "index.html";
+        const preferences = profile.workspace_preferences || {};
+        const defaultPage = preferences.default_page || "workspace";
+
+        message.textContent = "Signed in successfully.";
+
+        if (defaultPage === "tools") {
+            window.location.href = "tools.html";
+            return;
+        }
+
+        window.location.href = "workspace.html";
     } catch (error) {
         console.error("Login request failed:", error);
         message.textContent =

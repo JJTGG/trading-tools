@@ -1147,3 +1147,15 @@ main > section:nth-child(3) li {
         padding: 18px 20px;
     }
 }
+
+    body[data-workspace-density="compact"] .workspace-card,
+body[data-workspace-density="compact"] .workspace-section {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+body[data-workspace-density="compact"] .saved-calculation,
+body[data-workspace-density="compact"] .watchlist-item {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+}

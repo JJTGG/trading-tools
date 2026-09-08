@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace — Trading Tools</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="workspace-header">
+        <a href="index.html" class="auth-brand">Trading Tools</a>
+
+        <div class="workspace-account">
+            <span id="workspace-user">Loading...</span>
+            <button id="logout-button" type="button">Sign out</button>
+        </div>
+    </header>
+
+    <main class="workspace-page">
+        <section class="workspace-intro">
+            <p class="eyebrow">Personal Workspace</p>
+            <h1>Welcome back, <span id="workspace-name">Trader</span>.</h1>
+            <p>Your trading tools, saved work, and market activity in one place.</p>
+        </section>
+
+        <section class="workspace-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Quick actions</p>
+                    <h2>Tools</h2>
+                </div>
+            </div>
+
+            <div class="workspace-tools">
+                <a href="pnl-calculator.html">PnL Calculator</a>
+                <a href="position-size.html">Position Size</a>
+                <a href="risk-reward.html">Risk / Reward</a>
+                <a href="leverage.html">Leverage</a>
+            </div>
+        </section>
+
+        <section class="workspace-grid">
+            <div class="workspace-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Your work</p>
+                        <h2>Saved calculations</h2>
+                    </div>
+                </div>
+
+                <div id="saved-calculations">
+                    <p class="empty-state">No saved calculations yet.</p>
+                </div>
+            </div>
+
+            <div class="workspace-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Markets</p>
+                        <h2>Watchlist</h2>
+                    </div>
+                </div>
+
+                <div id="watchlist">
+                    <p class="empty-state">Your watchlist is empty.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="workspace.js"></script>
+</body>
+</html>

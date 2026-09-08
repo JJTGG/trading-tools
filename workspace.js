@@ -1,6 +1,7 @@
 const userName = document.getElementById("workspace-name");
 const userEmail = document.getElementById("workspace-user");
 const logoutButton = document.getElementById("logout-button");
+const savedCalculations = document.getElementById("saved-calculations");
 
 async function loadWorkspace() {
     const {
@@ -32,6 +33,60 @@ async function loadWorkspace() {
     }
 
     userName.textContent = profile.display_name || "Trader";
+
+    await loadSavedCalculations(user.id);
+}
+
+async function loadSavedCalculations(userId) {
+    const { data, error } = await supabaseClient
+        .from("saved_calculations")
+        .select("id, tool, inputs, result, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+    if (error) {
+        console.error("Saved calculations error:", error);
+        savedCalculations.innerHTML =
+            '<p class="empty-state">Unable to load saved calculations.</p>';
+        return;
+    }
+
+    if (!data.length) {
+        savedCalculations.innerHTML =
+            '<p class="empty-state">No saved calculations yet.</p>';
+        return;
+    }
+
+    savedCalculations.innerHTML = data.map((calculation) => `
+        <div class="saved-calculation">
+            <strong>${formatToolName(calculation.tool)}</strong>
+            <span>${formatCalculationResult(calculation.result)}</span>
+        </div>
+    `).join("");
+}
+
+function formatToolName(tool) {
+    return tool
+        .replace(/[-_]/g, " ")
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function formatCalculationResult(result) {
+    if (!result || typeof result !== "object") {
+        return "Saved calculation";
+    }
+
+    const entries = Object.entries(result);
+
+    if (!entries.length) {
+        return "Saved calculation";
+    }
+
+    return entries
+        .slice(0, 2)
+        .map(([key, value]) => `${formatToolName(key)}: ${value}`)
+        .join(" · ");
 }
 
 logoutButton.addEventListener("click", async () => {

@@ -10,10 +10,11 @@ form.addEventListener("submit", async (event) => {
     message.textContent = "Signing you in...";
 
     try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+                email,
+                password
+            });
 
         if (error) {
             console.error("Login error:", error);
@@ -23,15 +24,17 @@ form.addEventListener("submit", async (event) => {
 
         const user = data.user;
 
-        const { data: profile, error: profileError } = await supabaseClient
-            .from("profiles")
-            .select("onboarding_completed, workspace_preferences")
-            .eq("id", user.id)
-            .maybeSingle();
+        const { data: profile, error: profileError } =
+            await supabaseClient
+                .from("profiles")
+                .select("onboarding_completed")
+                .eq("id", user.id)
+                .maybeSingle();
 
         if (profileError) {
             console.error("Profile lookup error:", profileError);
-            message.textContent = "Signed in, but we couldn't load your workspace.";
+            message.textContent =
+                "Signed in, but we couldn't load your workspace.";
             return;
         }
 
@@ -40,19 +43,13 @@ form.addEventListener("submit", async (event) => {
             return;
         }
 
-        const preferences = profile.workspace_preferences || {};
-        const defaultPage = preferences.default_page || "workspace";
-
         message.textContent = "Signed in successfully.";
 
-        if (defaultPage === "tools") {
-            window.location.href = "tools.html";
-            return;
-        }
-
         window.location.href = "workspace.html";
+
     } catch (error) {
         console.error("Login request failed:", error);
+
         message.textContent =
             `Login request failed: ${error.message || "Unknown error"}`;
     }

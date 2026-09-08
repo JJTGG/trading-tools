@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const size = document.querySelector("#pnl-size");
     const fees = document.querySelector("#pnl-fees");
     const calculateButton = document.querySelector("#calculate-pnl");
+    const resetButton = document.querySelector("#reset-pnl");
+    const saveButton = document.querySelector("#save-pnl");
+    const saveMessage = document.querySelector("#pnl-save-message");
 
     const result = document.querySelector("#pnl-result");
     const priceDifference = document.querySelector("#pnl-price-difference");
@@ -18,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const feesResult = document.querySelector("#pnl-fees-result");
     const net = document.querySelector("#pnl-net");
     const returnValue = document.querySelector("#pnl-return");
+
+    let lastCalculation = null;
 
     const formatNumber = (value) => {
         return new Intl.NumberFormat(undefined, {
@@ -47,6 +52,10 @@ document.addEventListener("DOMContentLoaded", () => {
             net.textContent = "—";
             returnValue.textContent = "—";
 
+            lastCalculation = null;
+            saveButton.disabled = true;
+            saveMessage.textContent = "";
+
             return;
         }
 
@@ -72,24 +81,91 @@ document.addEventListener("DOMContentLoaded", () => {
         returnValue.textContent = `${formatNumber(percentageReturn)}%`;
 
         result.textContent = formatNumber(netPnL);
+
+        lastCalculation = {
+            inputs: {
+                direction: direction.value,
+                entryPrice,
+                exitPrice,
+                positionSize,
+                fees: totalFees
+            },
+            result: {
+                priceDifference: difference,
+                grossPnL,
+                fees: totalFees,
+                netPnL,
+                percentageReturn
+            }
+        };
+
+        saveButton.disabled = false;
+        saveMessage.textContent = "";
     };
 
-    const resetButton = document.querySelector("#reset-pnl");
+    resetButton.addEventListener("click", () => {
+        direction.value = "long";
+        entry.value = "";
+        exit.value = "";
+        size.value = "";
+        fees.value = "0";
 
-resetButton.addEventListener("click", () => {
-    direction.value = "long";
-    entry.value = "";
-    exit.value = "";
-    size.value = "";
-    fees.value = "0";
+        result.textContent = "—";
+        priceDifference.textContent = "—";
+        gross.textContent = "—";
+        feesResult.textContent = "—";
+        net.textContent = "—";
+        returnValue.textContent = "—";
 
-    result.textContent = "—";
-    priceDifference.textContent = "—";
-    gross.textContent = "—";
-    feesResult.textContent = "—";
-    net.textContent = "—";
-    returnValue.textContent = "—";
-});
+        lastCalculation = null;
+        saveButton.disabled = true;
+        saveMessage.textContent = "";
+    });
+
+    saveButton.addEventListener("click", async () => {
+        if (!lastCalculation) {
+            return;
+        }
+
+        saveButton.disabled = true;
+        saveMessage.textContent = "Saving...";
+
+        try {
+            const {
+                data: { user },
+                error: userError
+            } = await supabaseClient.auth.getUser();
+
+            if (userError || !user) {
+                saveMessage.textContent = "Sign in to save calculations.";
+                saveButton.disabled = false;
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from("saved_calculations")
+                .insert({
+                    user_id: user.id,
+                    tool: "pnl-calculator",
+                    inputs: lastCalculation.inputs,
+                    result: lastCalculation.result
+                });
+
+            if (error) {
+                console.error("Save calculation error:", error);
+                saveMessage.textContent = "Unable to save calculation.";
+                saveButton.disabled = false;
+                return;
+            }
+
+            saveMessage.textContent = "Calculation saved.";
+        } catch (error) {
+            console.error("Save calculation request failed:", error);
+            saveMessage.textContent =
+                `Save failed: ${error.message || "Unknown error"}`;
+            saveButton.disabled = false;
+        }
+    });
 
     calculateButton.addEventListener("click", calculatePnL);
 

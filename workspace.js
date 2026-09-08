@@ -2,6 +2,7 @@ const userName = document.getElementById("workspace-name");
 const userEmail = document.getElementById("workspace-user");
 const logoutButton = document.getElementById("logout-button");
 const savedCalculations = document.getElementById("saved-calculations");
+const watchlist = document.getElementById("watchlist");
 
 async function loadWorkspace() {
     const {
@@ -35,6 +36,7 @@ async function loadWorkspace() {
     userName.textContent = profile.display_name || "Trader";
 
     await loadSavedCalculations(user.id);
+    await loadWatchlist(user.id);
 }
 
 async function loadSavedCalculations(userId) {
@@ -81,6 +83,36 @@ async function loadSavedCalculations(userId) {
     });
 }
 
+async function loadWatchlist(userId) {
+    const { data, error } = await supabaseClient
+        .from("watchlist_items")
+        .select("id, symbol, asset_type, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("Watchlist error:", error);
+        watchlist.innerHTML =
+            '<p class="empty-state">Unable to load watchlist.</p>';
+        return;
+    }
+
+    if (!data.length) {
+        watchlist.innerHTML =
+            '<p class="empty-state">Your watchlist is empty.</p>';
+        return;
+    }
+
+    watchlist.innerHTML = data.map((item) => `
+        <div class="watchlist-item">
+            <div>
+                <strong>${item.symbol}</strong>
+                <span>${formatToolName(item.asset_type)}</span>
+            </div>
+        </div>
+    `).join("");
+}
+
 async function deleteCalculation(id) {
     const button = savedCalculations.querySelector(
         `.delete-calculation[data-id="${id}"]`
@@ -114,8 +146,8 @@ async function deleteCalculation(id) {
     }
 }
 
-function formatToolName(tool) {
-    return tool
+function formatToolName(value) {
+    return value
         .replace(/[-_]/g, " ")
         .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }

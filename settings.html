@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings — Trading Tools</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="workspace-header">
+        <a href="index.html" class="auth-brand">Trading Tools</a>
+
+        <div class="workspace-account">
+            <a href="workspace.html">Workspace</a>
+            <button id="logout-button" type="button">Sign out</button>
+        </div>
+    </header>
+
+    <main class="workspace-page">
+        <section class="workspace-intro">
+            <p class="eyebrow">Account</p>
+            <h1>Settings</h1>
+            <p>Manage your personal Trading Tools preferences.</p>
+        </section>
+
+        <section class="workspace-card settings-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Profile</p>
+                    <h2>Personal details</h2>
+                </div>
+            </div>
+
+            <form id="settings-form">
+                <div class="form-group">
+                    <label for="display-name">Display name</label>
+                    <input
+                        type="text"
+                        id="display-name"
+                        maxlength="50"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="preferred-currency">Preferred currency</label>
+                    <select id="preferred-currency" required>
+                        <option value="USD">USD — US Dollar</option>
+                        <option value="EUR">EUR — Euro</option>
+                        <option value="GBP">GBP — British Pound</option>
+                        <option value="NGN">NGN — Nigerian Naira</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Markets traded</label>
+
+                    <div class="market-options">
+                        <label>
+                            <input type="checkbox" name="markets-traded" value="crypto">
+                            Crypto
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="markets-traded" value="forex">
+                            Forex
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="markets-traded" value="stocks">
+                            Stocks
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="markets-traded" value="commodities">
+                            Commodities
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="experience-level">Experience level</label>
+                    <select id="experience-level" required>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="primary-button">
+                    Save changes
+                </button>
+
+                <p id="settings-message" class="form-message"></p>
+            </form>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>

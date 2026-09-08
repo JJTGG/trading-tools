@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Preferences — Trading Tools</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="workspace-header">
+        <a href="index.html" class="auth-brand">Trading Tools</a>
+
+        <div class="workspace-account">
+            <a href="workspace.html">Workspace</a>
+            <button id="logout-button" type="button">Sign out</button>
+        </div>
+    </header>
+
+    <main class="workspace-page">
+        <section class="workspace-intro">
+            <p class="eyebrow">Workspace</p>
+            <h1>Preferences</h1>
+            <p>Customize how your Trading Tools workspace behaves.</p>
+        </section>
+
+        <section class="workspace-card settings-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Personalization</p>
+                    <h2>Workspace behavior</h2>
+                </div>
+            </div>
+
+            <form id="preferences-form">
+                <div class="form-group">
+                    <label for="workspace-density">Workspace density</label>
+                    <select id="workspace-density">
+                        <option value="comfortable">Comfortable</option>
+                        <option value="compact">Compact</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="default-page">Default landing page</label>
+                    <select id="default-page">
+                        <option value="workspace">Workspace</option>
+                        <option value="tools">Tools</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="primary-button">
+                    Save preferences
+                </button>
+
+                <p id="preferences-message" class="form-message"></p>
+            </form>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="preferences.js"></script>
+</body>
+</html>

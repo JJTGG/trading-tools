@@ -3,6 +3,10 @@ const userEmail = document.getElementById("workspace-user");
 const logoutButton = document.getElementById("logout-button");
 const savedCalculations = document.getElementById("saved-calculations");
 const watchlist = document.getElementById("watchlist");
+const watchlistForm = document.getElementById("watchlist-form");
+const watchlistMessage = document.getElementById("watchlist-message");
+
+let currentUser = null;
 
 async function loadWorkspace() {
     const {
@@ -15,6 +19,7 @@ async function loadWorkspace() {
         return;
     }
 
+    currentUser = user;
     userEmail.textContent = user.email;
 
     const { data: profile, error: profileError } = await supabaseClient
@@ -109,8 +114,81 @@ async function loadWatchlist(userId) {
                 <strong>${item.symbol}</strong>
                 <span>${formatToolName(item.asset_type)}</span>
             </div>
+            <button
+                type="button"
+                class="delete-watchlist"
+                data-id="${item.id}"
+            >
+                Remove
+            </button>
         </div>
     `).join("");
+
+    watchlist.querySelectorAll(".delete-watchlist").forEach((button) => {
+        button.addEventListener("click", () => {
+            removeWatchlistItem(button.dataset.id);
+        });
+    });
+}
+
+async function addWatchlistItem(event) {
+    event.preventDefault();
+
+    if (!currentUser) {
+        return;
+    }
+
+    const symbolInput = document.getElementById("watchlist-symbol");
+    const typeInput = document.getElementById("watchlist-type");
+
+    const symbol = symbolInput.value.trim().toUpperCase();
+    const assetType = typeInput.value;
+
+    if (!symbol) {
+        return;
+    }
+
+    watchlistMessage.textContent = "Adding...";
+
+    const { error } = await supabaseClient
+        .from("watchlist_items")
+        .insert({
+            user_id: currentUser.id,
+            symbol,
+            asset_type: assetType
+        });
+
+    if (error) {
+        console.error("Add watchlist error:", error);
+
+        if (error.code === "23505") {
+            watchlistMessage.textContent =
+                "That symbol is already on your watchlist.";
+        } else {
+            watchlistMessage.textContent = "Unable to add that symbol.";
+        }
+
+        return;
+    }
+
+    symbolInput.value = "";
+    watchlistMessage.textContent = "Added to your watchlist.";
+
+    await loadWatchlist(currentUser.id);
+}
+
+async function removeWatchlistItem(id) {
+    const { error } = await supabaseClient
+        .from("watchlist_items")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.error("Remove watchlist error:", error);
+        return;
+    }
+
+    await loadWatchlist(currentUser.id);
 }
 
 async function deleteCalculation(id) {
@@ -137,13 +215,7 @@ async function deleteCalculation(id) {
         return;
     }
 
-    const {
-        data: { user }
-    } = await supabaseClient.auth.getUser();
-
-    if (user) {
-        await loadSavedCalculations(user.id);
-    }
+    await loadSavedCalculations(currentUser.id);
 }
 
 function formatToolName(value) {
@@ -168,6 +240,8 @@ function formatCalculationResult(result) {
         .map(([key, value]) => `${formatToolName(key)}: ${value}`)
         .join(" · ");
 }
+
+watchlistForm.addEventListener("submit", addWatchlistItem);
 
 logoutButton.addEventListener("click", async () => {
     logoutButton.disabled = true;

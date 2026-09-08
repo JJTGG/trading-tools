@@ -3,6 +3,7 @@ const userEmail = document.getElementById("workspace-user");
 const logoutButton = document.getElementById("logout-button");
 const savedCalculations = document.getElementById("saved-calculations");
 const watchlist = document.getElementById("watchlist");
+
 const watchlistForm = document.getElementById("watchlist-form");
 const watchlistMessage = document.getElementById("watchlist-message");
 
@@ -24,7 +25,9 @@ async function loadWorkspace() {
 
     const { data: profile, error: profileError } = await supabaseClient
         .from("profiles")
-        .select("display_name, onboarding_completed")
+        .select(
+            "display_name, onboarding_completed, workspace_preferences"
+        )
         .eq("id", user.id)
         .maybeSingle();
 
@@ -40,8 +43,18 @@ async function loadWorkspace() {
 
     userName.textContent = profile.display_name || "Trader";
 
+    applyWorkspacePreferences(
+        profile.workspace_preferences || {}
+    );
+
     await loadSavedCalculations(user.id);
     await loadWatchlist(user.id);
+}
+
+function applyWorkspacePreferences(preferences) {
+    const density = preferences.density || "comfortable";
+
+    document.body.dataset.workspaceDensity = density;
 }
 
 async function loadSavedCalculations(userId) {
@@ -54,14 +67,17 @@ async function loadSavedCalculations(userId) {
 
     if (error) {
         console.error("Saved calculations error:", error);
+
         savedCalculations.innerHTML =
             '<p class="empty-state">Unable to load saved calculations.</p>';
+
         return;
     }
 
     if (!data.length) {
         savedCalculations.innerHTML =
             '<p class="empty-state">No saved calculations yet.</p>';
+
         return;
     }
 
@@ -71,6 +87,7 @@ async function loadSavedCalculations(userId) {
                 <strong>${formatToolName(calculation.tool)}</strong>
                 <span>${formatCalculationResult(calculation.result)}</span>
             </div>
+
             <button
                 type="button"
                 class="delete-calculation"
@@ -81,11 +98,13 @@ async function loadSavedCalculations(userId) {
         </div>
     `).join("");
 
-    savedCalculations.querySelectorAll(".delete-calculation").forEach((button) => {
-        button.addEventListener("click", () => {
-            deleteCalculation(button.dataset.id);
+    savedCalculations
+        .querySelectorAll(".delete-calculation")
+        .forEach((button) => {
+            button.addEventListener("click", () => {
+                deleteCalculation(button.dataset.id);
+            });
         });
-    });
 }
 
 async function loadWatchlist(userId) {
@@ -97,14 +116,17 @@ async function loadWatchlist(userId) {
 
     if (error) {
         console.error("Watchlist error:", error);
+
         watchlist.innerHTML =
             '<p class="empty-state">Unable to load watchlist.</p>';
+
         return;
     }
 
     if (!data.length) {
         watchlist.innerHTML =
             '<p class="empty-state">Your watchlist is empty.</p>';
+
         return;
     }
 
@@ -114,6 +136,7 @@ async function loadWatchlist(userId) {
                 <strong>${item.symbol}</strong>
                 <span>${formatToolName(item.asset_type)}</span>
             </div>
+
             <button
                 type="button"
                 class="delete-watchlist"
@@ -124,11 +147,13 @@ async function loadWatchlist(userId) {
         </div>
     `).join("");
 
-    watchlist.querySelectorAll(".delete-watchlist").forEach((button) => {
-        button.addEventListener("click", () => {
-            removeWatchlistItem(button.dataset.id);
+    watchlist
+        .querySelectorAll(".delete-watchlist")
+        .forEach((button) => {
+            button.addEventListener("click", () => {
+                removeWatchlistItem(button.dataset.id);
+            });
         });
-    });
 }
 
 async function addWatchlistItem(event) {
@@ -138,10 +163,15 @@ async function addWatchlistItem(event) {
         return;
     }
 
-    const symbolInput = document.getElementById("watchlist-symbol");
-    const typeInput = document.getElementById("watchlist-type");
+    const symbolInput =
+        document.getElementById("watchlist-symbol");
 
-    const symbol = symbolInput.value.trim().toUpperCase();
+    const typeInput =
+        document.getElementById("watchlist-type");
+
+    const symbol =
+        symbolInput.value.trim().toUpperCase();
+
     const assetType = typeInput.value;
 
     if (!symbol) {
@@ -165,14 +195,16 @@ async function addWatchlistItem(event) {
             watchlistMessage.textContent =
                 "That symbol is already on your watchlist.";
         } else {
-            watchlistMessage.textContent = "Unable to add that symbol.";
+            watchlistMessage.textContent =
+                "Unable to add that symbol.";
         }
 
         return;
     }
 
     symbolInput.value = "";
-    watchlistMessage.textContent = "Added to your watchlist.";
+    watchlistMessage.textContent =
+        "Added to your watchlist.";
 
     await loadWatchlist(currentUser.id);
 }
@@ -210,8 +242,10 @@ async function deleteCalculation(id) {
 
     if (error) {
         console.error("Delete calculation error:", error);
+
         button.disabled = false;
         button.textContent = "Delete";
+
         return;
     }
 
@@ -237,24 +271,33 @@ function formatCalculationResult(result) {
 
     return entries
         .slice(0, 2)
-        .map(([key, value]) => `${formatToolName(key)}: ${value}`)
+        .map(
+            ([key, value]) =>
+                `${formatToolName(key)}: ${value}`
+        )
         .join(" · ");
 }
 
-watchlistForm.addEventListener("submit", addWatchlistItem);
+watchlistForm.addEventListener(
+    "submit",
+    addWatchlistItem
+);
 
 logoutButton.addEventListener("click", async () => {
     logoutButton.disabled = true;
     logoutButton.textContent = "Signing out...";
 
-    const { error } = await supabaseClient.auth.signOut({
-        scope: "local"
-    });
+    const { error } =
+        await supabaseClient.auth.signOut({
+            scope: "local"
+        });
 
     if (error) {
         console.error("Logout error:", error);
+
         logoutButton.disabled = false;
         logoutButton.textContent = "Sign out";
+
         return;
     }
 

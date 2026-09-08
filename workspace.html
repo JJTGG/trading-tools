@@ -6,11 +6,9 @@
     <title>Workspace — Trading Tools</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
     <header class="workspace-header">
         <a href="index.html" class="auth-brand">Trading Tools</a>
-
         <div class="workspace-account">
             <span id="workspace-user">Loading...</span>
             <button id="logout-button" type="button">Sign out</button>
@@ -48,7 +46,6 @@
                         <h2>Saved calculations</h2>
                     </div>
                 </div>
-
                 <div id="saved-calculations">
                     <p class="empty-state">No saved calculations yet.</p>
                 </div>
@@ -61,6 +58,28 @@
                         <h2>Watchlist</h2>
                     </div>
                 </div>
+
+                <form id="watchlist-form" class="watchlist-form">
+                    <input
+                        type="text"
+                        id="watchlist-symbol"
+                        placeholder="Symbol e.g. BTC"
+                        maxlength="20"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <select id="watchlist-type">
+                        <option value="crypto">Crypto</option>
+                        <option value="forex">Forex</option>
+                        <option value="stocks">Stocks</option>
+                        <option value="commodities">Commodities</option>
+                    </select>
+
+                    <button type="submit">Add</button>
+                </form>
+
+                <p id="watchlist-message" class="form-message"></p>
 
                 <div id="watchlist">
                     <p class="empty-state">Your watchlist is empty.</p>

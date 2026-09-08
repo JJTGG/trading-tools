@@ -60,10 +60,58 @@ async function loadSavedCalculations(userId) {
 
     savedCalculations.innerHTML = data.map((calculation) => `
         <div class="saved-calculation">
-            <strong>${formatToolName(calculation.tool)}</strong>
-            <span>${formatCalculationResult(calculation.result)}</span>
+            <div>
+                <strong>${formatToolName(calculation.tool)}</strong>
+                <span>${formatCalculationResult(calculation.result)}</span>
+            </div>
+            <button
+                type="button"
+                class="delete-calculation"
+                data-id="${calculation.id}"
+            >
+                Delete
+            </button>
         </div>
     `).join("");
+
+    savedCalculations.querySelectorAll(".delete-calculation").forEach((button) => {
+        button.addEventListener("click", () => {
+            deleteCalculation(button.dataset.id);
+        });
+    });
+}
+
+async function deleteCalculation(id) {
+    const button = savedCalculations.querySelector(
+        `.delete-calculation[data-id="${id}"]`
+    );
+
+    if (!button) {
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Deleting...";
+
+    const { error } = await supabaseClient
+        .from("saved_calculations")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.error("Delete calculation error:", error);
+        button.disabled = false;
+        button.textContent = "Delete";
+        return;
+    }
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (user) {
+        await loadSavedCalculations(user.id);
+    }
 }
 
 function formatToolName(tool) {

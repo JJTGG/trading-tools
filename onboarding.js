@@ -46,5 +46,5 @@ form.addEventListener("submit", async (event) => {
         return;
     }
 
-    message.textContent = "Workspace setup complete.";
+    window.location.href = "index.html";
 });

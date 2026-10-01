@@ -131,22 +131,28 @@ async function loadSavedCalculations(userId) {
         return;
     }
 
-    savedCalculations.innerHTML = data.map((calculation) => `
-        <div class="saved-calculation">
-            <div>
-                <strong>${formatToolName(calculation.tool)}</strong>
-                <span>${formatCalculationResult(calculation.result)}</span>
-            </div>
+    savedCalculations.innerHTML = data.map((calculation) => {
+        const actions = getCalculationActions(calculation);
 
-            <button
-                type="button"
-                class="delete-calculation"
-                data-id="${calculation.id}"
-            >
-                Delete
-            </button>
-        </div>
-    `).join("");
+        return `
+            <div class="saved-calculation">
+                <div>
+                    <strong>${formatToolName(calculation.tool)}</strong>
+                    <span>${formatCalculationResult(calculation.result)}</span>
+                </div>
+
+                ${actions}
+
+                <button
+                    type="button"
+                    class="delete-calculation"
+                    data-id="${calculation.id}"
+                >
+                    Delete
+                </button>
+            </div>
+        `;
+    }).join("");
 
     savedCalculations
         .querySelectorAll(".delete-calculation")
@@ -155,6 +161,59 @@ async function loadSavedCalculations(userId) {
                 deleteCalculation(button.dataset.id);
             });
         });
+}
+
+function getCalculationActions(calculation) {
+    if (
+        calculation.tool !== "position-size" ||
+        !calculation.inputs ||
+        typeof calculation.inputs !== "object"
+    ) {
+        return "";
+    }
+
+    const {
+        direction,
+        accountBalance,
+        riskPercent,
+        entryPrice,
+        stopLoss
+    } = calculation.inputs;
+
+    const values = [
+        direction,
+        accountBalance,
+        riskPercent,
+        entryPrice,
+        stopLoss
+    ];
+
+    if (values.some((value) => value === undefined || value === null || value === "")) {
+        return "";
+    }
+
+    const positionSizeUrl = new URL("position-size.html", window.location.href);
+    positionSizeUrl.search = new URLSearchParams({
+        direction: String(direction),
+        accountBalance: String(accountBalance),
+        riskPercent: String(riskPercent),
+        entryPrice: String(entryPrice),
+        stopLoss: String(stopLoss)
+    }).toString();
+
+    const riskRewardUrl = new URL("risk-reward.html", window.location.href);
+    riskRewardUrl.search = new URLSearchParams({
+        direction: String(direction),
+        entryPrice: String(entryPrice),
+        stopLoss: String(stopLoss)
+    }).toString();
+
+    return `
+        <div class="saved-calculation-actions">
+            <a href="${positionSizeUrl.href}">Continue</a>
+            <a href="${riskRewardUrl.href}">Use in Risk/Reward</a>
+        </div>
+    `;
 }
 
 async function loadWatchlist(userId) {

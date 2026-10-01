@@ -149,4 +149,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         );
     });
+
+    const params = new URLSearchParams(window.location.search);
+    const contextFields = [
+        ["direction", directionInput],
+        ["entryPrice", entryInput],
+        ["stopLoss", stopInput],
+        ["targetPrice", targetInput]
+    ];
+
+    contextFields.forEach(([name, field]) => {
+        if (params.has(name)) {
+            field.value = params.get(name);
+        }
+    });
+
+    const hasCompleteContext = contextFields.every(
+        ([name]) => params.has(name)
+    );
+
+    if (hasCompleteContext) {
+        calculateRiskReward();
+    }
 });

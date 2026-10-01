@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" href="styles.css">
     <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
-    <script src="position-size.js" defer></script>
 </head>
 
 <body>
@@ -66,18 +65,18 @@
             </div>
 
             <div>
-    <label for="risk-percent">Risk per Trade (%)</label>
+                <label for="risk-percent">Risk per Trade (%)</label>
 
-    <input
-        id="risk-percent"
-        type="number"
-        min="0"
-        step="any"
-        placeholder="1"
-    >
+                <input
+                    id="risk-percent"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="1"
+                >
 
-    <p>Percentage of your account balance you're willing to risk.</p>
-</div>
+                <p>Percentage of your account balance you're willing to risk.</p>
+            </div>
 
             <div>
                 <label for="entry-price">Entry Price</label>
@@ -111,6 +110,12 @@
                 <button id="reset-position-size" type="button">
                     Reset
                 </button>
+
+                <button id="save-position-size" type="button" disabled>
+                    Save Setup
+                </button>
+
+                <p id="position-size-save-message" aria-live="polite"></p>
             </div>
 
             <div id="position-size-results">
@@ -118,10 +123,10 @@
                 <h2>Result</h2>
 
                 <p>
-     Position Size
-    <strong id="position-size-result">—</strong>
-    units
-</p>
+                    Position Size
+                    <strong id="position-size-result">—</strong>
+                    units
+                </p>
 
                 <dl>
                     <div>
@@ -156,5 +161,8 @@
         <p>Understand. Calculate. Evaluate. Improve.</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="position-size.js"></script>
 </body>
 </html>

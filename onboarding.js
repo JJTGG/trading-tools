@@ -15,11 +15,15 @@ form.addEventListener("submit", async (event) => {
     }
 
     const displayName = document.getElementById("display-name").value.trim();
-    const preferredCurrency = document.getElementById("preferred-currency").value;
-    const experienceLevel = document.getElementById("experience-level").value;
+    const preferredCurrency =
+        document.getElementById("preferred-currency").value;
+    const experienceLevel =
+        document.getElementById("experience-level").value;
 
     const marketsTraded = [
-        ...document.querySelectorAll('input[name="markets-traded"]:checked')
+        ...document.querySelectorAll(
+            'input[name="markets-traded"]:checked'
+        )
     ].map((input) => input.value);
 
     if (!marketsTraded.length) {
@@ -46,5 +50,5 @@ form.addEventListener("submit", async (event) => {
         return;
     }
 
-    window.location.href = "index.html";
+    window.location.href = "workspace.html";
 });

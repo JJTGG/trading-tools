@@ -42,4 +42,4 @@ form.addEventListener("submit", async (event) => {
         message.textContent =
             `Signup request failed: ${error.message || "Unknown error"}`;
     }
-});w
+});

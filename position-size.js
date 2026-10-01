@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const stopLoss = document.querySelector("#stop-loss");
     const direction = document.querySelector("#position-direction");
     const calculateButton = document.querySelector("#calculate-position-size");
+    const resetButton = document.querySelector("#reset-position-size");
+    const saveButton = document.querySelector("#save-position-size");
+    const saveMessage = document.querySelector("#position-size-save-message");
 
     const result = document.querySelector("#position-size-result");
     const riskAmountResult = document.querySelector("#risk-amount");
@@ -18,10 +21,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const positionSizeResult = document.querySelector("#position-size-value");
     const positionValueResult = document.querySelector("#position-value");
 
+    let lastCalculation = null;
+
     const formatNumber = (value) => {
         return new Intl.NumberFormat(undefined, {
             maximumFractionDigits: 8
         }).format(value);
+    };
+
+    const clearResults = () => {
+        result.textContent = "—";
+        riskAmountResult.textContent = "—";
+        riskPerUnitResult.textContent = "—";
+        positionSizeResult.textContent = "—";
+        positionValueResult.textContent = "—";
+    };
+
+    const invalidateCalculation = (message = "—") => {
+        lastCalculation = null;
+        saveButton.disabled = true;
+        result.textContent = message;
+        riskAmountResult.textContent = "—";
+        riskPerUnitResult.textContent = "—";
+        positionSizeResult.textContent = "—";
+        positionValueResult.textContent = "—";
     };
 
     const calculatePositionSize = () => {
@@ -47,13 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
             entry === stop ||
             !validStop
         ) {
-            result.textContent = "Enter valid values";
-            riskAmountResult.textContent = "—";
-            riskPerUnitResult.textContent = "—";
-            positionSizeResult.textContent = "—";
-            positionValueResult.textContent = "—";
-
-            return;
+            invalidateCalculation("Enter valid values");
+            return false;
         }
 
         const riskAmount = balance * (risk / 100);
@@ -65,11 +83,57 @@ document.addEventListener("DOMContentLoaded", () => {
         riskPerUnitResult.textContent = formatNumber(riskPerUnit);
         positionSizeResult.textContent = formatNumber(positionSize);
         positionValueResult.textContent = formatNumber(positionValue);
-
         result.textContent = formatNumber(positionSize);
+
+        lastCalculation = {
+            inputs: {
+                direction: direction.value,
+                accountBalance: balance,
+                riskPercent: risk,
+                entryPrice: entry,
+                stopLoss: stop
+            },
+            result: {
+                riskAmount,
+                riskPerUnit,
+                positionSize,
+                positionValue
+            }
+        };
+
+        saveButton.disabled = false;
+
+        if (saveMessage) {
+            saveMessage.textContent = "";
+        }
+
+        return true;
     };
 
-    const resetButton = document.querySelector("#reset-position-size");
+    const applyUrlContext = () => {
+        const params = new URLSearchParams(window.location.search);
+        const contextFields = [
+            ["direction", direction],
+            ["accountBalance", accountBalance],
+            ["riskPercent", riskPercent],
+            ["entryPrice", entryPrice],
+            ["stopLoss", stopLoss]
+        ];
+
+        contextFields.forEach(([name, field]) => {
+            if (params.has(name)) {
+                field.value = params.get(name);
+            }
+        });
+
+        const hasCompleteContext = contextFields.every(
+            ([name]) => params.has(name)
+        );
+
+        if (hasCompleteContext) {
+            calculatePositionSize();
+        }
+    };
 
     resetButton.addEventListener("click", () => {
         direction.value = "long";
@@ -78,14 +142,61 @@ document.addEventListener("DOMContentLoaded", () => {
         entryPrice.value = "";
         stopLoss.value = "";
 
-        result.textContent = "—";
-        riskAmountResult.textContent = "—";
-        riskPerUnitResult.textContent = "—";
-        positionSizeResult.textContent = "—";
-        positionValueResult.textContent = "—";
+        lastCalculation = null;
+        saveButton.disabled = true;
+
+        if (saveMessage) {
+            saveMessage.textContent = "";
+        }
+
+        clearResults();
     });
 
     calculateButton.addEventListener("click", calculatePositionSize);
+
+    saveButton.addEventListener("click", async () => {
+        if (!lastCalculation) {
+            return;
+        }
+
+        if (typeof supabaseClient === "undefined") {
+            saveMessage.textContent = "Unable to save right now.";
+            return;
+        }
+
+        saveButton.disabled = true;
+        saveMessage.textContent = "Saving...";
+
+        const {
+            data: { user },
+            error: userError
+        } = await supabaseClient.auth.getUser();
+
+        if (userError || !user) {
+            saveButton.disabled = false;
+            saveMessage.textContent = "Sign in to save calculations.";
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from("saved_calculations")
+            .insert({
+                user_id: user.id,
+                tool: "position-size",
+                inputs: lastCalculation.inputs,
+                result: lastCalculation.result
+            });
+
+        if (error) {
+            console.error("Save position size error:", error);
+            saveButton.disabled = false;
+            saveMessage.textContent = "Unable to save this setup.";
+            return;
+        }
+
+        saveButton.disabled = false;
+        saveMessage.textContent = "Saved to Workspace.";
+    });
 
     calculator.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
@@ -93,4 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
             calculatePositionSize();
         }
     });
+
+    applyUrlContext();
 });

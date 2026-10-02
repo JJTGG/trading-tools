@@ -2,153 +2,452 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
     <meta
         name="description"
-        content="Calculate trading position size based on account risk, entry price, and stop-loss."
+        content="Calculate trading position size from account risk, entry price, and stop-loss."
     >
-    <title>Position Size Calculator — Trading Tools</title>
-
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+    <title>Position Size — Trading Tools</title>
 </head>
 
-<body>
+<body class="position-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <nav class="app-nav" aria-label="Application">
+            <a href="workspace.html">Workspace</a>
+            <a href="market.html">Markets</a>
+            <a href="tools.html">Tools</a>
         </nav>
+
+        <div class="header-state">
+            <span class="header-state-dot"></span>
+            System Ready
+        </div>
     </header>
 
-    <main>
+    <div class="market-strip">
+        <span>ACTIVE TOOL <strong>POSITION SIZE</strong></span>
+        <span>CALCULATION <strong>AUTO</strong></span>
+        <span>MODE <strong>TRADE RISK</strong></span>
+    </div>
 
-        <section>
-            <p>TRADING CALCULATOR</p>
+    <main class="terminal-layout">
 
-            <h1>Position Size Calculator</h1>
-
-            <p>
-                Set your account risk and stop-loss to calculate
-                the position size for a trade.
-            </p>
-        </section>
-
-        <section id="position-size-calculator">
-
-            <div>
-                <label for="position-direction">Direction</label>
-
-                <select id="position-direction">
-                    <option value="long">Long</option>
-                    <option value="short">Short</option>
-                </select>
+        <aside class="tool-rail">
+            <div class="tool-rail-header">
+                Risk tools
             </div>
 
-            <div>
-                <label for="account-balance">Account Balance</label>
+            <a
+                href="position-size.html"
+                class="tool-link active"
+            >
+                <span>Position Size</span>
+                <span class="tool-link-key">01</span>
+            </a>
 
-                <input
-                    id="account-balance"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="1000"
+            <a
+                href="risk-reward.html"
+                class="tool-link"
+            >
+                <span>Risk / Reward</span>
+                <span class="tool-link-key">02</span>
+            </a>
+
+            <a
+                href="pnl-calculator.html"
+                class="tool-link"
+            >
+                <span>PnL</span>
+                <span class="tool-link-key">03</span>
+            </a>
+
+            <a
+                href="leverage.html"
+                class="tool-link"
+            >
+                <span>Leverage</span>
+                <span class="tool-link-key">04</span>
+            </a>
+        </aside>
+
+        <section class="workbench">
+
+            <div class="page-heading">
+                <div>
+                    <p class="page-heading-kicker">
+                        Risk Engine / Trade Planning
+                    </p>
+
+                    <h1>Position Size</h1>
+
+                    <p>
+                        Convert defined account risk into a position size.
+                    </p>
+                </div>
+
+                <span class="live-badge">
+                    Live calculation
+                </span>
+            </div>
+
+            <div class="workspace-grid">
+
+                <section class="panel">
+
+                    <div class="panel-header">
+                        <strong>Trade Parameters</strong>
+                        <span>Input</span>
+                    </div>
+
+                    <form
+                        id="position-size-calculator"
+                        class="trade-form"
+                    >
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="trade-symbol"
+                                >
+                                    Instrument
+                                </label>
+
+                                <input
+                                    id="trade-symbol"
+                                    type="text"
+                                    autocomplete="off"
+                                    placeholder="BTC/USDT"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="trade-timeframe"
+                                >
+                                    Timeframe
+                                </label>
+
+                                <select id="trade-timeframe">
+                                    <option value="1m">1m</option>
+                                    <option value="5m">5m</option>
+                                    <option value="15m">15m</option>
+                                    <option value="1H" selected>1H</option>
+                                    <option value="4H">4H</option>
+                                    <option value="1D">1D</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="field-group">
+
+                            <div class="field-label">
+                                Direction
+                                <small>Position side</small>
+                            </div>
+
+                            <div class="direction-control">
+                                <button
+                                    type="button"
+                                    class="direction-button active"
+                                    data-direction="long"
+                                    aria-pressed="true"
+                                >
+                                    Long
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="direction-button"
+                                    data-direction="short"
+                                    aria-pressed="false"
+                                >
+                                    Short
+                                </button>
+                            </div>
+
+                            <input
+                                id="position-direction"
+                                type="hidden"
+                                value="long"
+                            >
+
+                        </div>
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="entry-price"
+                                >
+                                    Entry
+                                </label>
+
+                                <input
+                                    id="entry-price"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="107420"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="stop-loss"
+                                >
+                                    Stop
+                                </label>
+
+                                <input
+                                    id="stop-loss"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="105900"
+                                >
+                            </div>
+
+                        </div>
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="account-balance"
+                                >
+                                    Account
+                                </label>
+
+                                <input
+                                    id="account-balance"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="10000"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="risk-percent"
+                                >
+                                    Risk
+                                    <small>Per trade</small>
+                                </label>
+
+                                <input
+                                    id="risk-percent"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="1"
+                                >
+                            </div>
+
+                        </div>
+
+                        <div class="risk-map">
+
+                            <div class="field-label">
+                                Risk distance
+                                <small id="risk-distance-label">—</small>
+                            </div>
+
+                            <div
+                                class="risk-map-track"
+                                aria-hidden="true"
+                            >
+                                <div class="risk-map-line"></div>
+
+                                <span
+                                    id="risk-map-stop"
+                                    class="risk-marker stop"
+                                    style="left: 12%;"
+                                ></span>
+
+                                <span
+                                    id="risk-map-entry"
+                                    class="risk-marker entry"
+                                    style="left: 88%;"
+                                ></span>
+                            </div>
+
+                            <div class="risk-map-labels">
+                                <span id="risk-map-stop-label">
+                                    Stop
+                                </span>
+
+                                <span id="risk-map-entry-label">
+                                    Entry
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="actions">
+                            <button
+                                id="calculate-position-size"
+                                type="button"
+                                class="action primary"
+                            >
+                                Recalculate
+                            </button>
+
+                            <button
+                                id="use-risk-reward"
+                                type="button"
+                                class="action"
+                            >
+                                Use in Risk/Reward
+                            </button>
+
+                            <button
+                                id="reset-position-size"
+                                type="button"
+                                class="action"
+                            >
+                                Reset
+                            </button>
+                        </div>
+
+                    </form>
+
+                    <div class="setup-footer">
+                        <span>
+                            Context:
+                            <strong id="context-summary">
+                                Incomplete
+                            </strong>
+                        </span>
+
+                        <span
+                            id="position-size-save-message"
+                            class="save-message"
+                            aria-live="polite"
+                        ></span>
+                    </div>
+
+                </section>
+
+                <section class="panel result-panel">
+
+                    <div class="panel-header">
+                        <strong>Risk Output</strong>
+                        <span id="calculation-state">
+                            Ready
+                        </span>
+                    </div>
+
+                    <div class="primary-result">
+                        <span class="primary-result-label">
+                            Position Size
+                        </span>
+
+                        <strong
+                            id="position-size-result"
+                            class="primary-result-value"
+                        >
+                            —
+                        </strong>
+
+                        <span class="primary-result-unit">
+                            units
+                        </span>
+                    </div>
+
+                    <div class="result-metrics">
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Risk Amount
+                            </span>
+
+                            <strong
+                                id="risk-amount"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Risk / Unit
+                            </span>
+
+                            <strong
+                                id="risk-per-unit"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Position Value
+                            </span>
+
+                            <strong
+                                id="position-value"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="position-size-state"
+                        class="result-state"
+                    >
+                        Enter valid trade parameters.
+                    </div>
+
+                </section>
+
+            </div>
+
+            <div class="actions">
+
+                <button
+                    id="save-position-size"
+                    type="button"
+                    class="action primary"
+                    disabled
                 >
-            </div>
-
-            <div>
-                <label for="risk-percent">Risk per Trade (%)</label>
-
-                <input
-                    id="risk-percent"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="1"
-                >
-
-                <p>Percentage of your account balance you're willing to risk.</p>
-            </div>
-
-            <div>
-                <label for="entry-price">Entry Price</label>
-
-                <input
-                    id="entry-price"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="100"
-                >
-            </div>
-
-            <div>
-                <label for="stop-loss">Stop-Loss Price</label>
-
-                <input
-                    id="stop-loss"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="95"
-                >
-            </div>
-
-            <div>
-                <button id="calculate-position-size" type="button">
-                    Calculate Position Size
-                </button>
-
-                <button id="reset-position-size" type="button">
-                    Reset
-                </button>
-
-                <button id="save-position-size" type="button" disabled>
                     Save Setup
                 </button>
 
-                <p id="position-size-save-message" aria-live="polite"></p>
-            </div>
-
-            <div id="position-size-results">
-
-                <h2>Result</h2>
-
-                <p>
-                    Position Size
-                    <strong id="position-size-result">—</strong>
-                    units
-                </p>
-
-                <dl>
-                    <div>
-                        <dt>Risk Amount</dt>
-                        <dd id="risk-amount">—</dd>
-                    </div>
-
-                    <div>
-                        <dt>Risk per Unit</dt>
-                        <dd id="risk-per-unit">—</dd>
-                    </div>
-
-                    <div>
-                        <dt>Position Size</dt>
-                        <dd id="position-size-value">—</dd>
-                    </div>
-
-                    <div>
-                        <dt>Position Value</dt>
-                        <dd id="position-value">—</dd>
-                    </div>
-                </dl>
+                <button
+                    id="open-workspace"
+                    type="button"
+                    class="action"
+                >
+                    Open Workspace
+                </button>
 
             </div>
 
@@ -156,13 +455,12 @@
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
-    </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="position-size.js"></script>
+    <script
+        type="module"
+        src="/src/pages/position-size.ts"
+    ></script>
+
 </body>
 </html>

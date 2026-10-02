@@ -208,6 +208,28 @@ const setText = (
     }
 };
 
+const readNumberInput = (
+    input: HTMLInputElement | null
+): number => {
+    if (!input) {
+        return Number.NaN;
+    }
+
+    const value =
+        input.value.trim();
+
+    if (!value) {
+        return Number.NaN;
+    }
+
+    const parsed =
+        Number(value);
+
+    return Number.isFinite(parsed)
+        ? parsed
+        : Number.NaN;
+};
+
 const getInputs = (): PositionSizeInputs => {
     return {
         symbol:
@@ -224,30 +246,30 @@ const getInputs = (): PositionSizeInputs => {
                 : "long",
 
         accountBalance:
-            Number(
-                accountBalanceInput?.value
+            readNumberInput(
+                accountBalanceInput
             ),
 
         riskPercent:
-            Number(
-                riskPercentInput?.value
+            readNumberInput(
+                riskPercentInput
             ),
 
         entryPrice:
-            Number(
-                entryPriceInput?.value
+            readNumberInput(
+                entryPriceInput
             ),
 
         stopLoss:
-            Number(
-                stopLossInput?.value
+            readNumberInput(
+                stopLossInput
             )
     };
 };
 
-const isValid = (
+const getValidationMessage = (
     inputs: PositionSizeInputs
-): boolean => {
+): string => {
     const {
         accountBalance,
         riskPercent,
@@ -256,57 +278,88 @@ const isValid = (
         direction
     } = inputs;
 
-    if (
-        !Number.isFinite(accountBalance) ||
-        !Number.isFinite(riskPercent) ||
-        !Number.isFinite(entryPrice) ||
-        !Number.isFinite(stopLoss)
-    ) {
-        return false;
+    const hasMissingValue = [
+        accountBalance,
+        riskPercent,
+        entryPrice,
+        stopLoss
+    ].some(
+        (value) =>
+            !Number.isFinite(value)
+    );
+
+    if (hasMissingValue) {
+        return "Enter account, risk, entry, and stop.";
     }
 
     if (
         accountBalance <= 0 ||
-        riskPercent <= 0 ||
-        riskPercent >= 100 ||
         entryPrice <= 0 ||
-        stopLoss <= 0 ||
-        entryPrice === stopLoss
+        stopLoss <= 0
     ) {
-        return false;
+        return "Account and prices must be greater than zero.";
+    }
+
+    if (
+        riskPercent <= 0 ||
+        riskPercent >= 100
+    ) {
+        return "Risk must be greater than 0% and below 100%.";
     }
 
     if (
         direction === "long" &&
         stopLoss >= entryPrice
     ) {
-        return false;
+        return "Long positions require the stop below entry.";
     }
 
     if (
         direction === "short" &&
         stopLoss <= entryPrice
     ) {
-        return false;
+        return "Short positions require the stop above entry.";
     }
 
-    return true;
+    return "";
 };
 
 const clearResults = (
-    message = "Enter valid trade parameters."
+    message = "Enter account, risk, entry, and stop."
 ): void => {
-    setText(positionSizeResult, "—");
-    setText(riskAmountResult, "—");
-    setText(riskPerUnitResult, "—");
-    setText(positionValueResult, "—");
+    setText(
+        positionSizeResult,
+        "—"
+    );
 
-    setText(calculationState, "Ready");
-    setText(positionSizeState, message);
+    setText(
+        riskAmountResult,
+        "—"
+    );
+
+    setText(
+        riskPerUnitResult,
+        "—"
+    );
+
+    setText(
+        positionValueResult,
+        "—"
+    );
+
+    setText(
+        calculationState,
+        "Ready"
+    );
+
+    setText(
+        positionSizeState,
+        message
+    );
 
     positionSizeState?.classList.toggle(
         "invalid",
-        message !== "Enter valid trade parameters."
+        message !== "Enter account, risk, entry, and stop."
     );
 
     if (saveButton) {
@@ -425,8 +478,14 @@ const calculate = (): void => {
     updateContextSummary(inputs);
     updateRiskMap(inputs);
 
-    if (!isValid(inputs)) {
-        clearResults();
+    const validationMessage =
+        getValidationMessage(inputs);
+
+    if (validationMessage) {
+        clearResults(
+            validationMessage
+        );
+
         updateContextSummary(inputs);
         updateRiskMap(inputs);
 
@@ -444,7 +503,8 @@ const calculate = (): void => {
         );
 
     const positionSize =
-        riskAmount / riskPerUnit;
+        riskAmount /
+        riskPerUnit;
 
     const positionValue =
         positionSize *
@@ -464,22 +524,30 @@ const calculate = (): void => {
 
     setText(
         positionSizeResult,
-        formatNumber(positionSize)
+        formatNumber(
+            positionSize
+        )
     );
 
     setText(
         riskAmountResult,
-        formatNumber(riskAmount)
+        formatNumber(
+            riskAmount
+        )
     );
 
     setText(
         riskPerUnitResult,
-        formatNumber(riskPerUnit)
+        formatNumber(
+            riskPerUnit
+        )
     );
 
     setText(
         positionValueResult,
-        formatNumber(positionValue)
+        formatNumber(
+            positionValue
+        )
     );
 
     setText(
@@ -660,7 +728,10 @@ const reset = (): void => {
 
     setDirection("long");
 
-    setText(saveMessage, "");
+    setText(
+        saveMessage,
+        ""
+    );
 
     clearResults();
 

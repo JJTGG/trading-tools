@@ -53,7 +53,14 @@ interface PnLResult {
     positionValue: number;
 }
 
-declare const supabaseClient: SupabaseClientLike;
+declare global {
+    interface Window {
+        supabaseClient: SupabaseClientLike;
+    }
+}
+
+const supabaseClient =
+    window.supabaseClient;
 
 const calculator =
     document.querySelector<HTMLFormElement>(

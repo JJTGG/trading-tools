@@ -1,25 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Sign in to your Trading Tools workspace."
+    >
+
     <title>Sign In — Trading Tools</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="/src/styles/tokens.css">
+    <link rel="stylesheet" href="/src/styles/base.css">
+    <link rel="stylesheet" href="/src/pages/auth.css">
 </head>
 
-<body>
-    <main class="auth-page">
-        <section class="auth-panel">
-            <a href="index.html" class="auth-brand">Trading Tools</a>
+<body class="auth-page">
 
-            <div class="auth-header">
-                <h1>Welcome back</h1>
-                <p>Sign in to your Trading Tools workspace.</p>
+    <main class="auth-shell">
+
+        <section class="auth-context">
+
+            <a
+                href="index.html"
+                class="auth-brand"
+            >
+                <span class="auth-brand-mark"></span>
+                Trading Tools
+            </a>
+
+            <div>
+
+                <p class="auth-context-kicker">
+                    Workspace access
+                </p>
+
+                <h1>
+                    Continue the work you've already started.
+                </h1>
+
+                <p class="auth-context-copy">
+                    Your workspace keeps saved calculations,
+                    watchlists, preferences, and trade-planning
+                    work connected to your account.
+                </p>
+
+                <div class="auth-context-list">
+
+                    <div>
+                        <span>01</span>
+                        <strong>Saved calculations</strong>
+                    </div>
+
+                    <div>
+                        <span>02</span>
+                        <strong>Personal watchlist</strong>
+                    </div>
+
+                    <div>
+                        <span>03</span>
+                        <strong>Workspace continuity</strong>
+                    </div>
+
+                </div>
+
             </div>
 
-            <form id="login-form">
+            <span class="auth-context-kicker">
+                Decision support · No trade execution
+            </span>
+
+        </section>
+
+        <section class="auth-form-panel">
+
+            <div class="auth-form-header">
+
+                <span>
+                    Authentication
+                </span>
+
+                <h2>
+                    Sign in
+                </h2>
+
+                <p>
+                    Enter your account credentials to continue.
+                </p>
+
+            </div>
+
+            <form
+                id="login-form"
+                class="auth-form"
+            >
+
                 <div class="form-group">
-                    <label for="login-email">Email</label>
+
+                    <label for="login-email">
+                        Email
+                    </label>
+
                     <input
                         type="email"
                         id="login-email"
@@ -28,10 +115,15 @@
                         autocomplete="email"
                         required
                     >
+
                 </div>
 
                 <div class="form-group">
-                    <label for="login-password">Password</label>
+
+                    <label for="login-password">
+                        Password
+                    </label>
+
                     <input
                         type="password"
                         id="login-password"
@@ -40,24 +132,44 @@
                         autocomplete="current-password"
                         required
                     >
+
                 </div>
 
-                <button type="submit" class="primary-button">
+                <button
+                    type="submit"
+                    class="primary-button"
+                    id="login-submit"
+                >
                     Sign in
                 </button>
 
-                <p id="login-message" class="form-message"></p>
+                <p
+                    id="login-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+
             </form>
 
             <p class="auth-switch">
                 Don't have an account?
-                <a href="signup.html">Create one</a>
+                <a href="signup.html">
+                    Create one
+                </a>
             </p>
+
         </section>
+
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="login.js"></script>
+
+    <script
+        type="module"
+        src="/src/pages/login.ts"
+    ></script>
+
 </body>
+
 </html>

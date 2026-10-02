@@ -72,6 +72,7 @@ The product has its own codebase, deployment, roadmap, and development cycle.
 The project currently uses:
 - HTML
 - CSS
+- TypeScript
 - JavaScript
 
 The frontend is being developed with a focus on keeping the application lightweight, responsive, and easy to maintain.

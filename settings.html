@@ -1,104 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Settings — Trading Tools</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Manage your Trading Tools account profile."
+    >
+
+    <title>Settings — Trading Tools</title>
 </head>
-<body>
-    <header class="workspace-header">
-        <a href="index.html" class="auth-brand">Trading Tools</a>
+
+<body class="account-page">
+
+    <header class="app-header">
+
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav class="app-nav" aria-label="Application">
+
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+
+        </nav>
 
         <div class="workspace-account">
-            <a href="workspace.html">Workspace</a>
-            <button id="logout-button" type="button">Sign out</button>
+
+            <a href="preferences.html">
+                Preferences
+            </a>
+
+            <button
+                id="logout-button"
+                type="button"
+                class="account-action"
+            >
+                Sign out
+            </button>
+
         </div>
+
     </header>
 
-    <main class="workspace-page">
-        <section class="workspace-intro">
-            <p class="eyebrow">Account</p>
-            <h1>Settings</h1>
-            <p>Manage your personal Trading Tools preferences.</p>
-        </section>
+    <main class="account-shell">
 
-        <section class="workspace-card settings-card">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Profile</p>
-                    <h2>Personal details</h2>
-                </div>
+        <section class="account-heading">
+
+            <div>
+
+                <p class="account-kicker">
+                    Account / Profile
+                </p>
+
+                <h1>
+                    Settings
+                </h1>
+
+                <p>
+                    Manage the personal information used across your
+                    Trading Tools workspace.
+                </p>
+
             </div>
 
-            <form id="settings-form">
-                <div class="form-group">
-                    <label for="display-name">Display name</label>
-                    <input
-                        type="text"
-                        id="display-name"
-                        maxlength="50"
-                        autocomplete="name"
-                        required
-                    >
-                </div>
+            <span class="account-heading-meta">
+                Authenticated
+            </span>
 
-                <div class="form-group">
-                    <label for="preferred-currency">Preferred currency</label>
-                    <select id="preferred-currency" required>
-                        <option value="USD">USD — US Dollar</option>
-                        <option value="EUR">EUR — Euro</option>
-                        <option value="GBP">GBP — British Pound</option>
-                        <option value="NGN">NGN — Nigerian Naira</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Markets traded</label>
-
-                    <div class="market-options">
-                        <label>
-                            <input type="checkbox" name="markets-traded" value="crypto">
-                            Crypto
-                        </label>
-
-                        <label>
-                            <input type="checkbox" name="markets-traded" value="forex">
-                            Forex
-                        </label>
-
-                        <label>
-                            <input type="checkbox" name="markets-traded" value="stocks">
-                            Stocks
-                        </label>
-
-                        <label>
-                            <input type="checkbox" name="markets-traded" value="commodities">
-                            Commodities
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="experience-level">Experience level</label>
-                    <select id="experience-level" required>
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="primary-button">
-                    Save changes
-                </button>
-
-                <p id="settings-message" class="form-message"></p>
-            </form>
         </section>
+
+        <div class="account-grid">
+
+            <section class="account-panel">
+
+                <header class="account-panel-header">
+
+                    <h2>
+                        Personal details
+                    </h2>
+
+                    <span>
+                        Profile
+                    </span>
+
+                </header>
+
+                <form
+                    id="settings-form"
+                    class="account-form"
+                >
+
+                    <div class="form-group">
+
+                        <label for="display-name">
+                            Display name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="display-name"
+                            maxlength="50"
+                            autocomplete="name"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="preferred-currency">
+                            Preferred currency
+                        </label>
+
+                        <select
+                            id="preferred-currency"
+                            required
+                        >
+                            <option value="USD">
+                                USD — US Dollar
+                            </option>
+
+                            <option value="EUR">
+                                EUR — Euro
+                            </option>
+
+                            <option value="GBP">
+                                GBP — British Pound
+                            </option>
+
+                            <option value="NGN">
+                                NGN — Nigerian Naira
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Markets traded
+                        </label>
+
+                        <div class="market-options">
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="markets-traded"
+                                    value="crypto"
+                                >
+                                Crypto
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="markets-traded"
+                                    value="forex"
+                                >
+                                Forex
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="markets-traded"
+                                    value="stocks"
+                                >
+                                Stocks
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="markets-traded"
+                                    value="commodities"
+                                >
+                                Commodities
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="experience-level">
+                            Experience level
+                        </label>
+
+                        <select
+                            id="experience-level"
+                            required
+                        >
+                            <option value="beginner">
+                                Beginner
+                            </option>
+
+                            <option value="intermediate">
+                                Intermediate
+                            </option>
+
+                            <option value="advanced">
+                                Advanced
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                        id="settings-submit"
+                    >
+                        Save changes
+                    </button>
+
+                    <p
+                        id="settings-message"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                </form>
+
+            </section>
+
+            <aside class="account-panel">
+
+                <header class="account-panel-header">
+
+                    <h2>
+                        Account
+                    </h2>
+
+                    <span>
+                        Identity
+                    </span>
+
+                </header>
+
+                <div class="account-side-content">
+
+                    <div class="account-detail">
+
+                        <span>
+                            Email
+                        </span>
+
+                        <strong id="account-email">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <div class="account-detail">
+
+                        <span>
+                            Onboarding
+                        </span>
+
+                        <strong>
+                            Complete
+                        </strong>
+
+                    </div>
+
+                    <a
+                        href="preferences.html"
+                        class="account-link"
+                    >
+                        Workspace preferences
+                        <span>→</span>
+                    </a>
+
+                </div>
+
+            </aside>
+
+        </div>
+
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
     <script src="supabase.js"></script>
-    <script src="settings.js"></script>
+
+    <script
+        type="module"
+        src="/src/pages/settings.ts"
+    ></script>
+
 </body>
+
 </html>

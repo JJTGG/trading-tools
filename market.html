@@ -1,168 +1,448 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <meta
         name="description"
-        content="Track market prices, price changes, and market status with Trading Tools."
+        content="Trading Tools market terminal for live prices, market data, charts, and trade planning."
     >
 
     <title>Markets — Trading Tools</title>
-
-    <link rel="stylesheet" href="styles.css">
-    <script src="market.js" defer></script>
 </head>
 
-<body>
+<body class="market-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav
+            class="app-nav"
+            aria-label="Application"
+        >
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a
+                href="market.html"
+                class="active"
+            >
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
         </nav>
+
+        <div class="header-state">
+
+            <span class="header-state-dot"></span>
+
+            <span>
+                Market Terminal
+            </span>
+
+        </div>
+
     </header>
 
-    <main>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
 
-        <section>
-            <p>MARKETS</p>
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
 
-            <h1>Market Overview</h1>
-
-            <p>
-                Check current prices, price changes, and market status
-                across supported assets.
-            </p>
-        </section>
-
-        <section id="market-search">
-    <div>
-        <label for="market-symbol">Search Market</label>
-        <div>
-            <input
-                id="market-symbol"
-                type="text"
-                value="AAPL"
-                placeholder="Search a company, asset, or symbol"
-                autocomplete="off"
-            >
-            <button id="load-market" type="button">
-                Check Market
-            </button>
+        <div id="market-tickers">
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
         </div>
+
     </div>
 
-    <div id="market-suggestions" hidden></div>
-</section>
+    <main class="market-terminal">
 
-        <section id="market-result" hidden>
+        <section class="market-toolbar">
 
             <div>
-                <p id="market-name">—</p>
-                <span id="market-details">—</span>
+
+                <p class="market-kicker">
+                    Markets / Live Overview
+                </p>
+
+                <h1>
+                    Market Terminal
+                </h1>
+
             </div>
 
-            <div>
-                <strong id="market-price">—</strong>
-                <span id="market-change">—</span>
+            <div class="market-search">
+
+                <label
+                    for="market-search-input"
+                    class="sr-only"
+                >
+                    Search markets
+                </label>
+
+                <input
+                    id="market-search-input"
+                    type="search"
+                    autocomplete="off"
+                    placeholder="Search symbol or company"
+                >
+
+                <div
+                    id="market-suggestions"
+                    class="market-suggestions"
+                    hidden
+                ></div>
+
             </div>
-
-            <dl>
-    <div>
-        <dt>Symbol</dt>
-        <dd id="market-symbol-result">—</dd>
-    </div>
-
-    <div>
-        <dt>Exchange</dt>
-        <dd id="market-exchange">—</dd>
-    </div>
-
-    <div>
-        <dt>Currency</dt>
-        <dd id="market-currency">—</dd>
-    </div>
-
-    <div>
-        <dt>Market Status</dt>
-        <dd id="market-status">—</dd>
-    </div>
-
-    <div>
-        <dt>Open</dt>
-        <dd id="market-open">—</dd>
-    </div>
-
-    <div>
-        <dt>Previous Close</dt>
-        <dd id="market-previous-close">—</dd>
-    </div>
-
-    <div>
-        <dt>Day High</dt>
-        <dd id="market-high">—</dd>
-    </div>
-
-    <div>
-        <dt>Day Low</dt>
-        <dd id="market-low">—</dd>
-    </div>
-
-    <div>
-        <dt>Volume</dt>
-        <dd id="market-volume">—</dd>
-    </div>
-
-    <div>
-        <dt>Average Volume</dt>
-        <dd id="market-average-volume">—</dd>
-    </div>
-
-    <div>
-        <dt>52-Week High</dt>
-        <dd id="market-52w-high">—</dd>
-    </div>
-
-    <div>
-        <dt>52-Week Low</dt>
-        <dd id="market-52w-low">—</dd>
-    </div>
-</dl>
 
         </section>
 
-        <section id="market-chart-section" hidden>
-    <div>
-        <p>PRICE HISTORY</p>
-        <h2>Price Chart</h2>
-    </div>
+        <section
+            class="market-filters"
+            aria-label="Market categories"
+        >
 
-    <div id="market-timeframes">
-    <button type="button" data-interval="1h">1D</button>
-    <button type="button" data-interval="1day">1W</button>
-    <button type="button" data-interval="1day">1M</button>
-    <button type="button" data-interval="1week">1Y</button>
-</div>
+            <button
+                type="button"
+                class="market-filter active"
+                data-market-filter="all"
+            >
+                All
+            </button>
 
-    <div id="market-chart">
-        <canvas id="market-chart-canvas"></canvas>
-    </div>
-</section>
+            <button
+                type="button"
+                class="market-filter"
+                data-market-filter="crypto"
+            >
+                Crypto
+            </button>
+
+            <button
+                type="button"
+                class="market-filter"
+                data-market-filter="stock"
+            >
+                Stocks
+            </button>
+
+            <button
+                type="button"
+                class="market-filter"
+                data-market-filter="forex"
+            >
+                Forex
+            </button>
+
+        </section>
+
+        <section class="market-layout">
+
+            <div class="market-list-panel">
+
+                <div class="market-panel-header">
+
+                    <div>
+
+                        <span class="panel-kicker">
+                            Market List
+                        </span>
+
+                        <strong>
+                            Instruments
+                        </strong>
+
+                    </div>
+
+                    <span
+                        id="market-list-state"
+                        class="panel-status"
+                    >
+                        Loading
+                    </span>
+
+                </div>
+
+                <div class="market-table-scroll">
+
+                    <table class="market-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>
+                                    Market
+                                </th>
+
+                                <th>
+                                    Price
+                                </th>
+
+                                <th>
+                                    Change
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="market-table-body">
+
+                            <tr>
+                                <td
+                                    colspan="5"
+                                    class="market-table-state"
+                                >
+                                    Loading market data…
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <aside class="market-detail-panel">
+
+                <div class="market-panel-header">
+
+                    <div>
+
+                        <span class="panel-kicker">
+                            Selected Market
+                        </span>
+
+                        <strong id="detail-symbol">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <span
+                        id="detail-status"
+                        class="panel-status"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+                <div class="market-quote">
+
+                    <div class="market-identity">
+
+                        <strong id="detail-name">
+                            Select a market
+                        </strong>
+
+                        <span id="detail-meta">
+                            —
+                        </span>
+
+                    </div>
+
+                    <div class="market-price-line">
+
+                        <strong id="detail-price">
+                            —
+                        </strong>
+
+                        <span id="detail-change">
+                            —
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="chart-panel">
+
+                    <div class="chart-toolbar">
+
+                        <div
+                            id="market-timeframes"
+                            class="timeframe-tabs"
+                        >
+
+                            <button
+                                type="button"
+                                data-interval="1h"
+                                class="active"
+                            >
+                                1H
+                            </button>
+
+                            <button
+                                type="button"
+                                data-interval="1day"
+                            >
+                                1D
+                            </button>
+
+                            <button
+                                type="button"
+                                data-interval="1week"
+                            >
+                                1W
+                            </button>
+
+                            <button
+                                type="button"
+                                data-interval="1month"
+                            >
+                                1M
+                            </button>
+
+                        </div>
+
+                        <span
+                            id="chart-state"
+                            class="chart-state"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="market-chart"
+                        class="market-chart"
+                    >
+
+                        <svg
+                            id="market-chart-svg"
+                            viewBox="0 0 900 420"
+                            preserveAspectRatio="none"
+                            aria-label="Market price chart"
+                        ></svg>
+
+                        <div
+                            id="chart-tooltip"
+                            class="chart-tooltip"
+                            hidden
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <div class="detail-actions">
+
+                    <a
+                        id="position-size-link"
+                        href="position-size.html"
+                    >
+                        Position Size
+                    </a>
+
+                    <a
+                        id="risk-reward-link"
+                        href="risk-reward.html"
+                    >
+                        Risk / Reward
+                    </a>
+
+                    <a
+                        id="pnl-link"
+                        href="pnl-calculator.html"
+                    >
+                        PnL
+                    </a>
+
+                </div>
+
+                <div class="market-stats">
+
+                    <div class="market-stat">
+                        <span>Open</span>
+                        <strong id="detail-open">—</strong>
+                    </div>
+
+                    <div class="market-stat">
+                        <span>Previous Close</span>
+                        <strong id="detail-previous-close">—</strong>
+                    </div>
+
+                    <div class="market-stat">
+                        <span>Day High</span>
+                        <strong id="detail-high">—</strong>
+                    </div>
+
+                    <div class="market-stat">
+                        <span>Day Low</span>
+                        <strong id="detail-low">—</strong>
+                    </div>
+
+                    <div class="market-stat">
+                        <span>Volume</span>
+                        <strong id="detail-volume">—</strong>
+                    </div>
+
+                    <div class="market-stat">
+                        <span>Average Volume</span>
+                        <strong id="detail-average-volume">—</strong>
+                    </div>
+
+                    <div class="market-stat">
+                        <span>52W High</span>
+                        <strong id="detail-52w-high">—</strong>
+                    </div>
+
+                    <div class="market-stat">
+                        <span>52W Low</span>
+                        <strong id="detail-52w-low">—</strong>
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </section>
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
-    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <script
+        type="module"
+        src="/src/pages/market.ts"
+    ></script>
 
 </body>
+
 </html>

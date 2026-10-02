@@ -29,6 +29,13 @@ interface SupabaseClientLike {
     };
 }
 
+interface SupabaseLibrary {
+    createClient(
+        url: string,
+        key: string
+    ): SupabaseClientLike;
+}
+
 interface MarketSelectionDetail {
     symbol: string;
     price: number;
@@ -55,12 +62,40 @@ interface PnLResult {
 
 declare global {
     interface Window {
-        supabaseClient: SupabaseClientLike;
+        supabase?: SupabaseLibrary;
+        supabaseClient?: SupabaseClientLike;
     }
 }
 
-const supabaseClient =
-    window.supabaseClient;
+const SUPABASE_URL =
+    "https://kaierwmqowgpizvwoyet.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_lyrrIdCyXNH2IZt5O5PjQQ_G1l2IBKD";
+
+const getSupabaseClient =
+    (): SupabaseClientLike => {
+        if (window.supabaseClient) {
+            return window.supabaseClient;
+        }
+
+        if (window.supabase) {
+            const client =
+                window.supabase.createClient(
+                    SUPABASE_URL,
+                    SUPABASE_PUBLISHABLE_KEY
+                );
+
+            window.supabaseClient =
+                client;
+
+            return client;
+        }
+
+        throw new Error(
+            "Supabase library is unavailable."
+        );
+    };
 
 const calculator =
     document.querySelector<HTMLFormElement>(
@@ -526,6 +561,9 @@ const saveCalculation = async (): Promise<void> => {
     );
 
     try {
+        const supabaseClient =
+            getSupabaseClient();
+
         const {
             data: { user },
             error: userError

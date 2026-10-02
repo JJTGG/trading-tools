@@ -192,6 +192,28 @@ const setText = (
     }
 };
 
+const getErrorMessage = (
+    error: unknown
+): string => {
+    if (
+        error instanceof Error &&
+        error.message
+    ) {
+        return error.message;
+    }
+
+    if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof error.message === "string"
+    ) {
+        return error.message;
+    }
+
+    return "Unknown error";
+};
+
 const readNumber = (
     input: HTMLInputElement | null
 ): number => {
@@ -503,10 +525,19 @@ const saveCalculation = async (): Promise<void> => {
         } =
             await supabaseClient.auth.getUser();
 
-        if (
-            userError ||
-            !user
-        ) {
+        if (userError) {
+            setText(
+                saveMessage,
+                `Session check failed: ${userError.message}`
+            );
+
+            saveButton.disabled =
+                false;
+
+            return;
+        }
+
+        if (!user) {
             setText(
                 saveMessage,
                 "Sign in to save calculations."
@@ -533,9 +564,15 @@ const saveCalculation = async (): Promise<void> => {
                 });
 
         if (error) {
-            throw new Error(
-                error.message
+            setText(
+                saveMessage,
+                `Save failed: ${error.message}`
             );
+
+            saveButton.disabled =
+                false;
+
+            return;
         }
 
         setText(
@@ -550,7 +587,7 @@ const saveCalculation = async (): Promise<void> => {
 
         setText(
             saveMessage,
-            "Unable to save calculation."
+            `Save failed: ${getErrorMessage(error)}`
         );
 
         saveButton.disabled =

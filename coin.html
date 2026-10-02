@@ -1,51 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <meta
         name="description"
-        content="View cryptocurrency prices, market changes, volume, and trading information."
+        content="View current cryptocurrency prices and market information."
     >
-    <title>Coin Viewer — Trading Tools</title>
 
-    <link rel="stylesheet" href="styles.css">
-    <script src="coin.js" defer></script>
+    <title>Coin Viewer — Trading Tools</title>
 </head>
 
-<body>
+<body class="coin-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav class="app-nav" aria-label="Application">
+
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a
+                href="tools.html"
+                class="active"
+            >
+                Tools
+            </a>
+
         </nav>
+
+        <div class="header-state">
+
+            <span class="header-state-dot"></span>
+
+            <span>
+                Coin Data
+            </span>
+
+        </div>
+
     </header>
 
-    <main>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
 
-        <section>
-            <p>MARKET TOOL</p>
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
 
-            <h1>Coin Viewer</h1>
+        <div id="market-tickers">
 
-            <p>
-                View current cryptocurrency prices, market changes,
-                volume, and trading information.
-            </p>
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+
+        </div>
+
+    </div>
+
+    <main class="public-tool-shell">
+
+        <section class="public-tool-heading">
+
+            <div>
+
+                <p>
+                    Tools / Cryptocurrency
+                </p>
+
+                <h1>
+                    Coin Viewer
+                </h1>
+
+                <span>
+                    Inspect current cryptocurrency price and market information.
+                </span>
+
+            </div>
+
         </section>
 
-        <section id="coin-search">
-            <div>
-                <label for="coin-symbol">Coin</label>
+        <section class="coin-search-panel">
 
-                <div>
+            <div class="tool-panel-header">
+
+                <strong>
+                    Instrument
+                </strong>
+
+                <span>
+                    Search
+                </span>
+
+            </div>
+
+            <form id="coin-form">
+
+                <label
+                    for="coin-symbol"
+                    class="field-label"
+                >
+                    Coin symbol
+                </label>
+
+                <div class="coin-search-row">
+
                     <input
                         id="coin-symbol"
                         type="text"
@@ -54,27 +136,66 @@
                         autocomplete="off"
                     >
 
-                    <button id="load-coin" type="button">
+                    <button
+                        id="load-coin"
+                        type="submit"
+                        class="action primary"
+                    >
                         View Coin
                     </button>
+
                 </div>
-            </div>
+
+                <p
+                    id="coin-message"
+                    class="tool-message"
+                    aria-live="polite"
+                ></p>
+
+            </form>
+
         </section>
 
-        <section id="coin-result" hidden>
+        <section
+            id="coin-result"
+            class="coin-result-panel"
+            hidden
+        >
 
-            <div>
-                <p>CRYPTOCURRENCY</p>
-                <h2 id="coin-name">—</h2>
-                <p id="coin-details">—</p>
-            </div>
+            <header class="coin-result-header">
 
-            <div>
-                <strong id="coin-price">—</strong>
-                <p id="coin-change">—</p>
-            </div>
+                <div>
 
-            <dl>
+                    <span class="coin-kicker">
+                        Cryptocurrency
+                    </span>
+
+                    <h2 id="coin-name">
+                        —
+                    </h2>
+
+                    <p id="coin-details">
+                        —
+                    </p>
+
+                </div>
+
+                <div class="coin-price">
+
+                    <strong id="coin-price">
+                        —
+                    </strong>
+
+                    <span id="coin-change">
+                        —
+                    </span>
+
+                </div>
+
+            </header>
+
+            <dl class="coin-stats">
+
                 <div>
                     <dt>Symbol</dt>
                     <dd id="coin-symbol-result">—</dd>
@@ -106,7 +227,7 @@
                 </div>
 
                 <div>
-                    <dt>Previous Close</dt>
+                    <dt>Previous close</dt>
                     <dd id="coin-previous-close">—</dd>
                 </div>
 
@@ -114,16 +235,18 @@
                     <dt>Volume</dt>
                     <dd id="coin-volume">—</dd>
                 </div>
+
             </dl>
 
         </section>
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
-    </footer>
+    <script
+        type="module"
+        src="/src/pages/coin.ts"
+    ></script>
 
 </body>
+
 </html>

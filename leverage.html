@@ -2,116 +2,304 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
     <meta
         name="description"
         content="Calculate effective trading leverage and margin requirements."
     >
-    <title>Leverage Calculator — Trading Tools</title>
-
-    <link rel="stylesheet" href="styles.css">
-    <script src="leverage.js" defer></script>
+    <title>Leverage — Trading Tools</title>
 </head>
 
-<body>
+<body class="leverage-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <nav class="app-nav" aria-label="Application">
+            <a href="workspace.html">Workspace</a>
+            <a href="market.html">Markets</a>
+            <a href="tools.html">Tools</a>
         </nav>
+
+        <div class="header-state">
+            <span class="header-state-dot"></span>
+
+            <span>
+                Exposure Engine
+            </span>
+        </div>
     </header>
 
-    <main>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
 
-        <section>
-            <p>RISK MANAGEMENT</p>
+        <div id="market-tickers">
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+        </div>
+    </div>
 
-            <h1>Leverage Calculator</h1>
+    <main class="terminal-layout">
 
-            <p>
-                Calculate effective leverage and understand how much
-                market exposure your capital is controlling.
-            </p>
-        </section>
-
-        <section id="leverage-calculator">
-
-            <div>
-                <label for="position-value">
-                    Position Value
-                </label>
-
-                <input
-                    id="position-value"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="10000"
-                >
+        <aside class="tool-rail">
+            <div class="tool-rail-header">
+                Trading tools
             </div>
 
-            <div>
-                <label for="account-equity">
-                    Account Equity
-                </label>
+            <a
+                href="position-size.html"
+                class="tool-link"
+            >
+                <span>Position Size</span>
+                <span class="tool-link-key">01</span>
+            </a>
 
-                <input
-                    id="account-equity"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="1000"
-                >
+            <a
+                href="risk-reward.html"
+                class="tool-link"
+            >
+                <span>Risk / Reward</span>
+                <span class="tool-link-key">02</span>
+            </a>
+
+            <a
+                href="pnl-calculator.html"
+                class="tool-link"
+            >
+                <span>PnL</span>
+                <span class="tool-link-key">03</span>
+            </a>
+
+            <a
+                href="leverage.html"
+                class="tool-link active"
+            >
+                <span>Leverage</span>
+                <span class="tool-link-key">04</span>
+            </a>
+        </aside>
+
+        <section class="workbench">
+
+            <div class="page-heading">
+                <div>
+                    <p class="page-heading-kicker">
+                        Exposure Engine / Margin Planning
+                    </p>
+
+                    <h1>Leverage</h1>
+
+                    <p>
+                        Measure how much market exposure your capital is controlling.
+                    </p>
+                </div>
+
+                <span class="live-badge">
+                    Live calculation
+                </span>
             </div>
 
-            <div>
-                <button
-                    id="calculate-leverage"
-                    type="button"
-                >
-                    Calculate Leverage
-                </button>
+            <div class="workspace-grid">
 
-                <button
-                    id="reset-leverage"
-                    type="button"
-                >
-                    Reset
-                </button>
-            </div>
+                <section class="panel">
 
-            <div id="leverage-results">
-
-                <h2>Result</h2>
-
-                <p>
-                    Effective Leverage
-                    <strong id="leverage-ratio">—</strong>
-                </p>
-
-                <dl>
-                    <div>
-                        <dt>Position Value</dt>
-                        <dd id="leverage-position-value">—</dd>
+                    <div class="panel-header">
+                        <strong>Exposure Parameters</strong>
+                        <span>Input</span>
                     </div>
 
-                    <div>
-                        <dt>Account Equity</dt>
-                        <dd id="leverage-equity">—</dd>
+                    <form
+                        id="leverage-calculator"
+                        class="trade-form"
+                    >
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="leverage-position-value"
+                                >
+                                    Position Value
+                                </label>
+
+                                <input
+                                    id="leverage-position-value"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="10000"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="leverage-account-equity"
+                                >
+                                    Account Equity
+                                </label>
+
+                                <input
+                                    id="leverage-account-equity"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="1000"
+                                >
+                            </div>
+
+                        </div>
+
+                        <div class="exposure-summary">
+
+                            <div>
+                                <span>Exposure</span>
+
+                                <strong id="exposure-context">
+                                    Incomplete
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Capital coverage</span>
+
+                                <strong id="coverage-context">
+                                    —
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div class="actions">
+
+                            <button
+                                id="calculate-leverage"
+                                type="button"
+                                class="action primary"
+                            >
+                                Recalculate
+                            </button>
+
+                            <button
+                                id="reset-leverage"
+                                type="button"
+                                class="action"
+                            >
+                                Reset
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+                <section class="panel result-panel">
+
+                    <div class="panel-header">
+                        <strong>Exposure Output</strong>
+
+                        <span id="calculation-state">
+                            Ready
+                        </span>
                     </div>
 
-                    <div>
-                        <dt>Margin Requirement</dt>
-                        <dd id="margin-requirement">—</dd>
+                    <div class="primary-result">
+
+                        <span class="primary-result-label">
+                            Effective Leverage
+                        </span>
+
+                        <strong
+                            id="leverage-ratio"
+                            class="primary-result-value"
+                        >
+                            —
+                        </strong>
+
+                        <span class="primary-result-unit">
+                            exposure multiple
+                        </span>
+
                     </div>
-                </dl>
+
+                    <div class="result-metrics">
+
+                        <div class="metric-block">
+
+                            <span class="metric-label">
+                                Position Value
+                            </span>
+
+                            <strong
+                                id="leverage-position-value-result"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+
+                        </div>
+
+                        <div class="metric-block">
+
+                            <span class="metric-label">
+                                Account Equity
+                            </span>
+
+                            <strong
+                                id="leverage-equity-result"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+
+                        </div>
+
+                        <div class="metric-block">
+
+                            <span class="metric-label">
+                                Margin Requirement
+                            </span>
+
+                            <strong
+                                id="margin-requirement"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="leverage-state"
+                        class="result-state"
+                    >
+                        Enter valid position value and account equity.
+                    </div>
+
+                </section>
 
             </div>
 
@@ -119,10 +307,10 @@
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
-    </footer>
+    <script
+        type="module"
+        src="/src/pages/leverage.ts"
+    ></script>
 
 </body>
 </html>

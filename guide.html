@@ -1,323 +1,998 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <meta
         name="description"
-        content="Trading Guide — Learn how markets work, how different trading methods work, and how to manage risk."
+        content="Trading reference covering markets, trading methods, risk management, technical concepts, psychology, and decision-making."
     >
 
     <title>Guide — Trading Tools</title>
-
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
 
-<body>
+<body class="guide-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav class="app-nav" aria-label="Application">
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+
+            <a
+                href="guide.html"
+                class="active"
+            >
+                Guide
+            </a>
         </nav>
+
+        <div class="header-state">
+            <span class="header-state-dot"></span>
+            <span>Research Reference</span>
+        </div>
+
     </header>
 
-    <main>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
 
-        <section>
-            <p>TRADING GUIDE</p>
+        <div id="market-tickers">
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+        </div>
+    </div>
 
-            <h1>Learn how trading works.</h1>
+    <main class="guide-shell">
 
-            <p>
-                Understand markets, trading methods, risk management,
-                and the psychology behind trading decisions.
-            </p>
+        <section class="guide-heading">
+
+            <div>
+
+                <p class="guide-kicker">
+                    Guide / Market Reference
+                </p>
+
+                <h1>
+                    Understand what you're measuring.
+                </h1>
+
+                <p>
+                    A practical reference for the market concepts behind
+                    the numbers Trading Tools helps you calculate.
+                </p>
+
+            </div>
+
+            <a
+                href="tools.html"
+                class="guide-heading-action"
+            >
+                Open Tools
+            </a>
+
         </section>
 
-        <section>
-            <h2>Getting Started</h2>
+        <section class="guide-controls">
 
-            <article>
-                <h3>What Is Trading?</h3>
-                <p>
-                    Learn what trading means, why markets exist, and how
-                    traders attempt to profit from changes in price.
-                </p>
-            </article>
+            <div
+                class="guide-filters"
+                role="group"
+                aria-label="Guide topics"
+            >
 
-            <article>
-                <h3>Why People Trade</h3>
-                <p>
-                    Explore why people participate in financial markets,
-                    from speculation and hedging to portfolio growth.
-                </p>
-            </article>
+                <button
+                    type="button"
+                    class="guide-filter active"
+                    data-category="all"
+                    aria-pressed="true"
+                >
+                    All
+                </button>
 
-            <article>
-                <h3>How Markets Work</h3>
-                <p>
-                    Understand buyers, sellers, liquidity, price discovery,
-                    exchanges, and the basic mechanics behind markets.
-                </p>
-            </article>
+                <button
+                    type="button"
+                    class="guide-filter"
+                    data-category="foundation"
+                    aria-pressed="false"
+                >
+                    Foundations
+                </button>
 
-            <article>
-                <h3>Market Participants</h3>
-                <p>
-                    Learn about retail traders, institutions, market makers,
-                    brokers, exchanges, and other participants.
-                </p>
-            </article>
+                <button
+                    type="button"
+                    class="guide-filter"
+                    data-category="market"
+                    aria-pressed="false"
+                >
+                    Markets
+                </button>
+
+                <button
+                    type="button"
+                    class="guide-filter"
+                    data-category="risk"
+                    aria-pressed="false"
+                >
+                    Risk
+                </button>
+
+                <button
+                    type="button"
+                    class="guide-filter"
+                    data-category="behavior"
+                    aria-pressed="false"
+                >
+                    Behavior
+                </button>
+
+            </div>
+
+            <label class="guide-search">
+
+                <span>
+                    Find a topic
+                </span>
+
+                <input
+                    id="guide-search-input"
+                    type="search"
+                    autocomplete="off"
+                    placeholder="Search markets, leverage, liquidity…"
+                >
+
+            </label>
+
         </section>
 
-        <section>
-            <h2>Trading Types</h2>
+        <div class="guide-layout">
 
-            <article>
-                <h3>Spot Trading</h3>
-                <p>
-                    Learn the basics of buying and selling assets directly
-                    in the underlying market.
-                </p>
-            </article>
+            <aside class="guide-index">
 
-            <article>
-                <h3>Margin Trading</h3>
-                <p>
-                    Understand borrowed capital, leverage, margin requirements,
-                    and the additional risks involved.
-                </p>
-            </article>
+                <div class="guide-index-heading">
+                    <span class="panel-kicker">
+                        On this page
+                    </span>
 
-            <article>
-                <h3>Futures Trading</h3>
-                <p>
-                    Learn how futures contracts work and why leverage,
-                    margin, and liquidation matter.
-                </p>
-            </article>
+                    <strong>
+                        Reference
+                    </strong>
+                </div>
 
-            <article>
-                <h3>Forex Trading</h3>
-                <p>
-                    Understand currency pairs, exchange rates, and the
-                    fundamentals of the foreign exchange market.
-                </p>
-            </article>
+                <nav aria-label="Guide sections">
 
-            <article>
-                <h3>Degen Trading</h3>
-                <p>
-                    Explore highly speculative trading environments and
-                    the extreme risks associated with them.
-                </p>
-            </article>
+                    <a href="#foundations">
+                        Foundations
+                    </a>
 
-            <article>
-                <h3>Copy Trading</h3>
-                <p>
-                    Learn how copy trading works and the risks of relying
-                    on another trader's decisions.
-                </p>
-            </article>
+                    <a href="#markets">
+                        Markets
+                    </a>
 
-            <article>
-                <h3>Arbitrage</h3>
-                <p>
-                    Understand how traders attempt to benefit from price
-                    differences between markets or exchanges.
-                </p>
-            </article>
+                    <a href="#trading-methods">
+                        Trading methods
+                    </a>
 
-            <article>
-                <h3>Algorithmic Trading</h3>
-                <p>
-                    Learn how rules and software can automate parts of
-                    a trading strategy.
-                </p>
-            </article>
+                    <a href="#risk-management">
+                        Risk management
+                    </a>
 
-            <article>
-                <h3>Options Trading</h3>
-                <p>
-                    Understand calls, puts, premiums, expiration, and
-                    the unique risks of options.
-                </p>
-            </article>
-        </section>
+                    <a href="#behavior">
+                        Psychology & behavior
+                    </a>
 
-        <section>
-            <h2>Risk Management</h2>
+                    <a href="#technical">
+                        Technical concepts
+                    </a>
 
-            <article>
-                <h3>Risk & Reward</h3>
-                <p>
-                    Understand the relationship between potential gains,
-                    potential losses, and trade outcomes.
-                </p>
+                    <a href="#workflow">
+                        Applying the concepts
+                    </a>
 
-                <a href="risk-reward.html">
-                    Open Risk/Reward Calculator
-                </a>
-            </article>
+                </nav>
 
-            <article>
-                <h3>Position Sizing</h3>
-                <p>
-                    Learn how account size, acceptable risk, entry price,
-                    and stop-loss distance affect position size.
-                </p>
+            </aside>
 
-                <a href="position-size.html">
-                    Open Position Size Calculator
-                </a>
-            </article>
+            <div class="guide-content">
 
-            <article>
-                <h3>Leverage</h3>
-                <p>
-                    Understand how leverage increases market exposure and
-                    why greater exposure also increases risk.
-                </p>
+                <section
+                    id="foundations"
+                    class="guide-section"
+                >
 
-                <a href="leverage.html">
-                    Open Leverage Calculator
-                </a>
-            </article>
+                    <div class="guide-section-heading">
 
-            <article>
-                <h3>Risk Management</h3>
-                <p>
-                    Explore position sizing, stop-losses, leverage, drawdown,
-                    diversification, fees, slippage, liquidity, and exposure.
-                </p>
-            </article>
-        </section>
+                        <div>
+                            <span class="section-index">
+                                01
+                            </span>
 
-        <section>
-            <h2>Trading Psychology</h2>
+                            <h2>
+                                Foundations
+                            </h2>
+                        </div>
 
-            <article>
-                <h3>Trading Psychology</h3>
-                <p>
-                    Understand how fear, greed, FOMO, overconfidence,
-                    confirmation bias, and loss aversion can affect decisions.
-                </p>
-            </article>
+                        <span>
+                            Start here
+                        </span>
 
-            <article>
-                <h3>Common Trading Mistakes</h3>
-                <p>
-                    Learn why traders overtrade, move stops irrationally,
-                    chase price movements, increase leverage after losses,
-                    and abandon their plans.
-                </p>
-            </article>
+                    </div>
 
-            <article>
-                <h3>Discipline</h3>
-                <p>
-                    Learn why having a trading plan is not enough and how
-                    consistent rules can help reduce emotional decisions.
-                </p>
-            </article>
-        </section>
+                    <div class="guide-topics">
 
-        <section>
-            <h2>Technical Concepts</h2>
+                        <article
+                            class="guide-topic"
+                            data-category="foundation"
+                            data-search="what is trading markets buyers sellers price changes speculation"
+                        >
+                            <h3>
+                                What is trading?
+                            </h3>
 
-            <article>
-                <h3>Price & Volume</h3>
-                <p>
-                    Understand the basic relationship between price movement,
-                    trading activity, and market participation.
-                </p>
-            </article>
+                            <p>
+                                Trading is the buying and selling of financial
+                                instruments with the aim of managing exposure,
+                                transferring risk, or attempting to benefit
+                                from price movement.
+                            </p>
+                        </article>
 
-            <article>
-                <h3>Liquidity</h3>
-                <p>
-                    Learn why liquidity matters, how it affects execution,
-                    and why low-liquidity markets can increase risk.
-                </p>
-            </article>
+                        <article
+                            class="guide-topic"
+                            data-category="foundation"
+                            data-search="market participants retail institution market maker broker exchange"
+                        >
+                            <h3>
+                                Market participants
+                            </h3>
 
-            <article>
-                <h3>Volatility</h3>
-                <p>
-                    Understand why markets move differently over time and
-                    how volatility affects trading risk.
-                </p>
-            </article>
-        </section>
+                            <p>
+                                Retail traders, institutions, market makers,
+                                brokers, exchanges, funds, and other participants
+                                interact to create orders, liquidity, and price discovery.
+                            </p>
+                        </article>
 
-        <section>
-            <h2>Advanced Concepts</h2>
+                        <article
+                            class="guide-topic"
+                            data-category="foundation"
+                            data-search="price discovery order book bid ask spread liquidity"
+                        >
+                            <h3>
+                                Price discovery
+                            </h3>
 
-            <article>
-                <h3>Arbitrage Trading</h3>
-                <p>
-                    Explore price discrepancies between markets and the
-                    practical challenges involved in arbitrage.
-                </p>
-            </article>
+                            <p>
+                                Prices emerge from the interaction of buy and sell
+                                orders. Bid, ask, spread, depth, and available
+                                liquidity all affect how that process behaves.
+                            </p>
+                        </article>
 
-            <article>
-                <h3>Algorithmic Trading</h3>
-                <p>
-                    Understand the foundations of rule-based and automated
-                    trading systems.
-                </p>
-            </article>
+                        <article
+                            class="guide-topic"
+                            data-category="foundation"
+                            data-search="trading plan entry exit stop target position size"
+                        >
+                            <h3>
+                                Trading plans
+                            </h3>
 
-            <article>
-                <h3>Options</h3>
-                <p>
-                    Explore the concepts behind options contracts and the
-                    additional factors that affect their risk.
-                </p>
-            </article>
-        </section>
+                            <p>
+                                A trading plan defines what is being traded,
+                                why the position exists, where invalidation occurs,
+                                how much is at risk, and what conditions change the plan.
+                            </p>
+                        </article>
 
-        <section>
-            <h2>Use What You Learn</h2>
+                    </div>
 
-            <p>
-                Trading knowledge becomes more useful when you can apply it.
-                Use the Trading Tools calculators to turn concepts such as
-                position sizing, risk, leverage, and reward into measurable
-                numbers.
-            </p>
+                </section>
 
-            <a href="tools.html">Explore Trading Tools</a>
-        </section>
+                <section
+                    id="markets"
+                    class="guide-section"
+                >
 
-        <section>
-            <h2>Responsible Trading</h2>
+                    <div class="guide-section-heading">
 
-            <p>
-                Trading involves risk. No strategy guarantees profit, and
-                historical performance does not guarantee future results.
-                Trading Tools provides educational information and decision
-                support, not financial advice or guaranteed outcomes.
-            </p>
-        </section>
+                        <div>
+                            <span class="section-index">
+                                02
+                            </span>
+
+                            <h2>
+                                Markets
+                            </h2>
+                        </div>
+
+                        <span>
+                            Where the numbers come from
+                        </span>
+
+                    </div>
+
+                    <div class="guide-topics">
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="spot trading underlying asset buying selling crypto stocks forex"
+                        >
+                            <h3>
+                                Spot trading
+                            </h3>
+
+                            <p>
+                                Spot markets involve buying or selling the
+                                underlying instrument rather than a derivative
+                                contract built from it.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="margin leverage futures perpetual contract liquidation"
+                        >
+                            <h3>
+                                Margin and derivatives
+                            </h3>
+
+                            <p>
+                                Margin allows a trader to control exposure with
+                                less capital than the full position value. Futures
+                                and perpetual contracts add leverage and liquidation risk.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="forex currency pair base quote spread pips exchange rate"
+                        >
+                            <h3>
+                                Forex markets
+                            </h3>
+
+                            <p>
+                                Forex instruments quote one currency against another.
+                                Price conventions, spread, position size, and pip
+                                calculations depend on the pair and trading environment.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="crypto market exchange volatility liquidity token coin"
+                        >
+                            <h3>
+                                Crypto markets
+                            </h3>
+
+                            <p>
+                                Cryptocurrency markets operate across centralized
+                                and decentralized venues, often with significant
+                                differences in liquidity, volatility, and market structure.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="stocks equities market exchange shares"
+                        >
+                            <h3>
+                                Equity markets
+                            </h3>
+
+                            <p>
+                                Stocks represent ownership interests in companies.
+                                Trading conditions can vary by exchange, session,
+                                instrument, liquidity, and corporate events.
+                            </p>
+                        </article>
+
+                    </div>
+
+                </section>
+
+                <section
+                    id="trading-methods"
+                    class="guide-section"
+                >
+
+                    <div class="guide-section-heading">
+
+                        <div>
+                            <span class="section-index">
+                                03
+                            </span>
+
+                            <h2>
+                                Trading methods
+                            </h2>
+                        </div>
+
+                        <span>
+                            Different ways to participate
+                        </span>
+
+                    </div>
+
+                    <div class="guide-topics">
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="day trading short term intraday"
+                        >
+                            <h3>
+                                Day trading
+                            </h3>
+
+                            <p>
+                                Positions are generally opened and closed within
+                                the same trading session, making execution,
+                                volatility, and short-term risk especially important.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="swing trading multi day trend position"
+                        >
+                            <h3>
+                                Swing trading
+                            </h3>
+
+                            <p>
+                                Swing traders typically hold positions across
+                                multiple sessions and focus on larger price movements
+                                than purely intraday strategies.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="position trading long term trend investing"
+                        >
+                            <h3>
+                                Position trading
+                            </h3>
+
+                            <p>
+                                Position trading generally uses longer holding periods,
+                                with decisions based on broader market structure,
+                                trends, fundamentals, or other long-horizon factors.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="arbitrage price difference exchanges venues"
+                        >
+                            <h3>
+                                Arbitrage
+                            </h3>
+
+                            <p>
+                                Arbitrage strategies attempt to capture price
+                                differences between related markets or venues,
+                                while accounting for fees, latency, liquidity, and execution.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="algorithmic trading automated rules software strategy"
+                        >
+                            <h3>
+                                Algorithmic trading
+                            </h3>
+
+                            <p>
+                                Algorithmic systems use explicit rules or models
+                                to analyze markets, generate signals, manage orders,
+                                or automate parts of a trading process.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="options calls puts premium expiration strike implied volatility"
+                        >
+                            <h3>
+                                Options
+                            </h3>
+
+                            <p>
+                                Options give the holder defined rights under a contract.
+                                Strike price, premium, expiration, volatility, and time
+                                all affect their behavior and risk.
+                            </p>
+                        </article>
+
+                    </div>
+
+                </section>
+
+                <section
+                    id="risk-management"
+                    class="guide-section"
+                >
+
+                    <div class="guide-section-heading">
+
+                        <div>
+                            <span class="section-index">
+                                04
+                            </span>
+
+                            <h2>
+                                Risk management
+                            </h2>
+                        </div>
+
+                        <span>
+                            Define the downside first
+                        </span>
+
+                    </div>
+
+                    <div class="guide-topics">
+
+                        <article
+                            class="guide-topic"
+                            data-category="risk"
+                            data-search="position sizing account risk stop loss entry price"
+                        >
+                            <h3>
+                                Position sizing
+                            </h3>
+
+                            <p>
+                                Position size connects account risk to the distance
+                                between entry and invalidation. The same percentage
+                                risk can require very different position sizes.
+                            </p>
+
+                            <a href="position-size.html">
+                                Open Position Size
+                            </a>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="risk"
+                            data-search="risk reward rr target stop profit loss trade"
+                        >
+                            <h3>
+                                Risk / reward
+                            </h3>
+
+                            <p>
+                                Risk / reward compares the distance to a defined
+                                loss point with the distance to a defined target.
+                                It describes the setup; it does not predict the outcome.
+                            </p>
+
+                            <a href="risk-reward.html">
+                                Open Risk / Reward
+                            </a>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="risk"
+                            data-search="leverage margin exposure effective leverage capital"
+                        >
+                            <h3>
+                                Leverage
+                            </h3>
+
+                            <p>
+                                Leverage changes the amount of market exposure
+                                relative to available capital. Increasing exposure
+                                also changes the consequences of adverse price movement.
+                            </p>
+
+                            <a href="leverage.html">
+                                Open Leverage
+                            </a>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="risk"
+                            data-search="pnl profit loss fees entry exit position size"
+                        >
+                            <h3>
+                                PnL
+                            </h3>
+
+                            <p>
+                                Profit and loss can be measured from entry,
+                                exit, direction, position size, and fees.
+                                Net results matter more than a price move viewed in isolation.
+                            </p>
+
+                            <a href="pnl-calculator.html">
+                                Open PnL
+                            </a>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="risk"
+                            data-search="volatility risk range movement stop loss"
+                        >
+                            <h3>
+                                Volatility
+                            </h3>
+
+                            <p>
+                                Volatility describes how much and how quickly
+                                prices move. Higher volatility can increase both
+                                opportunity and the size of normal adverse movement.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="risk"
+                            data-search="liquidity slippage spread execution market impact"
+                        >
+                            <h3>
+                                Liquidity and slippage
+                            </h3>
+
+                            <p>
+                                Thin liquidity can increase spreads, slippage,
+                                and execution uncertainty. Position size should be
+                                considered alongside actual market depth.
+                            </p>
+                        </article>
+
+                    </div>
+
+                </section>
+
+                <section
+                    id="behavior"
+                    class="guide-section"
+                >
+
+                    <div class="guide-section-heading">
+
+                        <div>
+                            <span class="section-index">
+                                05
+                            </span>
+
+                            <h2>
+                                Psychology & behavior
+                            </h2>
+                        </div>
+
+                        <span>
+                            The human part of the system
+                        </span>
+
+                    </div>
+
+                    <div class="guide-topics">
+
+                        <article
+                            class="guide-topic"
+                            data-category="behavior"
+                            data-search="fear greed emotions trading psychology"
+                        >
+                            <h3>
+                                Fear and greed
+                            </h3>
+
+                            <p>
+                                Emotional reactions can affect entries,
+                                exits, sizing, and willingness to follow
+                                previously defined rules.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="behavior"
+                            data-search="fomo chasing price overtrading"
+                        >
+                            <h3>
+                                FOMO and chasing
+                            </h3>
+
+                            <p>
+                                Entering because a move already happened can
+                                change the original risk structure of a trade.
+                                The resulting position may no longer resemble the planned setup.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="behavior"
+                            data-search="confirmation bias selective evidence trading"
+                        >
+                            <h3>
+                                Confirmation bias
+                            </h3>
+
+                            <p>
+                                Traders can unconsciously prefer information that
+                                supports an existing view. Deliberately defining
+                                invalidation helps make the analysis less one-sided.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="behavior"
+                            data-search="revenge trading losses sizing discipline"
+                        >
+                            <h3>
+                                Revenge trading
+                            </h3>
+
+                            <p>
+                                Increasing risk because of a previous loss changes
+                                the decision process. Recording trades makes it easier
+                                to examine whether sizing or behavior is drifting.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="behavior"
+                            data-search="trading journal review performance record"
+                        >
+                            <h3>
+                                Review and journaling
+                            </h3>
+
+                            <p>
+                                Recording what was known, what was planned,
+                                what happened, and what changed creates a basis
+                                for reviewing decisions rather than only outcomes.
+                            </p>
+                        </article>
+
+                    </div>
+
+                </section>
+
+                <section
+                    id="technical"
+                    class="guide-section"
+                >
+
+                    <div class="guide-section-heading">
+
+                        <div>
+                            <span class="section-index">
+                                06
+                            </span>
+
+                            <h2>
+                                Technical concepts
+                            </h2>
+                        </div>
+
+                        <span>
+                            The market vocabulary
+                        </span>
+
+                    </div>
+
+                    <div class="guide-topics">
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="price volume trading activity"
+                        >
+                            <h3>
+                                Price and volume
+                            </h3>
+
+                            <p>
+                                Price shows where transactions occur while volume
+                                provides information about trading activity.
+                                Interpretation depends on the instrument and market structure.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="support resistance levels chart structure"
+                        >
+                            <h3>
+                                Support and resistance
+                            </h3>
+
+                            <p>
+                                Traders often use recurring areas of buying or selling
+                                interest as reference levels. These are analytical
+                                constructs, not guarantees that price will reverse.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="trend market structure higher high lower low"
+                        >
+                            <h3>
+                                Trend and structure
+                            </h3>
+
+                            <p>
+                                Market structure can be described using sequences
+                                of highs and lows, ranges, breakouts, and changes
+                                in directional behavior.
+                            </p>
+                        </article>
+
+                        <article
+                            class="guide-topic"
+                            data-category="market"
+                            data-search="timeframe multiple timeframe analysis"
+                        >
+                            <h3>
+                                Timeframes
+                            </h3>
+
+                            <p>
+                                The same instrument can display very different
+                                behavior across timeframes. A setup's timeframe
+                                should match the way the position is being managed.
+                            </p>
+                        </article>
+
+                    </div>
+
+                </section>
+
+                <section
+                    id="workflow"
+                    class="guide-section guide-workflow"
+                >
+
+                    <div class="guide-section-heading">
+
+                        <div>
+                            <span class="section-index">
+                                07
+                            </span>
+
+                            <h2>
+                                Applying the concepts
+                            </h2>
+                        </div>
+
+                        <span>
+                            From information to decision
+                        </span>
+
+                    </div>
+
+                    <div class="workflow-sequence">
+
+                        <span>Learn</span>
+                        <span>Calculate</span>
+                        <span>Analyze</span>
+                        <span>Plan</span>
+                        <span>Manage Risk</span>
+                        <span>Decide</span>
+                        <span>Record</span>
+                        <span>Review</span>
+                        <span>Improve</span>
+
+                    </div>
+
+                    <div class="guide-workflow-copy">
+
+                        <p>
+                            Trading Tools is designed around the idea that
+                            individual calculations are more useful when they
+                            remain connected to the broader decision process.
+                        </p>
+
+                        <p>
+                            A market can become a trade context. That context can
+                            feed risk calculations, position sizing, reward analysis,
+                            and later review through Workspace.
+                        </p>
+
+                        <a href="workspace.html">
+                            Open Workspace
+                        </a>
+
+                    </div>
+
+                </section>
+
+                <div
+                    id="guide-empty"
+                    class="guide-empty"
+                    hidden
+                >
+                    <strong>
+                        No matching topics
+                    </strong>
+
+                    <span>
+                        Try another search or select a different guide section.
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
+    <footer class="app-footer">
+
+        <span>
+            Trading Tools
+        </span>
+
+        <span>
+            Educational reference · Not financial advice
+        </span>
+
     </footer>
 
+    <script
+        type="module"
+        src="/src/pages/guide.ts"
+    ></script>
+
 </body>
+
 </html>

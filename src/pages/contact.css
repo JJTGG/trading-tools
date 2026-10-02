@@ -1,0 +1,266 @@
+body.contact-page {
+    background: var(--canvas);
+    color: var(--text);
+}
+
+.contact-shell {
+    width: min(
+        1200px,
+        calc(100% - 40px)
+    );
+
+    margin: 0 auto;
+    padding: 40px 0 64px;
+}
+
+.contact-heading {
+    min-height: 220px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+
+    padding-bottom: 30px;
+
+    border-bottom: 1px solid var(--line);
+}
+
+.contact-kicker {
+    margin: 0 0 9px;
+
+    color: var(--text-faint);
+
+    font-family: var(--font-data);
+    font-size: var(--text-xs);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.contact-heading h1 {
+    max-width: 780px;
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: clamp(
+        2.4rem,
+        5vw,
+        4rem
+    );
+
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+}
+
+.contact-heading > div > p:last-child {
+    max-width: 620px;
+    margin: 15px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: var(--text-md);
+    line-height: 1.6;
+}
+
+.contact-meta {
+    flex: 0 0 auto;
+
+    color: var(--text-faint);
+
+    font-family: var(--font-data);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+}
+
+.contact-layout {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.1fr)
+        minmax(300px, 0.9fr);
+
+    margin-top: 28px;
+
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.contact-primary {
+    min-height: 280px;
+    padding: 28px 30px 28px 0;
+
+    border-right: 1px solid var(--line);
+}
+
+.contact-secondary {
+    padding: 28px 0 28px 30px;
+}
+
+.contact-label {
+    margin-bottom: 14px;
+
+    color: var(--text-faint);
+
+    font-family: var(--font-data);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.contact-email {
+    display: inline-block;
+
+    color: var(--text);
+
+    font-size: clamp(
+        1.15rem,
+        2.4vw,
+        1.7rem
+    );
+
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.contact-email:hover {
+    color: var(--accent-strong);
+}
+
+.contact-copy {
+    max-width: 550px;
+    margin: 15px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: var(--text-sm);
+    line-height: 1.65;
+}
+
+.contact-list {
+    display: grid;
+}
+
+.contact-list > div {
+    min-height: 40px;
+
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    align-items: center;
+
+    border-bottom: 1px solid var(--line);
+}
+
+.contact-list > div:first-child {
+    border-top: 1px solid var(--line);
+}
+
+.contact-list span {
+    color: var(--text-faint);
+
+    font-family: var(--font-data);
+    font-size: var(--text-xs);
+}
+
+.contact-list strong {
+    color: var(--text-muted);
+
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.contact-note {
+    margin-top: 28px;
+    padding: 22px 0;
+
+    display: grid;
+    grid-template-columns:
+        minmax(0, 0.8fr)
+        minmax(0, 1.2fr);
+
+    gap: 30px;
+
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.contact-note h2 {
+    max-width: 420px;
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 1.15rem;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+
+.contact-note > p {
+    max-width: 650px;
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: var(--text-sm);
+    line-height: 1.65;
+}
+
+.app-footer {
+    width: min(
+        1200px,
+        calc(100% - 40px)
+    );
+
+    margin: 0 auto;
+    padding: 16px 0 24px;
+
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+
+    color: var(--text-faint);
+
+    font-family: var(--font-data);
+    font-size: var(--text-xs);
+}
+
+@media (max-width: 760px) {
+    .contact-shell {
+        width: calc(100% - 24px);
+        padding-top: 28px;
+    }
+
+    .contact-heading {
+        min-height: 0;
+
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .contact-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-primary {
+        min-height: 0;
+
+        padding: 22px 0;
+
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .contact-secondary {
+        padding: 22px 0;
+    }
+
+    .contact-note {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .app-footer {
+        width: calc(100% - 24px);
+        flex-direction: column;
+    }
+}

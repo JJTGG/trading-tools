@@ -20,6 +20,35 @@ export interface UserProfile {
     onboarding_completed: boolean;
 }
 
+export type ProfileUpdates =
+    Partial<{
+        display_name: string;
+        preferred_currency: string;
+        markets_traded: string[];
+        experience_level: string;
+        workspace_preferences:
+            Record<string, unknown>;
+        onboarding_completed: boolean;
+    }>;
+
+interface ProfileQuery {
+    maybeSingle(): Promise<{
+        data: UserProfile | null;
+        error: SupabaseError | null;
+    }>;
+}
+
+interface ProfileUpdateQuery {
+    eq(
+        column: string,
+        value: unknown
+    ): {
+        select(
+            columns?: string
+        ): ProfileQuery;
+    };
+}
+
 interface SupabaseClientLike {
     auth: {
         getUser(): Promise<{
@@ -63,13 +92,12 @@ interface SupabaseClientLike {
             eq(
                 column: string,
                 value: unknown
-            ): {
-                maybeSingle(): Promise<{
-                    data: UserProfile | null;
-                    error: SupabaseError | null;
-                }>;
-            };
+            ): ProfileQuery;
         };
+
+        update(
+            values: ProfileUpdates
+        ): ProfileUpdateQuery;
     };
 }
 
@@ -79,18 +107,19 @@ declare global {
     }
 }
 
-const getClient = (): SupabaseClientLike => {
-    const client =
-        window.supabaseClient;
+export const getClient =
+    (): SupabaseClientLike => {
+        const client =
+            window.supabaseClient;
 
-    if (!client) {
-        throw new Error(
-            "Supabase client is unavailable."
-        );
-    }
+        if (!client) {
+            throw new Error(
+                "Supabase client is unavailable."
+            );
+        }
 
-    return client;
-};
+        return client;
+    };
 
 export const getCurrentUser =
     async (): Promise<AuthUser | null> => {
@@ -142,6 +171,36 @@ export const getUserProfile =
         return data;
     };
 
+export const updateUserProfile =
+    async (
+        userId: string,
+        updates: ProfileUpdates
+    ): Promise<void> => {
+        const {
+            data,
+            error
+        } =
+            await getClient()
+                .from("profiles")
+                .update(updates)
+                .eq(
+                    "id",
+                    userId
+                )
+                .select("id")
+                .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data) {
+            throw new Error(
+                "Your profile could not be updated."
+            );
+        }
+    };
+
 const getSafeNext = (
     value: string | null
 ): string => {
@@ -168,7 +227,8 @@ const getSafeNext = (
                 "workspace.html",
                 "settings.html",
                 "preferences.html",
-                "onboarding.html"
+                "onboarding.html",
+                "tools.html"
             ]);
 
         const filename =
@@ -192,6 +252,21 @@ const getSafeNext = (
     } catch {
         return "workspace.html";
     }
+};
+
+const getDefaultLandingPage = (
+    profile: UserProfile
+): string => {
+    const defaultPage =
+        profile.workspace_preferences &&
+        typeof profile.workspace_preferences.default_page ===
+            "string"
+            ? profile.workspace_preferences.default_page
+            : "workspace";
+
+    return defaultPage === "tools"
+        ? "tools.html"
+        : "workspace.html";
 };
 
 export const currentPageDestination =
@@ -253,10 +328,17 @@ export const redirectAfterAuthentication =
             return;
         }
 
+        const requestedNext =
+            params.get("next");
+
         window.location.href =
-            getSafeNext(
-                params.get("next")
-            );
+            requestedNext
+                ? getSafeNext(
+                    requestedNext
+                )
+                : getDefaultLandingPage(
+                    profile
+                );
     };
 
 export const requireWorkspaceProfile =

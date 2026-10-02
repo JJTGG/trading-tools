@@ -3,6 +3,10 @@ import {
     type MarketQuote
 } from "../data/market-data";
 
+import {
+    getWatchlistSymbols
+} from "../data/watchlist";
+
 const DEFAULT_SYMBOLS = [
     "BTC/USD",
     "ETH/USD",
@@ -158,9 +162,17 @@ const renderQuotes = (
 const loadMarkets = async (): Promise<void> => {
     setConnectionState("connecting");
 
+    const watchlistSymbols =
+        await getWatchlistSymbols();
+
+    const symbols =
+        watchlistSymbols.length
+            ? watchlistSymbols
+            : DEFAULT_SYMBOLS;
+
     const results =
         await Promise.allSettled(
-            DEFAULT_SYMBOLS.map(
+            symbols.map(
                 getMarketQuote
             )
         );
@@ -197,14 +209,19 @@ const loadMarkets = async (): Promise<void> => {
 };
 
 export function mountMarketStrip(): void {
-    if (!strip || !tickerContainer) {
+    if (
+        !strip ||
+        !tickerContainer
+    ) {
         return;
     }
 
-    loadMarkets();
+    void loadMarkets();
 
     window.setInterval(
-        loadMarkets,
+        () => {
+            void loadMarkets();
+        },
         30_000
     );
 }

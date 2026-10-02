@@ -2,6 +2,8 @@ import "../styles/tokens.css";
 import "../styles/base.css";
 import "./position-size.css";
 
+import { mountMarketStrip } from "../components/market-strip";
+
 interface SupabaseError {
     message: string;
 }
@@ -27,7 +29,10 @@ interface SupabaseClientLike {
     };
 }
 
-declare const supabaseClient: SupabaseClientLike;
+interface MarketSelectionDetail {
+    symbol: string;
+    price: number;
+}
 
 interface PositionSizeInputs {
     symbol: string;
@@ -51,14 +56,22 @@ interface CalculationState {
     result: PositionSizeResult;
 }
 
+declare const supabaseClient: SupabaseClientLike;
+
 const symbolInput =
-    document.querySelector<HTMLInputElement>("#trade-symbol");
+    document.querySelector<HTMLInputElement>(
+        "#trade-symbol"
+    );
 
 const timeframeInput =
-    document.querySelector<HTMLSelectElement>("#trade-timeframe");
+    document.querySelector<HTMLSelectElement>(
+        "#trade-timeframe"
+    );
 
 const directionInput =
-    document.querySelector<HTMLInputElement>("#position-direction");
+    document.querySelector<HTMLInputElement>(
+        "#position-direction"
+    );
 
 const directionButtons =
     document.querySelectorAll<HTMLButtonElement>(
@@ -66,16 +79,24 @@ const directionButtons =
     );
 
 const accountBalanceInput =
-    document.querySelector<HTMLInputElement>("#account-balance");
+    document.querySelector<HTMLInputElement>(
+        "#account-balance"
+    );
 
 const riskPercentInput =
-    document.querySelector<HTMLInputElement>("#risk-percent");
+    document.querySelector<HTMLInputElement>(
+        "#risk-percent"
+    );
 
 const entryPriceInput =
-    document.querySelector<HTMLInputElement>("#entry-price");
+    document.querySelector<HTMLInputElement>(
+        "#entry-price"
+    );
 
 const stopLossInput =
-    document.querySelector<HTMLInputElement>("#stop-loss");
+    document.querySelector<HTMLInputElement>(
+        "#stop-loss"
+    );
 
 const calculateButton =
     document.querySelector<HTMLButtonElement>(
@@ -167,9 +188,12 @@ const riskMapEntryLabel =
         "#risk-map-entry-label"
     );
 
-let lastCalculation: CalculationState | null = null;
+let lastCalculation: CalculationState | null =
+    null;
 
-const formatNumber = (value: number): string => {
+const formatNumber = (
+    value: number
+): string => {
     return new Intl.NumberFormat(undefined, {
         maximumFractionDigits: 8
     }).format(value);
@@ -186,24 +210,38 @@ const setText = (
 
 const getInputs = (): PositionSizeInputs => {
     return {
-        symbol: symbolInput?.value.trim().toUpperCase() || "",
-        timeframe: timeframeInput?.value || "1H",
+        symbol:
+            symbolInput?.value
+                .trim()
+                .toUpperCase() || "",
+
+        timeframe:
+            timeframeInput?.value || "1H",
+
         direction:
             directionInput?.value === "short"
                 ? "short"
                 : "long",
-        accountBalance: Number(
-            accountBalanceInput?.value
-        ),
-        riskPercent: Number(
-            riskPercentInput?.value
-        ),
-        entryPrice: Number(
-            entryPriceInput?.value
-        ),
-        stopLoss: Number(
-            stopLossInput?.value
-        )
+
+        accountBalance:
+            Number(
+                accountBalanceInput?.value
+            ),
+
+        riskPercent:
+            Number(
+                riskPercentInput?.value
+            ),
+
+        entryPrice:
+            Number(
+                entryPriceInput?.value
+            ),
+
+        stopLoss:
+            Number(
+                stopLossInput?.value
+            )
     };
 };
 
@@ -255,19 +293,21 @@ const isValid = (
     return true;
 };
 
-const clearResults = (): void => {
+const clearResults = (
+    message = "Enter valid trade parameters."
+): void => {
     setText(positionSizeResult, "—");
     setText(riskAmountResult, "—");
     setText(riskPerUnitResult, "—");
     setText(positionValueResult, "—");
 
     setText(calculationState, "Ready");
-    setText(
-        positionSizeState,
-        "Enter valid trade parameters."
-    );
+    setText(positionSizeState, message);
 
-    positionSizeState?.classList.remove("invalid");
+    positionSizeState?.classList.toggle(
+        "invalid",
+        message !== "Enter valid trade parameters."
+    );
 
     if (saveButton) {
         saveButton.disabled = true;
@@ -293,13 +333,17 @@ const updateContextSummary = (
 
     if (Number.isFinite(inputs.entryPrice)) {
         parts.push(
-            `Entry ${formatNumber(inputs.entryPrice)}`
+            `Entry ${formatNumber(
+                inputs.entryPrice
+            )}`
         );
     }
 
     if (Number.isFinite(inputs.stopLoss)) {
         parts.push(
-            `Stop ${formatNumber(inputs.stopLoss)}`
+            `Stop ${formatNumber(
+                inputs.stopLoss
+            )}`
         );
     }
 
@@ -324,24 +368,31 @@ const updateRiskMap = (
     if (
         inputs.entryPrice <= 0 ||
         inputs.stopLoss <= 0 ||
-        inputs.entryPrice === inputs.stopLoss
+        inputs.entryPrice ===
+            inputs.stopLoss
     ) {
         return;
     }
 
-    const distance = Math.abs(
-        inputs.entryPrice - inputs.stopLoss
-    );
+    const distance =
+        Math.abs(
+            inputs.entryPrice -
+            inputs.stopLoss
+        );
 
     setText(
         riskDistanceLabel,
         formatNumber(distance)
     );
 
-    const isLong = inputs.direction === "long";
+    const isLong =
+        inputs.direction === "long";
 
-    const stopPosition = isLong ? 18 : 82;
-    const entryPosition = isLong ? 82 : 18;
+    const stopPosition =
+        isLong ? 18 : 82;
+
+    const entryPosition =
+        isLong ? 82 : 18;
 
     riskMapStop?.style.setProperty(
         "left",
@@ -355,12 +406,16 @@ const updateRiskMap = (
 
     setText(
         riskMapStopLabel,
-        `Stop ${formatNumber(inputs.stopLoss)}`
+        `Stop ${formatNumber(
+            inputs.stopLoss
+        )}`
     );
 
     setText(
         riskMapEntryLabel,
-        `Entry ${formatNumber(inputs.entryPrice)}`
+        `Entry ${formatNumber(
+            inputs.entryPrice
+        )}`
     );
 };
 
@@ -392,7 +447,8 @@ const calculate = (): void => {
         riskAmount / riskPerUnit;
 
     const positionValue =
-        positionSize * inputs.entryPrice;
+        positionSize *
+        inputs.entryPrice;
 
     const result: PositionSizeResult = {
         riskAmount,
@@ -426,14 +482,19 @@ const calculate = (): void => {
         formatNumber(positionValue)
     );
 
-    setText(calculationState, "Calculated");
+    setText(
+        calculationState,
+        "Calculated"
+    );
 
     setText(
         positionSizeState,
         `${inputs.direction === "long" ? "Long" : "Short"} · ${inputs.riskPercent}% account risk`
     );
 
-    positionSizeState?.classList.remove("invalid");
+    positionSizeState?.classList.remove(
+        "invalid"
+    );
 
     if (saveButton) {
         saveButton.disabled = false;
@@ -444,73 +505,127 @@ const setDirection = (
     direction: "long" | "short"
 ): void => {
     if (directionInput) {
-        directionInput.value = direction;
+        directionInput.value =
+            direction;
     }
 
-    directionButtons.forEach((button) => {
-        const active =
-            button.dataset.direction === direction;
+    directionButtons.forEach(
+        (button) => {
+            const active =
+                button.dataset.direction ===
+                direction;
 
-        button.classList.toggle("active", active);
-        button.setAttribute(
-            "aria-pressed",
-            String(active)
-        );
-    });
+            button.classList.toggle(
+                "active",
+                active
+            );
+
+            button.setAttribute(
+                "aria-pressed",
+                String(active)
+            );
+        }
+    );
 
     calculate();
 };
 
 const applyContextFromUrl = (): void => {
     const params =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
 
-    const symbol = params.get("symbol");
-    const timeframe = params.get("timeframe");
-    const direction = params.get("direction");
+    const symbol =
+        params.get("symbol");
+
+    const timeframe =
+        params.get("timeframe");
+
+    const direction =
+        params.get("direction");
+
     const accountBalance =
         params.get("accountBalance");
+
     const riskPercent =
         params.get("riskPercent");
+
     const entryPrice =
         params.get("entryPrice");
+
     const stopLoss =
         params.get("stopLoss");
 
     if (symbol && symbolInput) {
-        symbolInput.value = symbol;
+        symbolInput.value =
+            symbol;
     }
 
     if (
         timeframe &&
         timeframeInput
     ) {
-        timeframeInput.value = timeframe;
+        timeframeInput.value =
+            timeframe;
     }
 
     if (
         direction === "long" ||
         direction === "short"
     ) {
-        setDirection(direction);
+        if (directionInput) {
+            directionInput.value =
+                direction;
+        }
+
+        directionButtons.forEach(
+            (button) => {
+                const active =
+                    button.dataset.direction ===
+                    direction;
+
+                button.classList.toggle(
+                    "active",
+                    active
+                );
+
+                button.setAttribute(
+                    "aria-pressed",
+                    String(active)
+                );
+            }
+        );
     }
 
-    if (accountBalance && accountBalanceInput) {
+    if (
+        accountBalance &&
+        accountBalanceInput
+    ) {
         accountBalanceInput.value =
             accountBalance;
     }
 
-    if (riskPercent && riskPercentInput) {
+    if (
+        riskPercent &&
+        riskPercentInput
+    ) {
         riskPercentInput.value =
             riskPercent;
     }
 
-    if (entryPrice && entryPriceInput) {
+    if (
+        entryPrice &&
+        entryPriceInput
+    ) {
         entryPriceInput.value =
             entryPrice;
     }
 
-    if (stopLoss && stopLossInput) {
+    if (
+        stopLoss &&
+        stopLossInput
+    ) {
         stopLossInput.value =
             stopLoss;
     }
@@ -555,41 +670,60 @@ const reset = (): void => {
 };
 
 const saveSetup = async (): Promise<void> => {
-    if (!lastCalculation || !saveButton) {
+    if (
+        !lastCalculation ||
+        !saveButton
+    ) {
         return;
     }
 
     saveButton.disabled = true;
-    setText(saveMessage, "Saving...");
+
+    setText(
+        saveMessage,
+        "Saving..."
+    );
 
     try {
         const {
             data: { user },
             error: userError
-        } = await supabaseClient.auth.getUser();
+        } =
+            await supabaseClient.auth.getUser();
 
-        if (userError || !user) {
+        if (
+            userError ||
+            !user
+        ) {
             setText(
                 saveMessage,
                 "Sign in to save this setup."
             );
 
-            saveButton.disabled = false;
+            saveButton.disabled =
+                false;
+
             return;
         }
 
         const { error } =
             await supabaseClient
-                .from("saved_calculations")
+                .from(
+                    "saved_calculations"
+                )
                 .insert({
                     user_id: user.id,
                     tool: "position-size",
-                    inputs: lastCalculation.inputs,
-                    result: lastCalculation.result
+                    inputs:
+                        lastCalculation.inputs,
+                    result:
+                        lastCalculation.result
                 });
 
         if (error) {
-            throw new Error(error.message);
+            throw new Error(
+                error.message
+            );
         }
 
         setText(
@@ -607,7 +741,8 @@ const saveSetup = async (): Promise<void> => {
             "Unable to save setup."
         );
 
-        saveButton.disabled = false;
+        saveButton.disabled =
+            false;
     }
 };
 
@@ -620,32 +755,83 @@ const openRiskReward = (): void => {
         return;
     }
 
-    const params = new URLSearchParams({
-        direction:
-            lastCalculation.inputs.direction,
-        entryPrice:
-            String(lastCalculation.inputs.entryPrice),
-        stopLoss:
-            String(lastCalculation.inputs.stopLoss)
-    });
+    const params =
+        new URLSearchParams({
+            direction:
+                lastCalculation
+                    .inputs.direction,
+
+            entryPrice:
+                String(
+                    lastCalculation
+                        .inputs
+                        .entryPrice
+                ),
+
+            stopLoss:
+                String(
+                    lastCalculation
+                        .inputs
+                        .stopLoss
+                )
+        });
 
     window.location.href =
         `risk-reward.html?${params.toString()}`;
 };
 
-directionButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-        const direction =
-            button.dataset.direction;
+const openWorkspace = (): void => {
+    window.location.href =
+        "workspace.html";
+};
 
-        if (
-            direction === "long" ||
-            direction === "short"
-        ) {
-            setDirection(direction);
-        }
-    });
-});
+const handleMarketSelection = (
+    event: Event
+): void => {
+    const customEvent =
+        event as CustomEvent<MarketSelectionDetail>;
+
+    const {
+        symbol,
+        price
+    } = customEvent.detail;
+
+    if (symbolInput) {
+        symbolInput.value =
+            symbol;
+    }
+
+    if (
+        entryPriceInput &&
+        !entryPriceInput.value
+    ) {
+        entryPriceInput.value =
+            String(price);
+    }
+
+    calculate();
+};
+
+directionButtons.forEach(
+    (button) => {
+        button.addEventListener(
+            "click",
+            () => {
+                const direction =
+                    button.dataset.direction;
+
+                if (
+                    direction === "long" ||
+                    direction === "short"
+                ) {
+                    setDirection(
+                        direction
+                    );
+                }
+            }
+        );
+    }
+);
 
 [
     symbolInput,
@@ -654,17 +840,19 @@ directionButtons.forEach((button) => {
     riskPercentInput,
     entryPriceInput,
     stopLossInput
-].forEach((element) => {
-    element?.addEventListener(
-        "input",
-        calculate
-    );
+].forEach(
+    (element) => {
+        element?.addEventListener(
+            "input",
+            calculate
+        );
 
-    element?.addEventListener(
-        "change",
-        calculate
-    );
-});
+        element?.addEventListener(
+            "change",
+            calculate
+        );
+    }
+);
 
 calculateButton?.addEventListener(
     "click",
@@ -688,19 +876,26 @@ useRiskRewardButton?.addEventListener(
 
 openWorkspaceButton?.addEventListener(
     "click",
-    () => {
-        window.location.href =
-            "workspace.html";
-    }
+    openWorkspace
 );
 
 document
     .querySelector<HTMLFormElement>(
         "#position-size-calculator"
     )
-    ?.addEventListener("submit", (event) => {
-        event.preventDefault();
-        calculate();
-    });
+    ?.addEventListener(
+        "submit",
+        (event) => {
+            event.preventDefault();
+            calculate();
+        }
+    );
+
+document.addEventListener(
+    "trading-tools:market-selected",
+    handleMarketSelection
+);
+
+mountMarketStrip();
 
 applyContextFromUrl();

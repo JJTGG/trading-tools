@@ -2,159 +2,437 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
     <meta
         name="description"
-        content="Calculate trading profit and loss with the Trading Tools PnL Calculator."
+        content="Calculate trading profit and loss, fees, and return."
     >
-    <title>PnL Calculator — Trading Tools</title>
-
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-<script src="script.js" defer></script>
+    <title>PnL — Trading Tools</title>
 </head>
 
-<body>
+<body class="pnl-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <nav class="app-nav" aria-label="Application">
+            <a href="workspace.html">Workspace</a>
+            <a href="market.html">Markets</a>
+            <a href="tools.html">Tools</a>
         </nav>
+
+        <div class="header-state">
+            <span class="header-state-dot"></span>
+
+            <span>
+                Performance Engine
+            </span>
+        </div>
     </header>
 
-    <main>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
 
-        <section>
-            <p>TRADING CALCULATOR</p>
+        <div id="market-tickers">
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+        </div>
+    </div>
 
-            <h1>PnL Calculator</h1>
+    <main class="terminal-layout">
 
-            <p>
-                Enter your trade details to see gross PnL, fees, net PnL,
-                and the resulting return.
-            </p>
-        </section>
-
-        <section id="pnl-calculator">
-
-            <div>
-                <label for="pnl-direction">Direction</label>
-
-                <select id="pnl-direction">
-                    <option value="long">Long</option>
-                    <option value="short">Short</option>
-                </select>
+        <aside class="tool-rail">
+            <div class="tool-rail-header">
+                Trading tools
             </div>
 
-            <div>
-                <label for="pnl-entry">Entry Price</label>
+            <a
+                href="position-size.html"
+                class="tool-link"
+            >
+                <span>Position Size</span>
+                <span class="tool-link-key">01</span>
+            </a>
 
-                <input
-                    id="pnl-entry"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="100"
+            <a
+                href="risk-reward.html"
+                class="tool-link"
+            >
+                <span>Risk / Reward</span>
+                <span class="tool-link-key">02</span>
+            </a>
+
+            <a
+                href="pnl-calculator.html"
+                class="tool-link active"
+            >
+                <span>PnL</span>
+                <span class="tool-link-key">03</span>
+            </a>
+
+            <a
+                href="leverage.html"
+                class="tool-link"
+            >
+                <span>Leverage</span>
+                <span class="tool-link-key">04</span>
+            </a>
+        </aside>
+
+        <section class="workbench">
+
+            <div class="page-heading">
+                <div>
+                    <p class="page-heading-kicker">
+                        Performance Engine / Trade Review
+                    </p>
+
+                    <h1>PnL</h1>
+
+                    <p>
+                        Measure gross and net trade performance after fees.
+                    </p>
+                </div>
+
+                <span class="live-badge">
+                    Live calculation
+                </span>
+            </div>
+
+            <div class="workspace-grid">
+
+                <section class="panel">
+
+                    <div class="panel-header">
+                        <strong>Trade Parameters</strong>
+                        <span>Input</span>
+                    </div>
+
+                    <form
+                        id="pnl-calculator"
+                        class="trade-form"
+                    >
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="pnl-symbol"
+                                >
+                                    Instrument
+                                    <small id="market-reference">
+                                        Market —
+                                    </small>
+                                </label>
+
+                                <input
+                                    id="pnl-symbol"
+                                    type="text"
+                                    autocomplete="off"
+                                    placeholder="BTC/USD"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="pnl-timeframe"
+                                >
+                                    Timeframe
+                                </label>
+
+                                <select id="pnl-timeframe">
+                                    <option value="1m">1m</option>
+                                    <option value="5m">5m</option>
+                                    <option value="15m">15m</option>
+                                    <option value="1H" selected>1H</option>
+                                    <option value="4H">4H</option>
+                                    <option value="1D">1D</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="field-group">
+
+                            <div class="field-label">
+                                Direction
+                                <small>Position side</small>
+                            </div>
+
+                            <div class="direction-control">
+
+                                <button
+                                    type="button"
+                                    class="direction-button active"
+                                    data-direction="long"
+                                    aria-pressed="true"
+                                >
+                                    Long
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="direction-button"
+                                    data-direction="short"
+                                    aria-pressed="false"
+                                >
+                                    Short
+                                </button>
+
+                            </div>
+
+                            <input
+                                id="pnl-direction"
+                                type="hidden"
+                                value="long"
+                            >
+
+                        </div>
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="pnl-entry"
+                                >
+                                    Entry
+                                </label>
+
+                                <input
+                                    id="pnl-entry"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="84000"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="pnl-exit"
+                                >
+                                    Exit
+                                </label>
+
+                                <input
+                                    id="pnl-exit"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="86000"
+                                >
+                            </div>
+
+                        </div>
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="pnl-size"
+                                >
+                                    Position Size
+                                </label>
+
+                                <input
+                                    id="pnl-size"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="0.1"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="pnl-fees"
+                                >
+                                    Fees
+                                </label>
+
+                                <input
+                                    id="pnl-fees"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    value="0"
+                                    placeholder="0"
+                                >
+                            </div>
+
+                        </div>
+
+                        <div class="trade-summary">
+
+                            <div>
+                                <span>Price movement</span>
+                                <strong id="pnl-price-difference">
+                                    —
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Entry value</span>
+                                <strong id="pnl-entry-value">
+                                    —
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div class="actions">
+
+                            <button
+                                id="calculate-pnl"
+                                type="button"
+                                class="action primary"
+                            >
+                                Recalculate
+                            </button>
+
+                            <button
+                                id="reset-pnl"
+                                type="button"
+                                class="action"
+                            >
+                                Reset
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+                <section class="panel result-panel">
+
+                    <div class="panel-header">
+                        <strong>Performance Output</strong>
+
+                        <span id="calculation-state">
+                            Ready
+                        </span>
+                    </div>
+
+                    <div class="primary-result">
+
+                        <span class="primary-result-label">
+                            Net PnL
+                        </span>
+
+                        <strong
+                            id="pnl-result"
+                            class="primary-result-value"
+                        >
+                            —
+                        </strong>
+
+                        <span
+                            id="pnl-return"
+                            class="primary-result-unit"
+                        >
+                            Return —
+                        </span>
+
+                    </div>
+
+                    <div class="result-metrics">
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Gross PnL
+                            </span>
+
+                            <strong
+                                id="pnl-gross"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Fees
+                            </span>
+
+                            <strong
+                                id="pnl-fees-result"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Position Value
+                            </span>
+
+                            <strong
+                                id="pnl-position-value"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="pnl-state"
+                        class="result-state"
+                    >
+                        Enter valid trade parameters.
+                    </div>
+
+                </section>
+
+            </div>
+
+            <div class="actions">
+
+                <button
+                    id="save-pnl"
+                    type="button"
+                    class="action primary"
+                    disabled
                 >
-            </div>
-
-            <div>
-                <label for="pnl-exit">Exit Price</label>
-
-                <input
-                    id="pnl-exit"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="120"
-                >
-            </div>
-
-            <div>
-                <label for="pnl-size">Position Size</label>
-
-                <input
-                    id="pnl-size"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="10"
-                >
-            </div>
-
-            <div>
-                <label for="pnl-fees">Fees</label>
-
-                <input
-                    id="pnl-fees"
-                    type="number"
-                    min="0"
-                    step="any"
-                    value="0"
-                    placeholder="0"
-                >
-            </div>
-
-            <div>
-                <button id="calculate-pnl" type="button">
-                    Calculate PnL
+                    Save Calculation
                 </button>
 
-                <button id="reset-pnl" type="button">
-                    Reset
-                </button>
-            </div>
-
-            <div id="pnl-results">
-
-                <h2>Result</h2>
-
-                <p>
-                    Net PnL:
-                    <strong id="pnl-result">—</strong>
-                </p>
-
-                <dl>
-                    <div>
-                        <dt>Price Difference</dt>
-                        <dd id="pnl-price-difference">—</dd>
-                    </div>
-
-                    <div>
-                        <dt>Gross PnL</dt>
-                        <dd id="pnl-gross">—</dd>
-                    </div>
-
-                    <div>
-                        <dt>Fees</dt>
-                        <dd id="pnl-fees-result">—</dd>
-                    </div>
-
-                    <div>
-                        <dt>Net PnL</dt>
-                        <dd id="pnl-net">—</dd>
-                    </div>
-
-                    <div>
-                        <dt>Return</dt>
-                        <dd id="pnl-return">—</dd>
-                    </div>
-                </dl>
-
-                <button id="save-pnl" type="button" disabled>
-                    Save calculation
-                </button>
-
-                <p id="pnl-save-message" class="form-message"></p>
+                <span
+                    id="pnl-save-message"
+                    class="save-message"
+                    aria-live="polite"
+                ></span>
 
             </div>
 
@@ -162,10 +440,13 @@
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
-    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <script
+        type="module"
+        src="/src/pages/pnl.ts"
+    ></script>
 
 </body>
 </html>

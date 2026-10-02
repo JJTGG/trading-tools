@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <meta
         name="description"
@@ -11,77 +16,182 @@
 
     <title>Contact — Trading Tools</title>
 
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+    <link rel="stylesheet" href="/src/styles/tokens.css">
+    <link rel="stylesheet" href="/src/styles/base.css">
+    <link rel="stylesheet" href="/src/styles/app-shell.css">
+    <link rel="stylesheet" href="/src/pages/contact.css">
 </head>
 
-<body>
+<body class="contact-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav
+            class="app-nav"
+            aria-label="Application"
+        >
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+
+            <a href="guide.html">
+                Guide
+            </a>
         </nav>
+
+        <div class="header-state">
+
+            <span class="header-state-dot"></span>
+
+            <span>
+                Support
+            </span>
+
+        </div>
+
     </header>
 
-    <main>
+    <main class="contact-shell">
 
-        <section>
-            <p>CONTACT</p>
+        <section class="contact-heading">
 
-            <h1>Have feedback or found something that needs fixing?</h1>
+            <div>
 
-            <p>
-                Tell us about a bug, incorrect information, a tool you'd
-                like to see, or anything that could make Trading Tools better.
-            </p>
+                <p class="contact-kicker">
+                    Support / Feedback
+                </p>
+
+                <h1>
+                    Help improve the system.
+                </h1>
+
+                <p>
+                    Found a bug, incorrect calculation, unclear explanation,
+                    or something that should exist? Send it through.
+                </p>
+
+            </div>
+
+            <span class="contact-meta">
+                Response channel / Email
+            </span>
+
         </section>
 
-        <section>
+        <section class="contact-layout">
 
-            <h2>Get in touch</h2>
+            <div class="contact-primary">
 
-            <p>
-                Email us directly at
-                <a href="mailto:stradingtools3@gmail.com">
+                <div class="contact-label">
+                    Direct contact
+                </div>
+
+                <a
+                    class="contact-email"
+                    href="mailto:stradingtools3@gmail.com"
+                >
                     stradingtools3@gmail.com
                 </a>
-            </p>
 
-            <p>
-                We welcome bug reports, corrections, suggestions,
-                feedback, and collaboration enquiries.
-            </p>
+                <p class="contact-copy">
+                    Use the email address for bug reports, corrections,
+                    suggestions, feedback, or collaboration enquiries.
+                </p>
+
+            </div>
+
+            <div class="contact-secondary">
+
+                <div class="contact-label">
+                    Useful reports
+                </div>
+
+                <div class="contact-list">
+
+                    <div>
+                        <span>01</span>
+                        <strong>Bug reports</strong>
+                    </div>
+
+                    <div>
+                        <span>02</span>
+                        <strong>Incorrect calculations</strong>
+                    </div>
+
+                    <div>
+                        <span>03</span>
+                        <strong>Incorrect reference material</strong>
+                    </div>
+
+                    <div>
+                        <span>04</span>
+                        <strong>Tool suggestions</strong>
+                    </div>
+
+                    <div>
+                        <span>05</span>
+                        <strong>General feedback</strong>
+                    </div>
+
+                    <div>
+                        <span>06</span>
+                        <strong>Collaboration enquiries</strong>
+                    </div>
+
+                </div>
+
+            </div>
 
         </section>
 
-        <section>
+        <section class="contact-note">
 
-            <h2>What you can contact us about</h2>
+            <div>
+                <span class="contact-label">
+                    Before reporting a calculation issue
+                </span>
 
-            <ul>
-                <li>Bug reports</li>
-                <li>Incorrect calculations or information</li>
-                <li>Tool suggestions</li>
-                <li>Guide corrections</li>
-                <li>General feedback</li>
-                <li>Partnership or collaboration enquiries</li>
-            </ul>
+                <h2>
+                    Include the inputs that produced the result.
+                </h2>
+            </div>
+
+            <p>
+                For calculator issues, include the instrument, direction,
+                entry, exit or stop, position size, fees, and the result
+                you expected. That makes an incorrect calculation much
+                easier to reproduce and investigate.
+            </p>
 
         </section>
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
+    <footer class="app-footer">
+
+        <span>
+            Trading Tools
+        </span>
+
+        <span>
+            Decision support · No trade execution
+        </span>
+
     </footer>
 
 </body>
+
 </html>

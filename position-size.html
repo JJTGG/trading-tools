@@ -29,14 +29,31 @@
 
         <div class="header-state">
             <span class="header-state-dot"></span>
-            System Ready
+
+            <span>
+                Risk Engine
+            </span>
         </div>
     </header>
 
-    <div class="market-strip">
-        <span>ACTIVE TOOL <strong>POSITION SIZE</strong></span>
-        <span>CALCULATION <strong>AUTO</strong></span>
-        <span>MODE <strong>TRADE RISK</strong></span>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
+
+        <div id="market-tickers">
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+        </div>
     </div>
 
     <main class="terminal-layout">
@@ -354,6 +371,7 @@
 
                     <div class="panel-header">
                         <strong>Risk Output</strong>
+
                         <span id="calculation-state">
                             Ready
                         </span>
@@ -457,6 +475,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
+
     <script
         type="module"
         src="/src/pages/position-size.ts"

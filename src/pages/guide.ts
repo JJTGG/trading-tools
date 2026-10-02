@@ -1,5 +1,6 @@
 import "../styles/tokens.css";
 import "../styles/base.css";
+import "../styles/app-shell.css";
 import "./guide.css";
 
 import {
@@ -21,15 +22,20 @@ const searchInput =
 const topics =
     Array.from(
         document.querySelectorAll<HTMLElement>(
-            ".guide-topic"
+            ".reference-entry"
         )
     );
 
 const sections =
     Array.from(
         document.querySelectorAll<HTMLElement>(
-            ".guide-section"
+            ".reference-section"
         )
+    );
+
+const workflowSection =
+    document.querySelector<HTMLElement>(
+        ".workflow-reference"
     );
 
 const emptyState =
@@ -47,7 +53,7 @@ const normalize = (
         .toLowerCase();
 };
 
-const topicMatches = (
+const matchesTopic = (
     topic: HTMLElement,
     query: string
 ): boolean => {
@@ -81,59 +87,57 @@ const updateGuide = (): void => {
             searchInput?.value || ""
         );
 
-    let visibleTopics = 0;
+    let visibleCount = 0;
 
-    sections.forEach(
-        (section) => {
-            const sectionTopics =
-                Array.from(
-                    section.querySelectorAll<HTMLElement>(
-                        ".guide-topic"
-                    )
+    topics.forEach(
+        (topic) => {
+            const visible =
+                matchesTopic(
+                    topic,
+                    query
                 );
 
-            let visibleInSection = 0;
+            topic.hidden =
+                !visible;
 
-            sectionTopics.forEach(
-                (topic) => {
-                    const visible =
-                        topicMatches(
-                            topic,
-                            query
-                        );
-
-                    topic.hidden =
-                        !visible;
-
-                    if (visible) {
-                        visibleInSection += 1;
-                        visibleTopics += 1;
-                    }
-                }
-            );
-
-            const workflowSection =
-                section.classList.contains(
-                    "guide-workflow"
-                );
-
-            if (!workflowSection) {
-                section.hidden =
-                    visibleInSection === 0;
-            } else if (
-                activeCategory !== "all" ||
-                query
-            ) {
-                section.hidden = true;
-            } else {
-                section.hidden = false;
+            if (visible) {
+                visibleCount += 1;
             }
         }
     );
 
+    sections.forEach(
+        (section) => {
+            if (
+                section === workflowSection
+            ) {
+                return;
+            }
+
+            const hasVisibleEntries =
+                Array.from(
+                    section.querySelectorAll<HTMLElement>(
+                        ".reference-entry"
+                    )
+                ).some(
+                    (topic) =>
+                        !topic.hidden
+                );
+
+            section.hidden =
+                !hasVisibleEntries;
+        }
+    );
+
+    if (workflowSection) {
+        workflowSection.hidden =
+            Boolean(query) ||
+            activeCategory !== "all";
+    }
+
     if (emptyState) {
         emptyState.hidden =
-            visibleTopics !== 0;
+            visibleCount !== 0;
     }
 };
 

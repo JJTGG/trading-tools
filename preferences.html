@@ -1,64 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workspace Preferences — Trading Tools</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Customize Trading Tools workspace behavior and default landing page."
+    >
+
+    <title>Preferences — Trading Tools</title>
 </head>
-<body>
-    <header class="workspace-header">
-        <a href="index.html" class="auth-brand">Trading Tools</a>
+
+<body class="account-page">
+
+    <header class="app-header">
+
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav class="app-nav" aria-label="Application">
+
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+
+        </nav>
 
         <div class="workspace-account">
-            <a href="workspace.html">Workspace</a>
-            <button id="logout-button" type="button">Sign out</button>
+
+            <a href="settings.html">
+                Settings
+            </a>
+
+            <button
+                id="logout-button"
+                type="button"
+                class="account-action"
+            >
+                Sign out
+            </button>
+
         </div>
+
     </header>
 
-    <main class="workspace-page">
-        <section class="workspace-intro">
-            <p class="eyebrow">Workspace</p>
-            <h1>Preferences</h1>
-            <p>Customize how your Trading Tools workspace behaves.</p>
-        </section>
+    <main class="account-shell">
 
-        <section class="workspace-card settings-card">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Personalization</p>
-                    <h2>Workspace behavior</h2>
-                </div>
+        <section class="account-heading">
+
+            <div>
+
+                <p class="account-kicker">
+                    Workspace / Personalization
+                </p>
+
+                <h1>
+                    Preferences
+                </h1>
+
+                <p>
+                    Control the way your workspace behaves when you return to it.
+                </p>
+
             </div>
 
-            <form id="preferences-form">
-                <div class="form-group">
-                    <label for="workspace-density">Workspace density</label>
-                    <select id="workspace-density">
-                        <option value="comfortable">Comfortable</option>
-                        <option value="compact">Compact</option>
-                    </select>
-                </div>
+            <span class="account-heading-meta">
+                Persistent settings
+            </span>
 
-                <div class="form-group">
-                    <label for="default-page">Default landing page</label>
-                    <select id="default-page">
-                        <option value="workspace">Workspace</option>
-                        <option value="tools">Tools</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="primary-button">
-                    Save preferences
-                </button>
-
-                <p id="preferences-message" class="form-message"></p>
-            </form>
         </section>
+
+        <div class="account-grid">
+
+            <section class="account-panel">
+
+                <header class="account-panel-header">
+
+                    <h2>
+                        Workspace behavior
+                    </h2>
+
+                    <span>
+                        Preferences
+                    </span>
+
+                </header>
+
+                <form
+                    id="preferences-form"
+                    class="account-form"
+                >
+
+                    <div class="form-group">
+
+                        <label for="workspace-density">
+                            Workspace density
+                        </label>
+
+                        <select id="workspace-density">
+
+                            <option value="comfortable">
+                                Comfortable
+                            </option>
+
+                            <option value="compact">
+                                Compact
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="default-page">
+                            Default landing page
+                        </label>
+
+                        <select id="default-page">
+
+                            <option value="workspace">
+                                Workspace
+                            </option>
+
+                            <option value="tools">
+                                Tools
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                        id="preferences-submit"
+                    >
+                        Save preferences
+                    </button>
+
+                    <p
+                        id="preferences-message"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                </form>
+
+            </section>
+
+            <aside class="account-panel">
+
+                <header class="account-panel-header">
+
+                    <h2>
+                        Related
+                    </h2>
+
+                    <span>
+                        Workspace
+                    </span>
+
+                </header>
+
+                <div class="account-side-content">
+
+                    <div class="account-detail">
+
+                        <span>
+                            Density
+                        </span>
+
+                        <strong>
+                            Controls workspace information density.
+                        </strong>
+
+                    </div>
+
+                    <div class="account-detail">
+
+                        <span>
+                            Default page
+                        </span>
+
+                        <strong>
+                            Controls where authentication returns you.
+                        </strong>
+
+                    </div>
+
+                    <a
+                        href="workspace.html"
+                        class="account-link"
+                    >
+                        Return to Workspace
+                        <span>→</span>
+                    </a>
+
+                </div>
+
+            </aside>
+
+        </div>
+
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
     <script src="supabase.js"></script>
-    <script src="preferences.js"></script>
+
+    <script
+        type="module"
+        src="/src/pages/preferences.ts"
+    ></script>
+
 </body>
+
 </html>

@@ -1,144 +1,566 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Trading Tools — Calculators, market tools, and strategy utilities.">
-    <title>Tools — Trading Tools</title>
 
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Trading Tools instrument and calculator registry for risk, analysis, market data, and trade planning."
+    >
+
+    <title>Tools — Trading Tools</title>
 </head>
 
-<body>
+<body class="tools-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav class="app-nav" aria-label="Application">
+
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a
+                href="tools.html"
+                class="active"
+            >
+                Tools
+            </a>
+
         </nav>
+
+        <div class="header-state">
+
+            <span class="header-state-dot"></span>
+
+            <span>
+                Tool Registry
+            </span>
+
+        </div>
+
     </header>
 
-    <main>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
 
-        <section>
-            <p>TRADING TOOLS</p>
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
 
-            <h1>Practical tools for better trading decisions.</h1>
+        <div id="market-tickers">
+
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+
+        </div>
+
+    </div>
+
+    <main class="tools-terminal">
+
+        <section class="tools-heading">
+
+            <div>
+
+                <p class="tools-kicker">
+                    Tools / Research & Decision Support
+                </p>
+
+                <h1>
+                    Trading tools
+                </h1>
+
+                <p>
+                    Choose the part of the trading workflow you need to work on.
+                    Calculators are live; planned tools stay visible without pretending
+                    they are ready.
+                </p>
+
+            </div>
+
+            <a
+                href="workspace.html"
+                class="heading-action"
+            >
+                Open Workspace
+            </a>
+
+        </section>
+
+        <section class="tool-controls">
+
+            <div
+                class="tool-filter-group"
+                role="group"
+                aria-label="Tool category"
+            >
+
+                <button
+                    type="button"
+                    class="tool-filter active"
+                    data-category="all"
+                    aria-pressed="true"
+                >
+                    All
+                </button>
+
+                <button
+                    type="button"
+                    class="tool-filter"
+                    data-category="risk"
+                    aria-pressed="false"
+                >
+                    Risk
+                </button>
+
+                <button
+                    type="button"
+                    class="tool-filter"
+                    data-category="market"
+                    aria-pressed="false"
+                >
+                    Market
+                </button>
+
+                <button
+                    type="button"
+                    class="tool-filter"
+                    data-category="strategy"
+                    aria-pressed="false"
+                >
+                    Strategy
+                </button>
+
+            </div>
+
+            <label class="tool-search">
+
+                <span>
+                    Find a tool
+                </span>
+
+                <input
+                    id="tool-search-input"
+                    type="search"
+                    autocomplete="off"
+                    placeholder="Search name or purpose"
+                >
+
+            </label>
+
+        </section>
+
+        <section class="tool-registry-section">
+
+            <div class="registry-header">
+
+                <div>
+
+                    <span class="panel-kicker">
+                        Available instruments
+                    </span>
+
+                    <strong id="tool-result-count">
+                        8 tools
+                    </strong>
+
+                </div>
+
+                <span class="registry-note">
+                    Decision support · No trade execution
+                </span>
+
+            </div>
+
+            <div
+                id="tool-registry"
+                class="tool-registry"
+            >
+
+                <a
+                    class="tool-row"
+                    data-category="risk"
+                    data-search="position size risk account balance entry stop loss position sizing"
+                    href="position-size.html"
+                >
+
+                    <span class="tool-index">
+                        01
+                    </span>
+
+                    <span class="tool-main">
+
+                        <strong>
+                            Position Size
+                        </strong>
+
+                        <small>
+                            Convert defined account risk into a position size.
+                        </small>
+
+                    </span>
+
+                    <span class="tool-meta">
+
+                        <span class="tool-category">
+                            Risk
+                        </span>
+
+                        <span class="tool-status live">
+                            Live
+                        </span>
+
+                    </span>
+
+                </a>
+
+                <a
+                    class="tool-row"
+                    data-category="risk"
+                    data-search="risk reward rr stop target trade planning"
+                    href="risk-reward.html"
+                >
+
+                    <span class="tool-index">
+                        02
+                    </span>
+
+                    <span class="tool-main">
+
+                        <strong>
+                            Risk / Reward
+                        </strong>
+
+                        <small>
+                            Compare defined trade risk with potential reward.
+                        </small>
+
+                    </span>
+
+                    <span class="tool-meta">
+
+                        <span class="tool-category">
+                            Risk
+                        </span>
+
+                        <span class="tool-status live">
+                            Live
+                        </span>
+
+                    </span>
+
+                </a>
+
+                <a
+                    class="tool-row"
+                    data-category="risk"
+                    data-search="pnl profit loss trade performance entry exit size fees long short"
+                    href="pnl-calculator.html"
+                >
+
+                    <span class="tool-index">
+                        03
+                    </span>
+
+                    <span class="tool-main">
+
+                        <strong>
+                            PnL
+                        </strong>
+
+                        <small>
+                            Measure trade profit or loss from price movement, size, and fees.
+                        </small>
+
+                    </span>
+
+                    <span class="tool-meta">
+
+                        <span class="tool-category">
+                            Risk
+                        </span>
+
+                        <span class="tool-status live">
+                            Live
+                        </span>
+
+                    </span>
+
+                </a>
+
+                <a
+                    class="tool-row"
+                    data-category="risk"
+                    data-search="leverage exposure margin effective leverage capital"
+                    href="leverage.html"
+                >
+
+                    <span class="tool-index">
+                        04
+                    </span>
+
+                    <span class="tool-main">
+
+                        <strong>
+                            Leverage
+                        </strong>
+
+                        <small>
+                            Measure exposure, effective leverage, and required margin.
+                        </small>
+
+                    </span>
+
+                    <span class="tool-meta">
+
+                        <span class="tool-category">
+                            Risk
+                        </span>
+
+                        <span class="tool-status live">
+                            Live
+                        </span>
+
+                    </span>
+
+                </a>
+
+                <a
+                    class="tool-row"
+                    data-category="market"
+                    data-search="currency converter exchange rate fiat conversion"
+                    href="currency.html"
+                >
+
+                    <span class="tool-index">
+                        05
+                    </span>
+
+                    <span class="tool-main">
+
+                        <strong>
+                            Currency Converter
+                        </strong>
+
+                        <small>
+                            Convert between supported currencies using current rates.
+                        </small>
+
+                    </span>
+
+                    <span class="tool-meta">
+
+                        <span class="tool-category">
+                            Market
+                        </span>
+
+                        <span class="tool-status live">
+                            Live
+                        </span>
+
+                    </span>
+
+                </a>
+
+                <a
+                    class="tool-row"
+                    data-category="market"
+                    data-search="coin viewer crypto coin market data"
+                    href="coin.html"
+                >
+
+                    <span class="tool-index">
+                        06
+                    </span>
+
+                    <span class="tool-main">
+
+                        <strong>
+                            Coin Viewer
+                        </strong>
+
+                        <small>
+                            Inspect cryptocurrency information and market data.
+                        </small>
+
+                    </span>
+
+                    <span class="tool-meta">
+
+                        <span class="tool-category">
+                            Market
+                        </span>
+
+                        <span class="tool-status live">
+                            Live
+                        </span>
+
+                    </span>
+
+                </a>
+
+                <div
+                    class="tool-row tool-row-planned"
+                    data-category="market"
+                    data-search="arbitrage price differences exchange comparison"
+                >
+
+                    <span class="tool-index">
+                        07
+                    </span>
+
+                    <span class="tool-main">
+
+                        <strong>
+                            Arbitrage Finder
+                        </strong>
+
+                        <small>
+                            Compare market prices across supported venues.
+                        </small>
+
+                    </span>
+
+                    <span class="tool-meta">
+
+                        <span class="tool-category">
+                            Market
+                        </span>
+
+                        <span class="tool-status planned">
+                            Planned
+                        </span>
+
+                    </span>
+
+                </div>
+
+                <div
+                    class="tool-row tool-row-planned"
+                    data-category="strategy"
+                    data-search="algo simulator algorithmic trading strategy simulation backtest"
+                >
+
+                    <span class="tool-index">
+                        08
+                    </span>
+
+                    <span class="tool-main">
+
+                        <strong>
+                            Algo Simulator
+                        </strong>
+
+                        <small>
+                            Experiment with algorithmic trading ideas without execution.
+                        </small>
+
+                    </span>
+
+                    <span class="tool-meta">
+
+                        <span class="tool-category">
+                            Strategy
+                        </span>
+
+                        <span class="tool-status planned">
+                            Planned
+                        </span>
+
+                    </span>
+
+                </div>
+
+                <div
+                    id="tool-empty"
+                    class="tool-empty"
+                    hidden
+                >
+
+                    <strong>
+                        No matching tools
+                    </strong>
+
+                    <span>
+                        Try another search or switch the category filter.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="tool-context">
+
+            <div>
+
+                <span class="panel-kicker">
+                    Workflow
+                </span>
+
+                <h2>
+                    Tools are parts of the same process.
+                </h2>
+
+            </div>
 
             <p>
-                Calculate trades, measure risk, compare outcomes, and explore
-                market data without leaving the tools you already use.
+                A position can move from market selection to risk definition,
+                position sizing, reward analysis, PnL review, and back into
+                Workspace for continuity. The tools stay focused; the workflow connects them.
             </p>
-        </section>
 
-        <section>
-            <h2>Trading Calculators</h2>
+            <a href="market.html">
+                Start from a market
+            </a>
 
-            <div class="tools-list">
-                <article class="tool-card">
-                    <h3>PnL Calculator</h3>
-                    <p>
-                        Calculate profit or loss from a trade using your entry,
-                        exit, position size, direction, and fees.
-                    </p>
-                    <a href="pnl-calculator.html">Open Calculator</a>
-                </article>
-
-                <article class="tool-card">
-    <h3>Leverage Calculator</h3>
-    <p>
-        Calculate effective leverage and understand required margin.
-    </p>
-    <a href="leverage.html">Open Calculator</a>
-</article>
-
-                <article class="tool-card">
-                    <h3>Position Size Calculator</h3>
-                    <p>
-                        Calculate how much to position based on your account,
-                        risk limit, entry price, and stop-loss.
-                    </p>
-                    <a href="position-size.html">Open Calculator</a>
-                </article>
-
-                <article class="tool-card">
-    <h3>Risk/Reward Calculator</h3>
-    <p>
-        Compare potential trade risk and reward before entering a position.
-    </p>
-    <a href="risk-reward.html">Open Calculator</a>
-</article>
-
-                <article class="tool-card">
-                    <h3>Options Calculator</h3>
-                    <p>
-                        Explore potential options trade outcomes and
-                        basic payoff calculations.
-                    </p>
-                    <span>Coming Soon</span>
-                </article>
-            </div>
-        </section>
-
-        <section>
-            <h2>Market & Conversion Tools</h2>
-
-            <div class="tools-list">
-                <article class="tool-card">
-                    <h3>Currency Converter</h3>
-                    <p>
-                        Convert between supported currencies using
-                        current exchange rates.
-                    </p>
-                    <a href="currency.html">Open Converter</a>
-                </article>
-
-                <article class="tool-card">
-    <h3>Coin Viewer</h3>
-    <p>
-        View cryptocurrency information and market data.
-    </p>
-    <a href="coin.html">Open Coin Viewer</a>
-</article>
-
-                <article class="tool-card">
-                    <h3>Arbitrage Finder</h3>
-                    <p>
-                        Compare market prices across supported exchanges.
-                    </p>
-                    <span>Coming Soon</span>
-                </article>
-            </div>
-        </section>
-
-        <section>
-            <h2>Strategy & Automation</h2>
-
-            <div class="tools-list">
-                <article class="tool-card">
-                    <h3>Algo Simulator</h3>
-                    <p>
-                        Experiment with algorithmic trading ideas without
-                        executing real trades.
-                    </p>
-                    <span>Coming Soon</span>
-                </article>
-            </div>
         </section>
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
+    <footer class="app-footer">
+
+        <span>
+            Trading Tools
+        </span>
+
+        <span>
+            Decision support · No trade execution
+        </span>
+
     </footer>
 
+    <script
+        type="module"
+        src="/src/pages/tools.ts"
+    ></script>
+
 </body>
+
 </html>

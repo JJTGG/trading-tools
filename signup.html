@@ -1,25 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Create a Trading Tools account for saved calculations, watchlists, preferences, and workspace continuity."
+    >
+
     <title>Create Account — Trading Tools</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="/src/styles/tokens.css">
+    <link rel="stylesheet" href="/src/styles/base.css">
+    <link rel="stylesheet" href="/src/pages/auth.css">
 </head>
 
-<body>
-    <main class="auth-page">
-        <section class="auth-panel">
-            <a href="index.html" class="auth-brand">Trading Tools</a>
+<body class="auth-page">
 
-            <div class="auth-header">
-                <h1>Create your account</h1>
-                <p>Save calculations, build your watchlist, and keep your trading workspace in one place.</p>
+    <main class="auth-shell">
+
+        <section class="auth-context">
+
+            <a
+                href="index.html"
+                class="auth-brand"
+            >
+                <span class="auth-brand-mark"></span>
+                Trading Tools
+            </a>
+
+            <div>
+
+                <p class="auth-context-kicker">
+                    Create workspace
+                </p>
+
+                <h1>
+                    Build continuity into the way you trade.
+                </h1>
+
+                <p class="auth-context-copy">
+                    Your account gives Trading Tools somewhere
+                    to keep the work that should survive the current page.
+                </p>
+
+                <div class="auth-context-list">
+
+                    <div>
+                        <span>01</span>
+                        <strong>Save calculations</strong>
+                    </div>
+
+                    <div>
+                        <span>02</span>
+                        <strong>Build a watchlist</strong>
+                    </div>
+
+                    <div>
+                        <span>03</span>
+                        <strong>Continue from Workspace</strong>
+                    </div>
+
+                </div>
+
             </div>
 
-            <form id="signup-form">
+            <span class="auth-context-kicker">
+                Decision support · No trade execution
+            </span>
+
+        </section>
+
+        <section class="auth-form-panel">
+
+            <div class="auth-form-header">
+
+                <span>
+                    Authentication
+                </span>
+
+                <h2>
+                    Create account
+                </h2>
+
+                <p>
+                    Set up the account that will own your workspace.
+                </p>
+
+            </div>
+
+            <form
+                id="signup-form"
+                class="auth-form"
+            >
+
                 <div class="form-group">
-                    <label for="signup-email">Email</label>
+
+                    <label for="signup-email">
+                        Email
+                    </label>
+
                     <input
                         type="email"
                         id="signup-email"
@@ -28,10 +114,15 @@
                         autocomplete="email"
                         required
                     >
+
                 </div>
 
                 <div class="form-group">
-                    <label for="signup-password">Password</label>
+
+                    <label for="signup-password">
+                        Password
+                    </label>
+
                     <input
                         type="password"
                         id="signup-password"
@@ -41,10 +132,15 @@
                         minlength="6"
                         required
                     >
+
                 </div>
 
                 <div class="form-group">
-                    <label for="signup-confirm-password">Confirm password</label>
+
+                    <label for="signup-confirm-password">
+                        Confirm password
+                    </label>
+
                     <input
                         type="password"
                         id="signup-confirm-password"
@@ -54,24 +150,44 @@
                         minlength="6"
                         required
                     >
+
                 </div>
 
-                <button type="submit" class="primary-button">
+                <button
+                    type="submit"
+                    class="primary-button"
+                    id="signup-submit"
+                >
                     Create account
                 </button>
 
-                <p id="signup-message" class="form-message"></p>
+                <p
+                    id="signup-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+
             </form>
 
             <p class="auth-switch">
                 Already have an account?
-                <a href="login.html">Sign in</a>
+                <a href="login.html">
+                    Sign in
+                </a>
             </p>
+
         </section>
+
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="signup.js"></script>
+
+    <script
+        type="module"
+        src="/src/pages/signup.ts"
+    ></script>
+
 </body>
+
 </html>

@@ -163,6 +163,11 @@ const contextSummary =
         "#context-summary"
     );
 
+const marketReference =
+    document.querySelector<HTMLElement>(
+        "#market-reference"
+    );
+
 const riskDistanceLabel =
     document.querySelector<HTMLElement>(
         "#risk-distance-label"
@@ -726,6 +731,11 @@ const reset = (): void => {
         stopLossInput.value = "";
     }
 
+    setText(
+        marketReference,
+        "Market —"
+    );
+
     setDirection("long");
 
     setText(
@@ -871,6 +881,11 @@ const handleMarketSelection = (
         symbolInput.value =
             symbol;
     }
+
+    setText(
+        marketReference,
+        `Live ${formatNumber(price)}`
+    );
 
     if (
         entryPriceInput &&

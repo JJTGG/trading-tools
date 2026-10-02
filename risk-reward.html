@@ -2,141 +2,463 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
     <meta
         name="description"
-        content="Calculate trade risk, reward, and risk-to-reward ratio."
+        content="Measure trade risk, reward, and risk-to-reward ratio."
     >
-    <title>Risk/Reward Calculator — Trading Tools</title>
-
-    <link rel="stylesheet" href="styles.css">
-    <script src="risk-reward.js" defer></script>
+    <title>Risk / Reward — Trading Tools</title>
 </head>
 
-<body>
+<body class="risk-reward-page">
 
-    <header>
-        <nav>
-            <a href="index.html">Trading Tools</a>
+    <header class="app-header">
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
 
-            <div>
-                <a href="index.html">Home</a>
-                <a href="tools.html">Tools</a>
-                <a href="guide.html">Guide</a>
-                <a href="contact.html">Contact</a>
-            </div>
+        <nav class="app-nav" aria-label="Application">
+            <a href="workspace.html">Workspace</a>
+            <a href="market.html">Markets</a>
+            <a href="tools.html">Tools</a>
         </nav>
+
+        <div class="header-state">
+            <span class="header-state-dot"></span>
+
+            <span>
+                Risk Engine
+            </span>
+        </div>
     </header>
 
-    <main>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
 
-        <section>
-            <p>RISK MANAGEMENT</p>
+        <div id="market-tickers">
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+        </div>
+    </div>
 
-            <h1>Risk/Reward Calculator</h1>
+    <main class="terminal-layout">
 
-            <p>
-                Measure the potential risk and reward of a trade
-                before entering the position.
-            </p>
-        </section>
-
-        <section id="risk-reward-calculator">
-
-            <div>
-                <label for="risk-reward-direction">
-                    Direction
-                </label>
-
-                <select id="risk-reward-direction">
-                    <option value="long">Long</option>
-                    <option value="short">Short</option>
-                </select>
+        <aside class="tool-rail">
+            <div class="tool-rail-header">
+                Risk tools
             </div>
 
-            <div>
-                <label for="risk-reward-entry">
-                    Entry Price
-                </label>
+            <a
+                href="position-size.html"
+                class="tool-link"
+            >
+                <span>Position Size</span>
+                <span class="tool-link-key">01</span>
+            </a>
 
-                <input
-                    id="risk-reward-entry"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="100"
-                >
+            <a
+                href="risk-reward.html"
+                class="tool-link active"
+            >
+                <span>Risk / Reward</span>
+                <span class="tool-link-key">02</span>
+            </a>
+
+            <a
+                href="pnl-calculator.html"
+                class="tool-link"
+            >
+                <span>PnL</span>
+                <span class="tool-link-key">03</span>
+            </a>
+
+            <a
+                href="leverage.html"
+                class="tool-link"
+            >
+                <span>Leverage</span>
+                <span class="tool-link-key">04</span>
+            </a>
+        </aside>
+
+        <section class="workbench">
+
+            <div class="page-heading">
+                <div>
+                    <p class="page-heading-kicker">
+                        Risk Engine / Trade Planning
+                    </p>
+
+                    <h1>Risk / Reward</h1>
+
+                    <p>
+                        Measure the distance between entry, invalidation, and target.
+                    </p>
+                </div>
+
+                <span class="live-badge">
+                    Live calculation
+                </span>
             </div>
 
-            <div>
-                <label for="risk-reward-stop">
-                    Stop-Loss Price
-                </label>
+            <div class="workspace-grid">
 
-                <input
-                    id="risk-reward-stop"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="95"
-                >
-            </div>
+                <section class="panel">
 
-            <div>
-                <label for="risk-reward-target">
-                    Take-Profit Price
-                </label>
-
-                <input
-                    id="risk-reward-target"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="110"
-                >
-            </div>
-
-            <div>
-                <button
-                    id="calculate-risk-reward"
-                    type="button"
-                >
-                    Calculate Risk/Reward
-                </button>
-
-                <button
-                    id="reset-risk-reward"
-                    type="button"
-                >
-                    Reset
-                </button>
-            </div>
-
-            <div id="risk-reward-results">
-
-                <h2>Result</h2>
-
-                <p>
-                    Risk/Reward
-                    <strong id="risk-reward-ratio">—</strong>
-                </p>
-
-                <dl>
-                    <div>
-                        <dt>Risk per Unit</dt>
-                        <dd id="risk-per-unit">—</dd>
+                    <div class="panel-header">
+                        <strong>Trade Parameters</strong>
+                        <span>Input</span>
                     </div>
 
-                    <div>
-                        <dt>Reward per Unit</dt>
-                        <dd id="reward-per-unit">—</dd>
+                    <form
+                        id="risk-reward-calculator"
+                        class="trade-form"
+                    >
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="risk-reward-symbol"
+                                >
+                                    Instrument
+                                    <small id="market-reference">
+                                        Market —
+                                    </small>
+                                </label>
+
+                                <input
+                                    id="risk-reward-symbol"
+                                    type="text"
+                                    autocomplete="off"
+                                    placeholder="BTC/USD"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="risk-reward-timeframe"
+                                >
+                                    Timeframe
+                                </label>
+
+                                <select id="risk-reward-timeframe">
+                                    <option value="1m">1m</option>
+                                    <option value="5m">5m</option>
+                                    <option value="15m">15m</option>
+                                    <option value="1H" selected>1H</option>
+                                    <option value="4H">4H</option>
+                                    <option value="1D">1D</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="field-group">
+
+                            <div class="field-label">
+                                Direction
+                                <small>Position side</small>
+                            </div>
+
+                            <div class="direction-control">
+
+                                <button
+                                    id="risk-reward-long"
+                                    type="button"
+                                    class="direction-button active"
+                                    data-direction="long"
+                                    aria-pressed="true"
+                                >
+                                    Long
+                                </button>
+
+                                <button
+                                    id="risk-reward-short"
+                                    type="button"
+                                    class="direction-button"
+                                    data-direction="short"
+                                    aria-pressed="false"
+                                >
+                                    Short
+                                </button>
+
+                            </div>
+
+                            <input
+                                id="risk-reward-direction"
+                                type="hidden"
+                                value="long"
+                            >
+
+                        </div>
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="risk-reward-entry"
+                                >
+                                    Entry
+                                </label>
+
+                                <input
+                                    id="risk-reward-entry"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="84841.08"
+                                >
+                            </div>
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="risk-reward-stop"
+                                >
+                                    Stop
+                                    <small>Invalidation</small>
+                                </label>
+
+                                <input
+                                    id="risk-reward-stop"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="83500"
+                                >
+                            </div>
+
+                        </div>
+
+                        <div class="field-row">
+
+                            <div>
+                                <label
+                                    class="field-label"
+                                    for="risk-reward-target"
+                                >
+                                    Target
+                                </label>
+
+                                <input
+                                    id="risk-reward-target"
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    inputmode="decimal"
+                                    placeholder="87500"
+                                >
+                            </div>
+
+                            <div class="context-field">
+                                <span class="field-label">
+                                    Context
+                                </span>
+
+                                <strong id="context-summary">
+                                    Incomplete
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div class="level-map">
+
+                            <div class="field-label">
+                                Price structure
+                                <small id="level-map-state">
+                                    Entry / Stop / Target
+                                </small>
+                            </div>
+
+                            <div
+                                class="level-map-track"
+                                aria-hidden="true"
+                            >
+                                <div
+                                    id="level-map-risk"
+                                    class="level-map-segment risk"
+                                ></div>
+
+                                <div
+                                    id="level-map-reward"
+                                    class="level-map-segment reward"
+                                ></div>
+
+                                <span
+                                    id="level-map-stop"
+                                    class="level-marker stop"
+                                ></span>
+
+                                <span
+                                    id="level-map-entry"
+                                    class="level-marker entry"
+                                ></span>
+
+                                <span
+                                    id="level-map-target"
+                                    class="level-marker target"
+                                ></span>
+                            </div>
+
+                            <div class="level-map-labels">
+                                <span id="level-map-stop-label">
+                                    Stop
+                                </span>
+
+                                <span id="level-map-entry-label">
+                                    Entry
+                                </span>
+
+                                <span id="level-map-target-label">
+                                    Target
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="actions">
+
+                            <button
+                                id="calculate-risk-reward"
+                                type="button"
+                                class="action primary"
+                            >
+                                Recalculate
+                            </button>
+
+                            <button
+                                id="use-position-size"
+                                type="button"
+                                class="action"
+                            >
+                                Use in Position Size
+                            </button>
+
+                            <button
+                                id="reset-risk-reward"
+                                type="button"
+                                class="action"
+                            >
+                                Reset
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+                <section class="panel result-panel">
+
+                    <div class="panel-header">
+                        <strong>Trade Structure</strong>
+
+                        <span id="calculation-state">
+                            Ready
+                        </span>
                     </div>
 
-                    <div>
-                        <dt>Break-even Win Rate</dt>
-                        <dd id="breakeven-win-rate">—</dd>
+                    <div class="primary-result">
+                        <span class="primary-result-label">
+                            Risk / Reward
+                        </span>
+
+                        <strong
+                            id="risk-reward-ratio"
+                            class="primary-result-value"
+                        >
+                            —
+                        </strong>
+
+                        <span class="primary-result-unit">
+                            ratio
+                        </span>
                     </div>
-                </dl>
+
+                    <div class="result-metrics">
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Risk / Unit
+                            </span>
+
+                            <strong
+                                id="risk-per-unit"
+                                class="metric-value negative-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Reward / Unit
+                            </span>
+
+                            <strong
+                                id="reward-per-unit"
+                                class="metric-value positive-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                        <div class="metric-block">
+                            <span class="metric-label">
+                                Break-even Win Rate
+                            </span>
+
+                            <strong
+                                id="breakeven-win-rate"
+                                class="metric-value"
+                            >
+                                —
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="risk-reward-state"
+                        class="result-state"
+                    >
+                        Enter valid trade levels.
+                    </div>
+
+                </section>
+
+            </div>
+
+            <div class="setup-footer">
+
+                <span>
+                    Planning context:
+                    <strong id="footer-context">
+                        Incomplete
+                    </strong>
+                </span>
 
             </div>
 
@@ -144,10 +466,13 @@
 
     </main>
 
-    <footer>
-        <p>Trading Tools</p>
-        <p>Understand. Calculate. Evaluate. Improve.</p>
-    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <script
+        type="module"
+        src="/src/pages/risk-reward.ts"
+    ></script>
 
 </body>
 </html>

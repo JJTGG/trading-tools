@@ -1,163 +1,389 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <meta
+        name="description"
+        content="Continue trading work, review saved calculations, and manage your market watchlist."
+    >
     <title>Workspace — Trading Tools</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <header class="workspace-header">
-        <a href="index.html" class="auth-brand">Trading Tools</a>
+
+<body class="workspace-page">
+
+    <header class="app-header">
+
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav class="app-nav" aria-label="Application">
+            <a href="workspace.html" class="active">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+        </nav>
 
         <div class="workspace-account">
-            <a href="settings.html">Settings</a>
-            <a href="preferences.html">Preferences</a>
-            <button id="logout-button" type="button">Sign out</button>
+
+            <a href="settings.html">
+                Settings
+            </a>
+
+            <a href="preferences.html">
+                Preferences
+            </a>
+
+            <button
+                id="logout-button"
+                type="button"
+                class="account-action"
+            >
+                Sign out
+            </button>
+
         </div>
+
     </header>
 
-    <main class="workspace-page">
-        <section class="workspace-intro">
-            <p class="eyebrow">Personal Workspace</p>
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
 
-            <h1>
-                Welcome back, <span id="workspace-name">Trader</span>.
-            </h1>
+        <div id="market-tickers">
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+        </div>
+    </div>
 
-            <p id="workspace-user">
-                Your trading tools, saved work, and market activity in one place.
-            </p>
+    <main class="workspace-shell">
+
+        <section class="workspace-heading">
+
+            <div>
+
+                <p class="workspace-kicker">
+                    Workspace / Continuity
+                </p>
+
+                <h1>
+                    Welcome back,
+                    <span id="workspace-name">
+                        Trader
+                    </span>
+                </h1>
+
+                <p id="workspace-user">
+                    Continue the trading work you've already started.
+                </p>
+
+            </div>
+
+            <div class="workspace-status">
+
+                <span
+                    id="workspace-experience"
+                    class="status-value"
+                >
+                    Not set
+                </span>
+
+                <span class="status-label">
+                    Experience
+                </span>
+
+            </div>
+
         </section>
 
-        <section class="workspace-grid">
-            <div class="workspace-card">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">Profile</p>
-                        <h2>Experience</h2>
-                    </div>
-                </div>
+        <section class="workspace-summary">
 
-                <p id="workspace-experience">Not set</p>
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Saved calculations
+                </span>
+
+                <strong
+                    id="workspace-calculation-count"
+                    class="summary-value"
+                >
+                    0
+                </strong>
+
             </div>
 
-            <div class="workspace-card">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">Activity</p>
-                        <h2>Saved calculations</h2>
-                    </div>
-                </div>
+            <div class="summary-item">
 
-                <p id="workspace-calculation-count">0</p>
+                <span class="summary-label">
+                    Watchlist
+                </span>
+
+                <strong
+                    id="workspace-watchlist-count"
+                    class="summary-value"
+                >
+                    0
+                </strong>
+
             </div>
 
-            <div class="workspace-card">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">Markets</p>
-                        <h2>Watchlist</h2>
-                    </div>
-                </div>
+            <div class="summary-item">
 
-                <p id="workspace-watchlist-count">0</p>
+                <span class="summary-label">
+                    Workspace state
+                </span>
+
+                <strong class="summary-value">
+                    Ready
+                </strong>
+
             </div>
+
         </section>
 
-        <section class="workspace-section">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Quick actions</p>
-                    <h2>Tools</h2>
-                </div>
-            </div>
+        <section class="workspace-layout">
 
-            <div class="workspace-tools">
-                <a href="pnl-calculator.html">PnL Calculator</a>
-                <a href="position-size.html">Position Size</a>
-                <a href="risk-reward.html">Risk / Reward</a>
-                <a href="leverage.html">Leverage</a>
-            </div>
-        </section>
+            <div class="workspace-main">
 
-        <section class="workspace-grid">
-            <div class="workspace-card">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">Your work</p>
-                        <h2>Recent calculations</h2>
+                <section class="workspace-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-kicker">
+                                Continuity
+                            </span>
+
+                            <h2>
+                                Recent work
+                            </h2>
+                        </div>
+
+                        <span class="panel-meta">
+                            Last 5
+                        </span>
+
                     </div>
-                </div>
 
-                <div id="saved-calculations">
-                    <p class="empty-state">
-                        No saved calculations yet.
-                    </p>
-                </div>
+                    <div id="saved-calculations">
+
+                        <p class="empty-state">
+                            No saved calculations yet.
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <section class="workspace-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-kicker">
+                                Tools
+                            </span>
+
+                            <h2>
+                                Start new work
+                            </h2>
+                        </div>
+
+                    </div>
+
+                    <div class="tool-launcher">
+
+                        <a href="position-size.html">
+                            <span>Position Size</span>
+                            <small>Define risk and size</small>
+                        </a>
+
+                        <a href="risk-reward.html">
+                            <span>Risk / Reward</span>
+                            <small>Map stop and target</small>
+                        </a>
+
+                        <a href="pnl-calculator.html">
+                            <span>PnL</span>
+                            <small>Review trade performance</small>
+                        </a>
+
+                        <a href="leverage.html">
+                            <span>Leverage</span>
+                            <small>Measure exposure</small>
+                        </a>
+
+                    </div>
+
+                </section>
+
             </div>
 
-            <div class="workspace-card">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">Markets</p>
-                        <h2>Watchlist</h2>
-                    </div>
-                </div>
+            <aside class="workspace-side">
 
-                <form id="watchlist-form">
-                    <div>
-                        <label for="watchlist-symbol">Symbol</label>
-                        <input
-                            id="watchlist-symbol"
-                            name="symbol"
-                            type="text"
-                            placeholder="BTC"
-                            autocomplete="off"
-                            required
+                <section class="workspace-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-kicker">
+                                Markets
+                            </span>
+
+                            <h2>
+                                Watchlist
+                            </h2>
+                        </div>
+
+                    </div>
+
+                    <form id="watchlist-form">
+
+                        <div class="watchlist-form-row">
+
+                            <label
+                                for="watchlist-symbol"
+                                class="field-label"
+                            >
+                                Symbol
+                            </label>
+
+                            <input
+                                id="watchlist-symbol"
+                                name="symbol"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="BTC/USD"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="watchlist-form-row">
+
+                            <label
+                                for="watchlist-type"
+                                class="field-label"
+                            >
+                                Asset type
+                            </label>
+
+                            <select
+                                id="watchlist-type"
+                                name="asset-type"
+                            >
+                                <option value="crypto">
+                                    Crypto
+                                </option>
+
+                                <option value="stock">
+                                    Stock
+                                </option>
+
+                                <option value="forex">
+                                    Forex
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="action primary"
                         >
+                            Add symbol
+                        </button>
+
+                        <p
+                            id="watchlist-message"
+                            class="form-message"
+                            aria-live="polite"
+                        ></p>
+
+                    </form>
+
+                    <div id="watchlist">
+
+                        <p class="empty-state">
+                            Your watchlist is empty.
+                        </p>
+
                     </div>
 
-                    <div>
-                        <label for="watchlist-type">Asset type</label>
-                        <select id="watchlist-type" name="asset-type">
-                            <option value="crypto">Crypto</option>
-                            <option value="stock">Stock</option>
-                            <option value="forex">Forex</option>
-                        </select>
+                </section>
+
+                <section class="workspace-panel profile-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-kicker">
+                                Account
+                            </span>
+
+                            <h2>
+                                Personalization
+                            </h2>
+                        </div>
+
                     </div>
 
-                    <button type="submit">Add to watchlist</button>
+                    <a
+                        href="settings.html"
+                        class="side-link"
+                    >
+                        <span>Profile settings</span>
+                        <span>→</span>
+                    </a>
 
-                    <p id="watchlist-message" aria-live="polite"></p>
-                </form>
+                    <a
+                        href="preferences.html"
+                        class="side-link"
+                    >
+                        <span>Workspace preferences</span>
+                        <span>→</span>
+                    </a>
 
-                <div id="watchlist">
-                    <p class="empty-state">
-                        Your watchlist is empty.
-                    </p>
-                </div>
-            </div>
+                </section>
+
+            </aside>
+
         </section>
 
-        <section class="workspace-section">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Account</p>
-                    <h2>Personalization</h2>
-                </div>
-            </div>
-
-            <div class="workspace-tools">
-                <a href="settings.html">Profile settings</a>
-                <a href="preferences.html">Workspace preferences</a>
-            </div>
-        </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="workspace.js"></script>
+
+    <script
+        type="module"
+        src="/src/pages/workspace.ts"
+    ></script>
+
 </body>
+
 </html>

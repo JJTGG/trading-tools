@@ -245,15 +245,63 @@ body.auth-page {
 }
 
 .auth-legal {
-    margin-top: 20px;
-    padding-top: 14px;
+    min-width: 0;
+    margin: 2px 0 0;
+    padding: 14px 0 0;
 
+    border: 0;
     border-top: 1px solid var(--line);
+}
+
+.auth-legal legend {
+    padding: 0;
 
     color: var(--text-faint);
 
+    font-family: var(--font-data);
     font-size: var(--text-xs);
-    line-height: 1.55;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.auth-checkbox {
+    display: grid;
+    grid-template-columns:
+        16px
+        minmax(0, 1fr);
+
+    align-items: start;
+
+    gap: 9px;
+
+    margin-top: 12px;
+}
+
+.auth-checkbox input {
+    width: 14px;
+    height: 14px;
+
+    margin: 2px 0 0;
+    padding: 0;
+
+    accent-color: var(--accent);
+}
+
+.auth-checkbox label {
+    color: var(--text-muted);
+
+    font-size: var(--text-xs);
+    line-height: 1.6;
+}
+
+.auth-checkbox a {
+    color: var(--accent-strong);
+    font-weight: 650;
+}
+
+.auth-checkbox a:hover {
+    color: var(--text);
 }
 
 .market-options {

@@ -3,6 +3,7 @@ import "../styles/base.css";
 import "./leverage.css";
 
 import { mountMarketStrip } from "../components/market-strip";
+import { trackProductEvent } from "../data/product-events";
 
 const calculator =
     document.querySelector<HTMLFormElement>(
@@ -291,3 +292,11 @@ calculator?.addEventListener(
 mountMarketStrip();
 
 calculate();
+
+void trackProductEvent(
+    "tool_opened",
+    "leverage",
+    {
+        tool: "leverage"
+    }
+);

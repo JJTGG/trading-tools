@@ -7,6 +7,7 @@ import {
     buildTradeContextUrl,
     readTradeContextFromUrl
 } from "../data/trade-context";
+import { createTradeSetup } from "../data/trade-setups";
 import { trackProductEvent } from "../data/product-events";
 
 interface MarketSelectionDetail {
@@ -70,6 +71,11 @@ const calculateButton =
         "#calculate-risk-reward"
     );
 
+const saveButton =
+    document.querySelector<HTMLButtonElement>(
+        "#save-risk-reward"
+    );
+
 const resetButton =
     document.querySelector<HTMLButtonElement>(
         "#reset-risk-reward"
@@ -93,6 +99,11 @@ const contextSummary =
 const footerContext =
     document.querySelector<HTMLElement>(
         "#footer-context"
+    );
+
+const saveMessage =
+    document.querySelector<HTMLElement>(
+        "#risk-reward-save-message"
     );
 
 const calculationState =
@@ -170,15 +181,21 @@ const levelMapTargetLabel =
         "#level-map-target-label"
     );
 
-let lastResult: RiskRewardResult | null =
-    null;
+let lastCalculation:
+    {
+        inputs: RiskRewardInputs;
+        result: RiskRewardResult;
+    } | null = null;
 
 const formatNumber = (
     value: number
 ): string => {
-    return new Intl.NumberFormat(undefined, {
-        maximumFractionDigits: 8
-    }).format(value);
+    return new Intl.NumberFormat(
+        undefined,
+        {
+            maximumFractionDigits: 8
+        }
+    ).format(value);
 };
 
 const setText = (
@@ -186,7 +203,8 @@ const setText = (
     value: string
 ): void => {
     if (element) {
-        element.textContent = value;
+        element.textContent =
+            value;
     }
 };
 
@@ -212,39 +230,55 @@ const readNumber = (
         : Number.NaN;
 };
 
-const getInputs = (): RiskRewardInputs => {
-    return {
-        symbol:
-            symbolInput?.value
-                .trim()
-                .toUpperCase() || "",
+const getInputs =
+    (): RiskRewardInputs => {
+        return {
+            symbol:
+                symbolInput?.value
+                    .trim()
+                    .toUpperCase() ||
+                "",
 
-        timeframe:
-            timeframeInput?.value || "1H",
+            timeframe:
+                timeframeInput?.value ||
+                "1H",
 
-        direction:
-            directionInput?.value === "short"
-                ? "short"
-                : "long",
+            direction:
+                directionInput?.value ===
+                "short"
+                    ? "short"
+                    : "long",
 
-        entry:
-            readNumber(entryInput),
+            entry:
+                readNumber(
+                    entryInput
+                ),
 
-        stop:
-            readNumber(stopInput),
+            stop:
+                readNumber(
+                    stopInput
+                ),
 
-        target:
-            readNumber(targetInput)
+            target:
+                readNumber(
+                    targetInput
+                )
+        };
     };
-};
 
 const getValidationMessage = (
     inputs: RiskRewardInputs
 ): string => {
     if (
-        !Number.isFinite(inputs.entry) ||
-        !Number.isFinite(inputs.stop) ||
-        !Number.isFinite(inputs.target)
+        !Number.isFinite(
+            inputs.entry
+        ) ||
+        !Number.isFinite(
+            inputs.stop
+        ) ||
+        !Number.isFinite(
+            inputs.target
+        )
     ) {
         return "Enter entry, stop, and target.";
     }
@@ -258,32 +292,38 @@ const getValidationMessage = (
     }
 
     if (
-        inputs.direction === "long"
+        inputs.direction ===
+        "long"
     ) {
         if (
-            inputs.stop >= inputs.entry
+            inputs.stop >=
+            inputs.entry
         ) {
             return "Long positions require the stop below entry.";
         }
 
         if (
-            inputs.target <= inputs.entry
+            inputs.target <=
+            inputs.entry
         ) {
             return "Long positions require the target above entry.";
         }
     }
 
     if (
-        inputs.direction === "short"
+        inputs.direction ===
+        "short"
     ) {
         if (
-            inputs.stop <= inputs.entry
+            inputs.stop <=
+            inputs.entry
         ) {
             return "Short positions require the stop above entry.";
         }
 
         if (
-            inputs.target >= inputs.entry
+            inputs.target >=
+            inputs.entry
         ) {
             return "Short positions require the target below entry.";
         }
@@ -298,30 +338,51 @@ const updateContext = (
     const parts: string[] = [];
 
     if (inputs.symbol) {
-        parts.push(inputs.symbol);
+        parts.push(
+            inputs.symbol
+        );
     }
 
     parts.push(
-        inputs.direction === "long"
+        inputs.direction ===
+            "long"
             ? "Long"
             : "Short"
     );
 
-    if (Number.isFinite(inputs.entry)) {
+    if (
+        Number.isFinite(
+            inputs.entry
+        )
+    ) {
         parts.push(
-            `Entry ${formatNumber(inputs.entry)}`
+            `Entry ${formatNumber(
+                inputs.entry
+            )}`
         );
     }
 
-    if (Number.isFinite(inputs.stop)) {
+    if (
+        Number.isFinite(
+            inputs.stop
+        )
+    ) {
         parts.push(
-            `Stop ${formatNumber(inputs.stop)}`
+            `Stop ${formatNumber(
+                inputs.stop
+            )}`
         );
     }
 
-    if (Number.isFinite(inputs.target)) {
+    if (
+        Number.isFinite(
+            inputs.target
+        )
+    ) {
         parts.push(
-            `Target ${formatNumber(inputs.target)}`
+            `Target ${formatNumber(
+                inputs.target
+            )}`
         );
     }
 
@@ -342,7 +403,8 @@ const updateContext = (
 };
 
 const clearResults = (
-    message = "Enter entry, stop, and target."
+    message =
+        "Enter entry, stop, and target."
 ): void => {
     setText(
         ratioResult,
@@ -376,19 +438,31 @@ const clearResults = (
 
     resultState?.classList.toggle(
         "invalid",
-        message !== "Enter entry, stop, and target."
+        message !==
+            "Enter entry, stop, and target."
     );
 
-    lastResult = null;
+    if (saveButton) {
+        saveButton.disabled =
+            true;
+    }
+
+    lastCalculation = null;
 };
 
 const updateLevelMap = (
     inputs: RiskRewardInputs
 ): void => {
     if (
-        !Number.isFinite(inputs.entry) ||
-        !Number.isFinite(inputs.stop) ||
-        !Number.isFinite(inputs.target)
+        !Number.isFinite(
+            inputs.entry
+        ) ||
+        !Number.isFinite(
+            inputs.stop
+        ) ||
+        !Number.isFinite(
+            inputs.target
+        )
     ) {
         return;
     }
@@ -416,19 +490,26 @@ const updateLevelMap = (
         price: number
     ): number => {
         return (
-            ((price - minimum) / range) *
+            ((price - minimum) /
+                range) *
             100
         );
     };
 
     const stopPosition =
-        toPosition(inputs.stop);
+        toPosition(
+            inputs.stop
+        );
 
     const entryPosition =
-        toPosition(inputs.entry);
+        toPosition(
+            inputs.entry
+        );
 
     const targetPosition =
-        toPosition(inputs.target);
+        toPosition(
+            inputs.target
+        );
 
     levelMapStop?.style.setProperty(
         "left",
@@ -454,7 +535,7 @@ const updateLevelMap = (
     const riskWidth =
         Math.abs(
             entryPosition -
-            stopPosition
+                stopPosition
         );
 
     const rewardStart =
@@ -466,7 +547,7 @@ const updateLevelMap = (
     const rewardWidth =
         Math.abs(
             targetPosition -
-            entryPosition
+                entryPosition
         );
 
     levelMapRisk?.style.setProperty(
@@ -491,22 +572,29 @@ const updateLevelMap = (
 
     setText(
         levelMapStopLabel,
-        `Stop ${formatNumber(inputs.stop)}`
+        `Stop ${formatNumber(
+            inputs.stop
+        )}`
     );
 
     setText(
         levelMapEntryLabel,
-        `Entry ${formatNumber(inputs.entry)}`
+        `Entry ${formatNumber(
+            inputs.entry
+        )}`
     );
 
     setText(
         levelMapTargetLabel,
-        `Target ${formatNumber(inputs.target)}`
+        `Target ${formatNumber(
+            inputs.target
+        )}`
     );
 
     setText(
         levelMapState,
-        inputs.direction === "long"
+        inputs.direction ===
+            "long"
             ? "Stop ← Entry → Target"
             : "Target ← Entry → Stop"
     );
@@ -516,19 +604,31 @@ const calculate = (): void => {
     const inputs =
         getInputs();
 
-    updateContext(inputs);
-    updateLevelMap(inputs);
+    updateContext(
+        inputs
+    );
+
+    updateLevelMap(
+        inputs
+    );
 
     const validationMessage =
-        getValidationMessage(inputs);
+        getValidationMessage(
+            inputs
+        );
 
     if (validationMessage) {
         clearResults(
             validationMessage
         );
 
-        updateContext(inputs);
-        updateLevelMap(inputs);
+        updateContext(
+            inputs
+        );
+
+        updateLevelMap(
+            inputs
+        );
 
         return;
     }
@@ -536,13 +636,13 @@ const calculate = (): void => {
     const risk =
         Math.abs(
             inputs.entry -
-            inputs.stop
+                inputs.stop
         );
 
     const reward =
         Math.abs(
             inputs.target -
-            inputs.entry
+                inputs.entry
         );
 
     if (risk <= 0) {
@@ -557,32 +657,41 @@ const calculate = (): void => {
         reward / risk;
 
     const breakevenWinRate =
-        (
-            1 /
-            (1 + ratio)
-        ) *
+        (1 / (1 + ratio)) *
         100;
 
-    lastResult = {
+    const result:
+        RiskRewardResult = {
         risk,
         reward,
         ratio,
         breakevenWinRate
     };
 
+    lastCalculation = {
+        inputs,
+        result
+    };
+
     setText(
         ratioResult,
-        `1 : ${formatNumber(ratio)}`
+        `1 : ${formatNumber(
+            ratio
+        )}`
     );
 
     setText(
         riskResult,
-        formatNumber(risk)
+        formatNumber(
+            risk
+        )
     );
 
     setText(
         rewardResult,
-        formatNumber(reward)
+        formatNumber(
+            reward
+        )
     );
 
     setText(
@@ -599,32 +708,130 @@ const calculate = (): void => {
 
     setText(
         resultState,
-        `${inputs.direction === "long" ? "Long" : "Short"} · ${formatNumber(ratio)}R`
+        `${
+            inputs.direction ===
+            "long"
+                ? "Long"
+                : "Short"
+        } · ${formatNumber(
+            ratio
+        )}R`
     );
 
     resultState?.classList.remove(
         "invalid"
     );
-};
 
-const trackCompletedCalculation = (): void => {
-    calculate();
-
-    if (!lastResult) {
-        return;
+    if (saveButton) {
+        saveButton.disabled =
+            false;
     }
-
-    void trackProductEvent(
-        "calculation_completed",
-        "risk-reward",
-        {
-            tool: "risk-reward"
-        }
-    );
 };
+
+const trackCompletedCalculation =
+    (): void => {
+        calculate();
+
+        if (!lastCalculation) {
+            return;
+        }
+
+        void trackProductEvent(
+            "calculation_completed",
+            "risk-reward",
+            {
+                tool:
+                    "risk-reward"
+            }
+        );
+    };
+
+const saveSetup =
+    async (): Promise<void> => {
+        if (
+            !lastCalculation ||
+            !saveButton
+        ) {
+            return;
+        }
+
+        saveButton.disabled =
+            true;
+
+        setText(
+            saveMessage,
+            "Saving..."
+        );
+
+        try {
+            const {
+                inputs
+            } =
+                lastCalculation;
+
+            const title =
+                inputs.symbol
+                    ? `${inputs.symbol} · Risk / Reward`
+                    : "Risk / Reward setup";
+
+            await createTradeSetup({
+                title,
+                context: {
+                    symbol:
+                        inputs.symbol ||
+                        undefined,
+
+                    timeframe:
+                        inputs.timeframe ||
+                        undefined,
+
+                    direction:
+                        inputs.direction,
+
+                    entryPrice:
+                        inputs.entry,
+
+                    stopLoss:
+                        inputs.stop,
+
+                    targetPrice:
+                        inputs.target
+                }
+            });
+
+            setText(
+                saveMessage,
+                "Saved to Workspace."
+            );
+
+            void trackProductEvent(
+                "calculation_saved",
+                "risk-reward",
+                {
+                    tool:
+                        "risk-reward"
+                }
+            );
+        } catch (error) {
+            console.error(
+                "Save risk reward setup error:",
+                error
+            );
+
+            setText(
+                saveMessage,
+                "Unable to save setup."
+            );
+
+            saveButton.disabled =
+                false;
+        }
+    };
 
 const setDirection = (
-    direction: "long" | "short"
+    direction:
+        | "long"
+        | "short"
 ): void => {
     if (directionInput) {
         directionInput.value =
@@ -652,63 +859,75 @@ const setDirection = (
     calculate();
 };
 
-const applyContextFromUrl = (): void => {
-    const context =
-        readTradeContextFromUrl();
+const applyContextFromUrl =
+    (): void => {
+        const context =
+            readTradeContextFromUrl();
 
-    if (
-        context.symbol &&
-        symbolInput
-    ) {
-        symbolInput.value =
-            context.symbol;
-    }
+        if (
+            context.symbol &&
+            symbolInput
+        ) {
+            symbolInput.value =
+                context.symbol;
+        }
 
-    if (
-        context.timeframe &&
-        timeframeInput
-    ) {
-        timeframeInput.value =
-            context.timeframe;
-    }
+        if (
+            context.timeframe &&
+            timeframeInput
+        ) {
+            timeframeInput.value =
+                context.timeframe;
+        }
 
-    if (
-        context.entryPrice !== undefined &&
-        entryInput
-    ) {
-        entryInput.value =
-            String(context.entryPrice);
-    }
+        if (
+            context.entryPrice !==
+                undefined &&
+            entryInput
+        ) {
+            entryInput.value =
+                String(
+                    context.entryPrice
+                );
+        }
 
-    if (
-        context.stopLoss !== undefined &&
-        stopInput
-    ) {
-        stopInput.value =
-            String(context.stopLoss);
-    }
+        if (
+            context.stopLoss !==
+                undefined &&
+            stopInput
+        ) {
+            stopInput.value =
+                String(
+                    context.stopLoss
+                );
+        }
 
-    if (
-        context.targetPrice !== undefined &&
-        targetInput
-    ) {
-        targetInput.value =
-            String(context.targetPrice);
-    }
+        if (
+            context.targetPrice !==
+                undefined &&
+            targetInput
+        ) {
+            targetInput.value =
+                String(
+                    context.targetPrice
+                );
+        }
 
-    if (
-        context.direction === "long" ||
-        context.direction === "short"
-    ) {
-        setDirection(
-            context.direction
-        );
+        if (
+            context.direction ===
+                "long" ||
+            context.direction ===
+                "short"
+        ) {
+            setDirection(
+                context.direction
+            );
 
-        return;
-    }
+            return;
+        }
 
-    calculate();
-};
+        calculate();
+    };
 
 const handleMarketSelection = (
     event: Event
@@ -719,7 +938,8 @@ const handleMarketSelection = (
     const {
         symbol,
         price
-    } = customEvent.detail;
+    } =
+        customEvent.detail;
 
     if (symbolInput) {
         symbolInput.value =
@@ -728,7 +948,9 @@ const handleMarketSelection = (
 
     setText(
         marketReference,
-        `Live ${formatNumber(price)}`
+        `Live ${formatNumber(
+            price
+        )}`
     );
 
     if (
@@ -744,7 +966,8 @@ const handleMarketSelection = (
 
 const reset = (): void => {
     if (symbolInput) {
-        symbolInput.value = "";
+        symbolInput.value =
+            "";
     }
 
     if (timeframeInput) {
@@ -753,15 +976,18 @@ const reset = (): void => {
     }
 
     if (entryInput) {
-        entryInput.value = "";
+        entryInput.value =
+            "";
     }
 
     if (stopInput) {
-        stopInput.value = "";
+        stopInput.value =
+            "";
     }
 
     if (targetInput) {
-        targetInput.value = "";
+        targetInput.value =
+            "";
     }
 
     setText(
@@ -769,7 +995,14 @@ const reset = (): void => {
         "Market —"
     );
 
-    setDirection("long");
+    setDirection(
+        "long"
+    );
+
+    setText(
+        saveMessage,
+        ""
+    );
 
     clearResults();
 
@@ -778,35 +1011,40 @@ const reset = (): void => {
     );
 };
 
-const openPositionSize = (): void => {
-    const inputs =
-        getInputs();
+const openPositionSize =
+    (): void => {
+        const inputs =
+            getInputs();
 
-    window.location.href =
-        buildTradeContextUrl(
-            "position-size.html",
-            {
-                symbol:
-                    inputs.symbol,
+        window.location.href =
+            buildTradeContextUrl(
+                "position-size.html",
+                {
+                    symbol:
+                        inputs.symbol,
 
-                timeframe:
-                    inputs.timeframe,
+                    timeframe:
+                        inputs.timeframe,
 
-                direction:
-                    inputs.direction,
+                    direction:
+                        inputs.direction,
 
-                entryPrice:
-                    Number.isFinite(inputs.entry)
-                        ? inputs.entry
-                        : undefined,
+                    entryPrice:
+                        Number.isFinite(
+                            inputs.entry
+                        )
+                            ? inputs.entry
+                            : undefined,
 
-                stopLoss:
-                    Number.isFinite(inputs.stop)
-                        ? inputs.stop
-                        : undefined
-            }
-        );
-};
+                    stopLoss:
+                        Number.isFinite(
+                            inputs.stop
+                        )
+                            ? inputs.stop
+                            : undefined
+                }
+            );
+    };
 
 directionButtons.forEach(
     (button) => {
@@ -817,8 +1055,10 @@ directionButtons.forEach(
                     button.dataset.direction;
 
                 if (
-                    direction === "long" ||
-                    direction === "short"
+                    direction ===
+                        "long" ||
+                    direction ===
+                        "short"
                 ) {
                     setDirection(
                         direction
@@ -852,6 +1092,11 @@ directionButtons.forEach(
 calculateButton?.addEventListener(
     "click",
     trackCompletedCalculation
+);
+
+saveButton?.addEventListener(
+    "click",
+    saveSetup
 );
 
 resetButton?.addEventListener(
@@ -889,6 +1134,7 @@ void trackProductEvent(
     "tool_opened",
     "risk-reward",
     {
-        tool: "risk-reward"
+        tool:
+            "risk-reward"
     }
 );

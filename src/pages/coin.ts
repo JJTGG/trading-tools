@@ -6,6 +6,7 @@ import "./coin.css";
 import {
     mountMarketStrip
 } from "../components/market-strip";
+import { trackProductEvent } from "../data/product-events";
 
 const form =
     document.querySelector<HTMLFormElement>(
@@ -362,3 +363,11 @@ form?.addEventListener(
 );
 
 mountMarketStrip();
+
+void trackProductEvent(
+    "tool_opened",
+    "coin",
+    {
+        tool: "coin"
+    }
+);

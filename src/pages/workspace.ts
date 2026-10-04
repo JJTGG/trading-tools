@@ -27,8 +27,12 @@ interface SupabaseUser {
 interface SavedCalculation {
     id: string;
     tool: string;
-    inputs: Record<string, unknown> | null;
-    result: Record<string, unknown> | null;
+    inputs:
+        | Record<string, unknown>
+        | null;
+    result:
+        | Record<string, unknown>
+        | null;
     created_at: string;
 }
 
@@ -52,28 +56,42 @@ interface SupabaseClientLike {
     auth: {
         getUser(): Promise<{
             data: {
-                user: SupabaseUser | null;
+                user:
+                    | SupabaseUser
+                    | null;
             };
-            error: SupabaseError | null;
+            error:
+                | SupabaseError
+                | null;
         }>;
 
         signOut(options?: {
-            scope?: "global" | "local" | "others";
+            scope?:
+                | "global"
+                | "local"
+                | "others";
         }): Promise<{
-            error: SupabaseError | null;
+            error:
+                | SupabaseError
+                | null;
         }>;
     };
 
     from(table: string): {
         select(
             columns?: string,
-            options?: Record<string, unknown>
+            options?: Record<
+                string,
+                unknown
+            >
         ): SupabaseQueryLike;
 
         insert(
             values: Record<string, unknown>
         ): Promise<{
-            error: SupabaseError | null;
+            error:
+                | SupabaseError
+                | null;
         }>;
 
         delete(): SupabaseQueryLike;
@@ -98,18 +116,25 @@ interface SupabaseQueryLike {
     ): SupabaseQueryLike;
 
     maybeSingle(): Promise<{
-        data: Profile | null;
-        error: SupabaseError | null;
+        data:
+            | Profile
+            | null;
+        error:
+            | SupabaseError
+            | null;
     }>;
 
-    then: Promise<
-        SavedCalculation[] | WatchlistItem[]
-    >["then"];
+    then:
+        Promise<
+            | SavedCalculation[]
+            | WatchlistItem[]
+        >["then"];
 }
 
 declare global {
     interface Window {
-        supabaseClient: SupabaseClientLike;
+        supabaseClient:
+            SupabaseClientLike;
     }
 }
 
@@ -193,7 +218,10 @@ const formatToolName = (
     value: string
 ): string => {
     return value
-        .replace(/[-_]/g, " ")
+        .replace(
+            /[-_]/g,
+            " "
+        )
         .replace(
             /\b\w/g,
             (letter) =>
@@ -301,9 +329,12 @@ const getCalculationSummary = (
     calculation: SavedCalculation
 ): string => {
     const result =
-        calculation.result || {};
+        calculation.result ||
+        {};
 
-    switch (calculation.tool) {
+    switch (
+        calculation.tool
+    ) {
         case "position-size":
             return [
                 `Size ${formatValue(
@@ -363,28 +394,31 @@ const getTradeContextFromCalculation = (
     calculation: SavedCalculation
 ): TradeContext | null => {
     const inputs =
-        calculation.inputs || {};
+        calculation.inputs ||
+        {};
 
     if (
         calculation.tool ===
         "position-size"
     ) {
         return {
-            symbol: hasValue(
-                inputs.symbol
-            )
-                ? String(
-                      inputs.symbol
-                  )
-                : undefined,
+            symbol:
+                hasValue(
+                    inputs.symbol
+                )
+                    ? String(
+                          inputs.symbol
+                      )
+                    : undefined,
 
-            timeframe: hasValue(
-                inputs.timeframe
-            )
-                ? String(
-                      inputs.timeframe
-                  )
-                : undefined,
+            timeframe:
+                hasValue(
+                    inputs.timeframe
+                )
+                    ? String(
+                          inputs.timeframe
+                      )
+                    : undefined,
 
             direction:
                 toDirection(
@@ -424,21 +458,23 @@ const getTradeContextFromCalculation = (
         "risk-reward"
     ) {
         return {
-            symbol: hasValue(
-                inputs.symbol
-            )
-                ? String(
-                      inputs.symbol
-                  )
-                : undefined,
+            symbol:
+                hasValue(
+                    inputs.symbol
+                )
+                    ? String(
+                          inputs.symbol
+                      )
+                    : undefined,
 
-            timeframe: hasValue(
-                inputs.timeframe
-            )
-                ? String(
-                      inputs.timeframe
-                  )
-                : undefined,
+            timeframe:
+                hasValue(
+                    inputs.timeframe
+                )
+                    ? String(
+                          inputs.timeframe
+                      )
+                    : undefined,
 
             direction:
                 toDirection(
@@ -467,21 +503,23 @@ const getTradeContextFromCalculation = (
         "pnl-calculator"
     ) {
         return {
-            symbol: hasValue(
-                inputs.symbol
-            )
-                ? String(
-                      inputs.symbol
-                  )
-                : undefined,
+            symbol:
+                hasValue(
+                    inputs.symbol
+                )
+                    ? String(
+                          inputs.symbol
+                      )
+                    : undefined,
 
-            timeframe: hasValue(
-                inputs.timeframe
-            )
-                ? String(
-                      inputs.timeframe
-                  )
-                : undefined,
+            timeframe:
+                hasValue(
+                    inputs.timeframe
+                )
+                    ? String(
+                          inputs.timeframe
+                      )
+                    : undefined,
 
             direction:
                 toDirection(
@@ -517,37 +555,42 @@ const getCalculationContinueUrl = (
     calculation: SavedCalculation
 ): string | null => {
     const inputs =
-        calculation.inputs || {};
+        calculation.inputs ||
+        {};
 
     if (
         calculation.tool ===
-        "position-size" &&
+            "position-size" &&
         [
             inputs.direction,
             inputs.accountBalance,
             inputs.riskPercent,
             inputs.entryPrice,
             inputs.stopLoss
-        ].every(hasValue)
+        ].every(
+            hasValue
+        )
     ) {
         return buildTradeContextUrl(
             "position-size.html",
             {
-                symbol: hasValue(
-                    inputs.symbol
-                )
-                    ? String(
-                          inputs.symbol
-                      )
-                    : undefined,
+                symbol:
+                    hasValue(
+                        inputs.symbol
+                    )
+                        ? String(
+                              inputs.symbol
+                          )
+                        : undefined,
 
-                timeframe: hasValue(
-                    inputs.timeframe
-                )
-                    ? String(
-                          inputs.timeframe
-                      )
-                    : undefined,
+                timeframe:
+                    hasValue(
+                        inputs.timeframe
+                    )
+                        ? String(
+                              inputs.timeframe
+                          )
+                        : undefined,
 
                 direction:
                     toDirection(
@@ -579,32 +622,36 @@ const getCalculationContinueUrl = (
 
     if (
         calculation.tool ===
-        "risk-reward" &&
+            "risk-reward" &&
         [
             inputs.direction,
             inputs.entryPrice,
             inputs.stopLoss,
             inputs.target
-        ].every(hasValue)
+        ].every(
+            hasValue
+        )
     ) {
         return buildTradeContextUrl(
             "risk-reward.html",
             {
-                symbol: hasValue(
-                    inputs.symbol
-                )
-                    ? String(
-                          inputs.symbol
-                      )
-                    : undefined,
+                symbol:
+                    hasValue(
+                        inputs.symbol
+                    )
+                        ? String(
+                              inputs.symbol
+                          )
+                        : undefined,
 
-                timeframe: hasValue(
-                    inputs.timeframe
-                )
-                    ? String(
-                          inputs.timeframe
-                      )
-                    : undefined,
+                timeframe:
+                    hasValue(
+                        inputs.timeframe
+                    )
+                        ? String(
+                              inputs.timeframe
+                          )
+                        : undefined,
 
                 direction:
                     toDirection(
@@ -631,7 +678,7 @@ const getCalculationContinueUrl = (
 
     if (
         calculation.tool ===
-        "pnl-calculator" &&
+            "pnl-calculator" &&
         [
             inputs.symbol,
             inputs.timeframe,
@@ -640,7 +687,9 @@ const getCalculationContinueUrl = (
             inputs.exitPrice,
             inputs.positionSize,
             inputs.fees
-        ].every(hasValue)
+        ].every(
+            hasValue
+        )
     ) {
         return buildTradeContextUrl(
             "pnl-calculator.html",
@@ -690,6 +739,9 @@ const getTradeSetupContext = (
     setup: TradeSetup
 ): TradeContext => {
     return {
+        setupId:
+            setup.id,
+
         symbol:
             setup.symbol ||
             undefined,
@@ -739,68 +791,19 @@ const getTradeSetupContext = (
 const getTradeSetupContinueUrl = (
     setup: TradeSetup
 ): string => {
-    const context =
-        getTradeSetupContext(
-            setup
-        );
-
-    if (
-        setup.entryPrice !==
-            null &&
-        setup.stopLoss !==
-            null &&
-        setup.targetPrice !==
-            null &&
-        setup.direction
-    ) {
-        return buildTradeContextUrl(
-            "risk-reward.html",
-            context
-        );
-    }
-
-    if (
-        setup.entryPrice !==
-            null &&
-        setup.stopLoss !==
-            null &&
-        setup.accountBalance !==
-            null &&
-        setup.riskPercent !==
-            null &&
-        setup.direction
-    ) {
-        return buildTradeContextUrl(
-            "position-size.html",
-            context
-        );
-    }
-
-    if (
-        setup.entryPrice !==
-            null &&
-        setup.exitPrice !==
-            null &&
-        setup.positionSize !==
-            null &&
-        setup.direction
-    ) {
-        return buildTradeContextUrl(
-            "pnl-calculator.html",
-            context
-        );
-    }
-
     return buildTradeContextUrl(
         "position-size.html",
-        context
+        getTradeSetupContext(
+            setup
+        )
     );
 };
 
 const getTradeSetupSummary = (
     setup: TradeSetup
 ): string => {
-    const parts: string[] = [];
+    const parts: string[] =
+        [];
 
     if (setup.symbol) {
         parts.push(
@@ -811,7 +814,7 @@ const getTradeSetupSummary = (
     if (setup.direction) {
         parts.push(
             setup.direction ===
-            "long"
+                "long"
                 ? "Long"
                 : "Short"
         );
@@ -877,7 +880,9 @@ const createElement = <
     className?: string
 ): HTMLElementTagNameMap[K] => {
     const element =
-        document.createElement(tag);
+        document.createElement(
+            tag
+        );
 
     if (className) {
         element.className =
@@ -1170,9 +1175,6 @@ const renderSavedCalculations = (
                 saveButton.textContent =
                     "Save as setup";
 
-                saveButton.dataset.calculationId =
-                    calculation.id;
-
                 saveButton.addEventListener(
                     "click",
                     () => {
@@ -1439,7 +1441,8 @@ const loadSavedCalculations =
                 .order(
                     "created_at",
                     {
-                        ascending: false
+                        ascending:
+                            false
                     }
                 )
                 .limit(5);
@@ -1450,7 +1453,9 @@ const loadSavedCalculations =
                 error
             );
 
-            if (savedCalculations) {
+            if (
+                savedCalculations
+            ) {
                 savedCalculations.replaceChildren();
 
                 const errorState =
@@ -1497,7 +1502,9 @@ const loadTradeSetups =
                 "—"
             );
 
-            if (tradeSetups) {
+            if (
+                tradeSetups
+            ) {
                 tradeSetups.replaceChildren();
 
                 const errorState =
@@ -1538,7 +1545,8 @@ const loadWatchlist =
                 .order(
                     "created_at",
                     {
-                        ascending: false
+                        ascending:
+                            false
                     }
                 );
 
@@ -1644,8 +1652,10 @@ const loadWorkspaceStats =
 
 const saveCalculationAsSetup =
     async (
-        calculation: SavedCalculation,
-        button: HTMLButtonElement
+        calculation:
+            SavedCalculation,
+        button:
+            HTMLButtonElement
     ): Promise<void> => {
         const context =
             getTradeContextFromCalculation(
@@ -1689,7 +1699,9 @@ const saveCalculationAsSetup =
                 error
             );
 
-            button.disabled = false;
+            button.disabled =
+                false;
+
             button.textContent =
                 "Save as setup";
         }
@@ -1867,7 +1879,9 @@ const deleteCalculation =
             );
 
         if (button) {
-            button.disabled = true;
+            button.disabled =
+                true;
+
             button.textContent =
                 "Deleting...";
         }

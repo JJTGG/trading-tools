@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Confirm your Trading Tools email address."
+    >
+
+    <title>Confirm Email — Trading Tools</title>
+
+    <link rel="stylesheet" href="/src/styles/tokens.css">
+    <link rel="stylesheet" href="/src/styles/base.css">
+    <link rel="stylesheet" href="/src/pages/auth.css">
+</head>
+
+<body class="auth-page">
+
+    <main class="auth-shell">
+
+        <section class="auth-context">
+
+            <a
+                href="index.html"
+                class="auth-brand"
+            >
+                <span class="auth-brand-mark"></span>
+                Trading Tools
+            </a>
+
+            <div>
+
+                <p class="auth-context-kicker">
+                    Account verification
+                </p>
+
+                <h1>
+                    One last step before the workspace.
+                </h1>
+
+                <p class="auth-context-copy">
+                    Confirming your email address activates
+                    the account you just created.
+                </p>
+
+            </div>
+
+            <span class="auth-context-kicker">
+                Decision support · No trade execution
+            </span>
+
+        </section>
+
+        <section class="auth-form-panel">
+
+            <div class="auth-form-header">
+
+                <span>
+                    Email verification
+                </span>
+
+                <h2 id="confirm-email-title">
+                    Confirming your email
+                </h2>
+
+                <p id="confirm-email-copy">
+                    Please wait while we finish verifying your account.
+                </p>
+
+            </div>
+
+            <p
+                id="confirm-email-message"
+                class="form-message"
+                aria-live="polite"
+            ></p>
+
+            <a
+                id="confirm-email-action"
+                href="login.html"
+                class="primary-button"
+                hidden
+            >
+                Continue to sign in
+            </a>
+
+        </section>
+
+    </main>
+
+    <script
+        type="module"
+        src="/src/pages/confirm-email.ts"
+    ></script>
+
+</body>
+
+</html>

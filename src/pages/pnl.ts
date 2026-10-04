@@ -3,6 +3,9 @@ import "../styles/base.css";
 import "./pnl.css";
 
 import { mountMarketStrip } from "../components/market-strip";
+import {
+    readTradeContextFromUrl
+} from "../data/trade-context";
 
 interface SupabaseError {
     message: string;
@@ -714,87 +717,75 @@ const reset = (): void => {
 };
 
 const applyContextFromUrl = (): void => {
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    const symbol =
-        params.get("symbol");
-
-    const timeframe =
-        params.get("timeframe");
-
-    const direction =
-        params.get("direction");
-
-    const entry =
-        params.get("entryPrice");
-
-    const exit =
-        params.get("exitPrice");
-
-    const positionSize =
-        params.get("positionSize");
-
-    const fees =
-        params.get("fees");
+    const context =
+        readTradeContextFromUrl();
 
     if (
-        symbol &&
+        context.symbol &&
         symbolInput
     ) {
         symbolInput.value =
-            symbol;
+            context.symbol;
     }
 
     if (
-        timeframe &&
+        context.timeframe &&
         timeframeInput
     ) {
         timeframeInput.value =
-            timeframe;
+            context.timeframe;
     }
 
     if (
-        direction === "long" ||
-        direction === "short"
+        context.direction
     ) {
         setDirection(
-            direction
+            context.direction
         );
     }
 
     if (
-        entry &&
+        context.entryPrice !==
+            undefined &&
         entryInput
     ) {
         entryInput.value =
-            entry;
+            String(
+                context.entryPrice
+            );
     }
 
     if (
-        exit &&
+        context.exitPrice !==
+            undefined &&
         exitInput
     ) {
         exitInput.value =
-            exit;
+            String(
+                context.exitPrice
+            );
     }
 
     if (
-        positionSize &&
+        context.positionSize !==
+            undefined &&
         sizeInput
     ) {
         sizeInput.value =
-            positionSize;
+            String(
+                context.positionSize
+            );
     }
 
     if (
-        fees &&
+        context.fees !==
+            undefined &&
         feesInput
     ) {
         feesInput.value =
-            fees;
+            String(
+                context.fees
+            );
     }
 
     calculate();

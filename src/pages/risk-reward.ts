@@ -7,6 +7,7 @@ import {
     buildTradeContextUrl,
     readTradeContextFromUrl
 } from "../data/trade-context";
+import { trackProductEvent } from "../data/product-events";
 
 interface MarketSelectionDetail {
     symbol: string;
@@ -606,6 +607,22 @@ const calculate = (): void => {
     );
 };
 
+const trackCompletedCalculation = (): void => {
+    calculate();
+
+    if (!lastResult) {
+        return;
+    }
+
+    void trackProductEvent(
+        "calculation_completed",
+        "risk-reward",
+        {
+            tool: "risk-reward"
+        }
+    );
+};
+
 const setDirection = (
     direction: "long" | "short"
 ): void => {
@@ -834,7 +851,7 @@ directionButtons.forEach(
 
 calculateButton?.addEventListener(
     "click",
-    calculate
+    trackCompletedCalculation
 );
 
 resetButton?.addEventListener(
@@ -847,6 +864,18 @@ positionSizeButton?.addEventListener(
     openPositionSize
 );
 
+document
+    .querySelector<HTMLFormElement>(
+        "#risk-reward-calculator"
+    )
+    ?.addEventListener(
+        "submit",
+        (event) => {
+            event.preventDefault();
+            trackCompletedCalculation();
+        }
+    );
+
 document.addEventListener(
     "trading-tools:market-selected",
     handleMarketSelection
@@ -855,3 +884,11 @@ document.addEventListener(
 mountMarketStrip();
 
 applyContextFromUrl();
+
+void trackProductEvent(
+    "tool_opened",
+    "risk-reward",
+    {
+        tool: "risk-reward"
+    }
+);

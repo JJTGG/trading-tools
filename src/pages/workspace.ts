@@ -3,6 +3,9 @@ import "../styles/base.css";
 import "./workspace.css";
 
 import { mountMarketStrip } from "../components/market-strip";
+import {
+    buildTradeContextUrl
+} from "../data/trade-context";
 
 interface SupabaseError {
     message: string;
@@ -65,7 +68,7 @@ interface SupabaseClientLike {
         ): Promise<{
             error: SupabaseError | null;
         }>;
-        
+
         delete(): SupabaseQueryLike;
     };
 }
@@ -317,35 +320,38 @@ const createCalculationUrl = (
             inputs.stopLoss
         ].every(hasValue)
     ) {
-        const params =
-            new URLSearchParams({
+        return buildTradeContextUrl(
+            "position-size.html",
+            {
+                symbol:
+                    hasValue(inputs.symbol)
+                        ? String(inputs.symbol)
+                        : undefined,
+
+                timeframe:
+                    hasValue(inputs.timeframe)
+                        ? String(inputs.timeframe)
+                        : undefined,
+
                 direction:
-                    String(
-                        inputs.direction
-                    ),
+                    inputs.direction === "long" ||
+                    inputs.direction === "short"
+                        ? inputs.direction
+                        : undefined,
 
                 accountBalance:
-                    String(
-                        inputs.accountBalance
-                    ),
+                    Number(inputs.accountBalance),
 
                 riskPercent:
-                    String(
-                        inputs.riskPercent
-                    ),
+                    Number(inputs.riskPercent),
 
                 entryPrice:
-                    String(
-                        inputs.entryPrice
-                    ),
+                    Number(inputs.entryPrice),
 
                 stopLoss:
-                    String(
-                        inputs.stopLoss
-                    )
-            });
-
-        return `position-size.html?${params.toString()}`;
+                    Number(inputs.stopLoss)
+            }
+        );
     }
 
     if (
@@ -357,30 +363,35 @@ const createCalculationUrl = (
             inputs.target
         ].every(hasValue)
     ) {
-        const params =
-            new URLSearchParams({
+        return buildTradeContextUrl(
+            "risk-reward.html",
+            {
+                symbol:
+                    hasValue(inputs.symbol)
+                        ? String(inputs.symbol)
+                        : undefined,
+
+                timeframe:
+                    hasValue(inputs.timeframe)
+                        ? String(inputs.timeframe)
+                        : undefined,
+
                 direction:
-                    String(
-                        inputs.direction
-                    ),
+                    inputs.direction === "long" ||
+                    inputs.direction === "short"
+                        ? inputs.direction
+                        : undefined,
 
                 entryPrice:
-                    String(
-                        inputs.entryPrice
-                    ),
+                    Number(inputs.entryPrice),
 
                 stopLoss:
-                    String(
-                        inputs.stopLoss
-                    ),
+                    Number(inputs.stopLoss),
 
-                target:
-                    String(
-                        inputs.target
-                    )
-            });
-
-        return `risk-reward.html?${params.toString()}`;
+                targetPrice:
+                    Number(inputs.target)
+            }
+        );
     }
 
     if (
@@ -395,45 +406,34 @@ const createCalculationUrl = (
             inputs.fees
         ].every(hasValue)
     ) {
-        const params =
-            new URLSearchParams({
+        return buildTradeContextUrl(
+            "pnl-calculator.html",
+            {
                 symbol:
-                    String(
-                        inputs.symbol
-                    ),
+                    String(inputs.symbol),
 
                 timeframe:
-                    String(
-                        inputs.timeframe
-                    ),
+                    String(inputs.timeframe),
 
                 direction:
-                    String(
-                        inputs.direction
-                    ),
+                    inputs.direction === "long" ||
+                    inputs.direction === "short"
+                        ? inputs.direction
+                        : undefined,
 
                 entryPrice:
-                    String(
-                        inputs.entryPrice
-                    ),
+                    Number(inputs.entryPrice),
 
                 exitPrice:
-                    String(
-                        inputs.exitPrice
-                    ),
+                    Number(inputs.exitPrice),
 
                 positionSize:
-                    String(
-                        inputs.positionSize
-                    ),
+                    Number(inputs.positionSize),
 
                 fees:
-                    String(
-                        inputs.fees
-                    )
-            });
-
-        return `pnl-calculator.html?${params.toString()}`;
+                    Number(inputs.fees)
+            }
+        );
     }
 
     return null;

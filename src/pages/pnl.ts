@@ -6,39 +6,9 @@ import { mountMarketStrip } from "../components/market-strip";
 import {
     readTradeContextFromUrl
 } from "../data/trade-context";
+import { createTradeSetup } from "../data/trade-setups";
+import { supabaseClient } from "../data/supabase";
 import { trackProductEvent } from "../data/product-events";
-
-interface SupabaseError {
-    message: string;
-}
-
-interface SupabaseUser {
-    id: string;
-    email?: string;
-}
-
-interface SupabaseClientLike {
-    auth: {
-        getUser(): Promise<{
-            data: {
-                user: SupabaseUser | null;
-            };
-            error: SupabaseError | null;
-        }>;
-    };
-    from(table: string): {
-        insert(values: Record<string, unknown>): Promise<{
-            error: SupabaseError | null;
-        }>;
-    };
-}
-
-interface SupabaseLibrary {
-    createClient(
-        url: string,
-        key: string
-    ): SupabaseClientLike;
-}
 
 interface MarketSelectionDetail {
     symbol: string;
@@ -63,43 +33,6 @@ interface PnLResult {
     percentageReturn: number;
     positionValue: number;
 }
-
-declare global {
-    interface Window {
-        supabase?: SupabaseLibrary;
-        supabaseClient?: SupabaseClientLike;
-    }
-}
-
-const SUPABASE_URL =
-    "https://kaierwmqowgpizvwoyet.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_lyrrIdCyXNH2IZt5O5PjQQ_G1l2IBKD";
-
-const getSupabaseClient =
-    (): SupabaseClientLike => {
-        if (window.supabaseClient) {
-            return window.supabaseClient;
-        }
-
-        if (window.supabase) {
-            const client =
-                window.supabase.createClient(
-                    SUPABASE_URL,
-                    SUPABASE_PUBLISHABLE_KEY
-                );
-
-            window.supabaseClient =
-                client;
-
-            return client;
-        }
-
-        throw new Error(
-            "Supabase library is unavailable."
-        );
-    };
 
 const calculator =
     document.querySelector<HTMLFormElement>(
@@ -156,9 +89,14 @@ const resetButton =
         "#reset-pnl"
     );
 
-const saveButton =
+const saveCalculationButton =
     document.querySelector<HTMLButtonElement>(
         "#save-pnl"
+    );
+
+const saveSetupButton =
+    document.querySelector<HTMLButtonElement>(
+        "#save-pnl-setup"
     );
 
 const marketReference =
@@ -216,6 +154,11 @@ const saveMessage =
         "#pnl-save-message"
     );
 
+const saveSetupMessage =
+    document.querySelector<HTMLElement>(
+        "#pnl-setup-save-message"
+    );
+
 let lastCalculation: {
     inputs: PnLInputs;
     result: PnLResult;
@@ -224,9 +167,12 @@ let lastCalculation: {
 const formatNumber = (
     value: number
 ): string => {
-    return new Intl.NumberFormat(undefined, {
-        maximumFractionDigits: 8
-    }).format(value);
+    return new Intl.NumberFormat(
+        undefined,
+        {
+            maximumFractionDigits: 8
+        }
+    ).format(value);
 };
 
 const setText = (
@@ -234,30 +180,9 @@ const setText = (
     value: string
 ): void => {
     if (element) {
-        element.textContent = value;
+        element.textContent =
+            value;
     }
-};
-
-const getErrorMessage = (
-    error: unknown
-): string => {
-    if (
-        error instanceof Error &&
-        error.message
-    ) {
-        return error.message;
-    }
-
-    if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error &&
-        typeof error.message === "string"
-    ) {
-        return error.message;
-    }
-
-    return "Unknown error";
 };
 
 const readNumber = (
@@ -282,48 +207,68 @@ const readNumber = (
         : Number.NaN;
 };
 
-const getInputs = (): PnLInputs => {
-    return {
-        symbol:
-            symbolInput?.value
-                .trim()
-                .toUpperCase() || "",
+const getInputs =
+    (): PnLInputs => {
+        return {
+            symbol:
+                symbolInput?.value
+                    .trim()
+                    .toUpperCase() ||
+                "",
 
-        timeframe:
-            timeframeInput?.value || "1H",
+            timeframe:
+                timeframeInput?.value ||
+                "1H",
 
-        direction:
-            directionInput?.value === "short"
-                ? "short"
-                : "long",
+            direction:
+                directionInput?.value ===
+                "short"
+                    ? "short"
+                    : "long",
 
-        entryPrice:
-            readNumber(entryInput),
+            entryPrice:
+                readNumber(
+                    entryInput
+                ),
 
-        exitPrice:
-            readNumber(exitInput),
+            exitPrice:
+                readNumber(
+                    exitInput
+                ),
 
-        positionSize:
-            readNumber(sizeInput),
+            positionSize:
+                readNumber(
+                    sizeInput
+                ),
 
-        fees:
-            readNumber(feesInput)
+            fees:
+                readNumber(
+                    feesInput
+                )
+        };
     };
-};
 
 const getValidationMessage = (
     inputs: PnLInputs
 ): string => {
     if (
-        !Number.isFinite(inputs.entryPrice) ||
-        !Number.isFinite(inputs.exitPrice) ||
-        !Number.isFinite(inputs.positionSize)
+        !Number.isFinite(
+            inputs.entryPrice
+        ) ||
+        !Number.isFinite(
+            inputs.exitPrice
+        ) ||
+        !Number.isFinite(
+            inputs.positionSize
+        )
     ) {
         return "Enter entry, exit, and position size.";
     }
 
     if (
-        !Number.isFinite(inputs.fees)
+        !Number.isFinite(
+            inputs.fees
+        )
     ) {
         return "Enter a valid fee amount.";
     }
@@ -398,15 +343,23 @@ const clearResults = (
             "Enter entry, exit, and position size."
     );
 
-    if (saveButton) {
-        saveButton.disabled = true;
+    if (saveCalculationButton) {
+        saveCalculationButton.disabled =
+            true;
+    }
+
+    if (saveSetupButton) {
+        saveSetupButton.disabled =
+            true;
     }
 
     lastCalculation = null;
 };
 
 const setDirection = (
-    direction: "long" | "short"
+    direction:
+        | "long"
+        | "short"
 ): void => {
     if (directionInput) {
         directionInput.value =
@@ -472,16 +425,25 @@ const calculate = (): void => {
 
     const percentageReturn =
         positionValue > 0
-            ? (netPnL / positionValue) *
+            ? (netPnL /
+                  positionValue) *
               100
             : 0;
 
-    const calculationResult: PnLResult = {
-        priceDifference: difference,
+    const calculationResult:
+        PnLResult = {
+        priceDifference:
+            difference,
+
         grossPnL,
-        fees: inputs.fees,
+
+        fees:
+            inputs.fees,
+
         netPnL,
+
         percentageReturn,
+
         positionValue
     };
 
@@ -493,32 +455,44 @@ const calculate = (): void => {
 
     setText(
         priceDifferenceResult,
-        formatNumber(difference)
+        formatNumber(
+            difference
+        )
     );
 
     setText(
         entryValueResult,
-        formatNumber(positionValue)
+        formatNumber(
+            positionValue
+        )
     );
 
     setText(
         grossResult,
-        formatNumber(grossPnL)
+        formatNumber(
+            grossPnL
+        )
     );
 
     setText(
         feesResult,
-        formatNumber(inputs.fees)
+        formatNumber(
+            inputs.fees
+        )
     );
 
     setText(
         positionValueResult,
-        formatNumber(positionValue)
+        formatNumber(
+            positionValue
+        )
     );
 
     setText(
         result,
-        formatNumber(netPnL)
+        formatNumber(
+            netPnL
+        )
     );
 
     setText(
@@ -535,7 +509,12 @@ const calculate = (): void => {
 
     setText(
         resultState,
-        `${inputs.direction === "long" ? "Long" : "Short"} · ${formatNumber(
+        `${
+            inputs.direction ===
+            "long"
+                ? "Long"
+                : "Short"
+        } · ${formatNumber(
             percentageReturn
         )}% return`
     );
@@ -544,121 +523,230 @@ const calculate = (): void => {
         "invalid"
     );
 
-    if (saveButton) {
-        saveButton.disabled = false;
-    }
-};
-
-const trackCompletedCalculation = (): void => {
-    calculate();
-
-    if (!lastCalculation) {
-        return;
+    if (saveCalculationButton) {
+        saveCalculationButton.disabled =
+            false;
     }
 
-    void trackProductEvent(
-        "calculation_completed",
-        "pnl-calculator",
-        {
-            tool: "pnl-calculator"
-        }
-    );
-};
-
-const saveCalculation = async (): Promise<void> => {
-    if (
-        !lastCalculation ||
-        !saveButton
-    ) {
-        return;
-    }
-
-    saveButton.disabled = true;
-
-    setText(
-        saveMessage,
-        "Saving..."
-    );
-
-    try {
-        const supabaseClient =
-            getSupabaseClient();
-
-        const {
-            data: { user },
-            error: userError
-        } =
-            await supabaseClient.auth.getUser();
-
-        if (userError) {
-            setText(
-                saveMessage,
-                `Session check failed: ${userError.message}`
-            );
-
-            saveButton.disabled =
-                false;
-
-            return;
-        }
-
-        if (!user) {
-            setText(
-                saveMessage,
-                "Sign in to save calculations."
-            );
-
-            saveButton.disabled =
-                false;
-
-            return;
-        }
-
-        const { error } =
-            await supabaseClient
-                .from(
-                    "saved_calculations"
-                )
-                .insert({
-                    user_id: user.id,
-                    tool: "pnl-calculator",
-                    inputs:
-                        lastCalculation.inputs,
-                    result:
-                        lastCalculation.result
-                });
-
-        if (error) {
-            setText(
-                saveMessage,
-                `Save failed: ${error.message}`
-            );
-
-            saveButton.disabled =
-                false;
-
-            return;
-        }
-
-        setText(
-            saveMessage,
-            "Calculation saved."
-        );
-    } catch (error) {
-        console.error(
-            "Save PnL calculation error:",
-            error
-        );
-
-        setText(
-            saveMessage,
-            `Save failed: ${getErrorMessage(error)}`
-        );
-
-        saveButton.disabled =
+    if (saveSetupButton) {
+        saveSetupButton.disabled =
             false;
     }
 };
+
+const trackCompletedCalculation =
+    (): void => {
+        calculate();
+
+        if (!lastCalculation) {
+            return;
+        }
+
+        void trackProductEvent(
+            "calculation_completed",
+            "pnl-calculator",
+            {
+                tool:
+                    "pnl-calculator"
+            }
+        );
+    };
+
+const saveCalculation =
+    async (): Promise<void> => {
+        if (
+            !lastCalculation ||
+            !saveCalculationButton
+        ) {
+            return;
+        }
+
+        saveCalculationButton.disabled =
+            true;
+
+        setText(
+            saveMessage,
+            "Saving..."
+        );
+
+        try {
+            const {
+                data: {
+                    user
+                },
+                error: userError
+            } =
+                await supabaseClient
+                    .auth
+                    .getUser();
+
+            if (userError) {
+                setText(
+                    saveMessage,
+                    `Session check failed: ${userError.message}`
+                );
+
+                saveCalculationButton.disabled =
+                    false;
+
+                return;
+            }
+
+            if (!user) {
+                setText(
+                    saveMessage,
+                    "Sign in to save calculations."
+                );
+
+                saveCalculationButton.disabled =
+                    false;
+
+                return;
+            }
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from(
+                        "saved_calculations"
+                    )
+                    .insert({
+                        user_id:
+                            user.id,
+                        tool:
+                            "pnl-calculator",
+                        inputs:
+                            lastCalculation.inputs,
+                        result:
+                            lastCalculation.result
+                    });
+
+            if (error) {
+                setText(
+                    saveMessage,
+                    `Save failed: ${error.message}`
+                );
+
+                saveCalculationButton.disabled =
+                    false;
+
+                return;
+            }
+
+            setText(
+                saveMessage,
+                "Calculation saved."
+            );
+
+            void trackProductEvent(
+                "calculation_saved",
+                "pnl-calculator",
+                {
+                    tool:
+                        "pnl-calculator"
+                }
+            );
+        } catch (error) {
+            console.error(
+                "Save PnL calculation error:",
+                error
+            );
+
+            setText(
+                saveMessage,
+                "Unable to save calculation."
+            );
+
+            saveCalculationButton.disabled =
+                false;
+        }
+    };
+
+const saveSetup =
+    async (): Promise<void> => {
+        if (
+            !lastCalculation ||
+            !saveSetupButton
+        ) {
+            return;
+        }
+
+        saveSetupButton.disabled =
+            true;
+
+        setText(
+            saveSetupMessage,
+            "Saving..."
+        );
+
+        try {
+            const {
+                inputs
+            } =
+                lastCalculation;
+
+            const title =
+                inputs.symbol
+                    ? `${inputs.symbol} · PnL`
+                    : "PnL setup";
+
+            await createTradeSetup({
+                title,
+                context: {
+                    symbol:
+                        inputs.symbol ||
+                        undefined,
+
+                    timeframe:
+                        inputs.timeframe ||
+                        undefined,
+
+                    direction:
+                        inputs.direction,
+
+                    entryPrice:
+                        inputs.entryPrice,
+
+                    positionSize:
+                        inputs.positionSize,
+
+                    exitPrice:
+                        inputs.exitPrice,
+
+                    fees:
+                        inputs.fees
+                }
+            });
+
+            setText(
+                saveSetupMessage,
+                "Saved to Workspace."
+            );
+
+            void trackProductEvent(
+                "context_handoff",
+                "pnl-calculator",
+                {
+                    tool:
+                        "pnl-calculator"
+                }
+            );
+        } catch (error) {
+            console.error(
+                "Save PnL setup error:",
+                error
+            );
+
+            setText(
+                saveSetupMessage,
+                "Unable to save setup."
+            );
+
+            saveSetupButton.disabled =
+                false;
+        }
+    };
 
 const handleMarketSelection = (
     event: Event
@@ -669,7 +757,8 @@ const handleMarketSelection = (
     const {
         symbol,
         price
-    } = customEvent.detail;
+    } =
+        customEvent.detail;
 
     if (symbolInput) {
         symbolInput.value =
@@ -678,7 +767,9 @@ const handleMarketSelection = (
 
     setText(
         marketReference,
-        `Live ${formatNumber(price)}`
+        `Live ${formatNumber(
+            price
+        )}`
     );
 
     if (
@@ -694,7 +785,8 @@ const handleMarketSelection = (
 
 const reset = (): void => {
     if (symbolInput) {
-        symbolInput.value = "";
+        symbolInput.value =
+            "";
     }
 
     if (timeframeInput) {
@@ -703,19 +795,23 @@ const reset = (): void => {
     }
 
     if (entryInput) {
-        entryInput.value = "";
+        entryInput.value =
+            "";
     }
 
     if (exitInput) {
-        exitInput.value = "";
+        exitInput.value =
+            "";
     }
 
     if (sizeInput) {
-        sizeInput.value = "";
+        sizeInput.value =
+            "";
     }
 
     if (feesInput) {
-        feesInput.value = "0";
+        feesInput.value =
+            "0";
     }
 
     setText(
@@ -728,85 +824,91 @@ const reset = (): void => {
         ""
     );
 
-    setDirection("long");
+    setText(
+        saveSetupMessage,
+        ""
+    );
+
+    setDirection(
+        "long"
+    );
 
     clearResults();
 };
 
-const applyContextFromUrl = (): void => {
-    const context =
-        readTradeContextFromUrl();
+const applyContextFromUrl =
+    (): void => {
+        const context =
+            readTradeContextFromUrl();
 
-    if (
-        context.symbol &&
-        symbolInput
-    ) {
-        symbolInput.value =
-            context.symbol;
-    }
+        if (
+            context.symbol &&
+            symbolInput
+        ) {
+            symbolInput.value =
+                context.symbol;
+        }
 
-    if (
-        context.timeframe &&
-        timeframeInput
-    ) {
-        timeframeInput.value =
-            context.timeframe;
-    }
+        if (
+            context.timeframe &&
+            timeframeInput
+        ) {
+            timeframeInput.value =
+                context.timeframe;
+        }
 
-    if (
-        context.direction
-    ) {
-        setDirection(
-            context.direction
-        );
-    }
-
-    if (
-        context.entryPrice !==
-            undefined &&
-        entryInput
-    ) {
-        entryInput.value =
-            String(
-                context.entryPrice
+        if (context.direction) {
+            setDirection(
+                context.direction
             );
-    }
+        }
 
-    if (
-        context.exitPrice !==
-            undefined &&
-        exitInput
-    ) {
-        exitInput.value =
-            String(
-                context.exitPrice
-            );
-    }
+        if (
+            context.entryPrice !==
+                undefined &&
+            entryInput
+        ) {
+            entryInput.value =
+                String(
+                    context.entryPrice
+                );
+        }
 
-    if (
-        context.positionSize !==
-            undefined &&
-        sizeInput
-    ) {
-        sizeInput.value =
-            String(
-                context.positionSize
-            );
-    }
+        if (
+            context.exitPrice !==
+                undefined &&
+            exitInput
+        ) {
+            exitInput.value =
+                String(
+                    context.exitPrice
+                );
+        }
 
-    if (
-        context.fees !==
-            undefined &&
-        feesInput
-    ) {
-        feesInput.value =
-            String(
-                context.fees
-            );
-    }
+        if (
+            context.positionSize !==
+                undefined &&
+            sizeInput
+        ) {
+            sizeInput.value =
+                String(
+                    context.positionSize
+                );
+        }
 
-    calculate();
-};
+        if (
+            context.fees !==
+                undefined &&
+            feesInput
+        ) {
+            feesInput.value =
+                String(
+                    context.fees
+                );
+        }
+
+        calculate();
+    };
 
 directionButtons.forEach(
     (button) => {
@@ -817,8 +919,10 @@ directionButtons.forEach(
                     button.dataset.direction;
 
                 if (
-                    direction === "long" ||
-                    direction === "short"
+                    direction ===
+                        "long" ||
+                    direction ===
+                        "short"
                 ) {
                     setDirection(
                         direction
@@ -860,9 +964,18 @@ resetButton?.addEventListener(
     reset
 );
 
-saveButton?.addEventListener(
+saveCalculationButton?.addEventListener(
     "click",
-    saveCalculation
+    () => {
+        void saveCalculation();
+    }
+);
+
+saveSetupButton?.addEventListener(
+    "click",
+    () => {
+        void saveSetup();
+    }
 );
 
 calculator?.addEventListener(
@@ -886,6 +999,7 @@ void trackProductEvent(
     "tool_opened",
     "pnl-calculator",
     {
-        tool: "pnl-calculator"
+        tool:
+            "pnl-calculator"
     }
 );

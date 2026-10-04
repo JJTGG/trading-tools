@@ -331,6 +331,8 @@
 
 .action:disabled {
     opacity: 0.6;
+
+    cursor: not-allowed;
 }
 
 .workflow-list {
@@ -421,6 +423,91 @@
     line-height: 1.5;
 }
 
+.decision-controls {
+    display: grid;
+    gap: 12px;
+
+    margin-top: 4px;
+}
+
+.decision-options {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 6px;
+}
+
+.decision-options .action {
+    width: 100%;
+}
+
+.decision-reason {
+    display: grid;
+    gap: 5px;
+}
+
+.decision-reason label {
+    color: var(--text-muted);
+
+    font-family: var(--font-data);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+}
+
+.decision-reason textarea {
+    width: 100%;
+
+    min-height: 110px;
+
+    padding: 10px 11px;
+
+    border: 1px solid var(--line);
+
+    background: var(--canvas);
+
+    color: var(--text);
+
+    font: inherit;
+
+    line-height: 1.5;
+
+    resize: vertical;
+}
+
+.decision-reason textarea:focus {
+    outline: 0;
+
+    border-color: var(--accent);
+}
+
+.decision-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.decision-recorded {
+    margin: 0;
+
+    color: var(--positive);
+
+    font-family: var(--font-data);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+}
+
+.decision-disclaimer {
+    margin: 0;
+
+    color: var(--text-faint);
+
+    font-size: var(--text-xs);
+    line-height: 1.5;
+}
+
 @media (max-width: 900px) {
     .trade-setup-layout {
         grid-template-columns: 1fr;
@@ -486,6 +573,15 @@
     }
 
     .setup-planning-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .decision-options {
+        grid-template-columns: 1fr;
+    }
+
+    .decision-footer {
         align-items: stretch;
         flex-direction: column;
     }

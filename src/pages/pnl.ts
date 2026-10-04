@@ -4,9 +4,13 @@ import "./pnl.css";
 
 import { mountMarketStrip } from "../components/market-strip";
 import {
-    readTradeContextFromUrl
+    readTradeContextFromUrl,
+    setTradeContextSetupIdInUrl
 } from "../data/trade-context";
-import { createTradeSetup } from "../data/trade-setups";
+import {
+    createTradeSetup,
+    saveTradeSetup
+} from "../data/trade-setups";
 import { supabaseClient } from "../data/supabase";
 import { trackProductEvent } from "../data/product-events";
 
@@ -159,10 +163,14 @@ const saveSetupMessage =
         "#pnl-setup-save-message"
     );
 
-let lastCalculation: {
-    inputs: PnLInputs;
-    result: PnLResult;
-} | null = null;
+let currentSetupId:
+    string | undefined;
+
+let lastCalculation:
+    {
+        inputs: PnLInputs;
+        result: PnLResult;
+    } | null = null;
 
 const formatNumber = (
     value: number
@@ -185,6 +193,18 @@ const setText = (
     }
 };
 
+const updateSaveSetupButton =
+    (): void => {
+        if (!saveSetupButton) {
+            return;
+        }
+
+        saveSetupButton.textContent =
+            currentSetupId
+                ? "Update Setup"
+                : "Save Setup";
+    };
+
 const readNumber = (
     input: HTMLInputElement | null
 ): number => {
@@ -202,7 +222,9 @@ const readNumber = (
     const parsed =
         Number(value);
 
-    return Number.isFinite(parsed)
+    return Number.isFinite(
+        parsed
+    )
         ? parsed
         : Number.NaN;
 };
@@ -614,10 +636,13 @@ const saveCalculation =
                     .insert({
                         user_id:
                             user.id,
+
                         tool:
                             "pnl-calculator",
+
                         inputs:
                             lastCalculation.inputs,
+
                         result:
                             lastCalculation.result
                     });
@@ -677,7 +702,9 @@ const saveSetup =
 
         setText(
             saveSetupMessage,
-            "Saving..."
+            currentSetupId
+                ? "Updating..."
+                : "Saving..."
         );
 
         try {
@@ -691,37 +718,51 @@ const saveSetup =
                     ? `${inputs.symbol} · PnL`
                     : "PnL setup";
 
-            await createTradeSetup({
-                title,
-                context: {
-                    symbol:
-                        inputs.symbol ||
-                        undefined,
+            const setup =
+                await saveTradeSetup({
+                    id:
+                        currentSetupId,
 
-                    timeframe:
-                        inputs.timeframe ||
-                        undefined,
+                    title,
 
-                    direction:
-                        inputs.direction,
+                    context: {
+                        symbol:
+                            inputs.symbol ||
+                            undefined,
 
-                    entryPrice:
-                        inputs.entryPrice,
+                        timeframe:
+                            inputs.timeframe ||
+                            undefined,
 
-                    positionSize:
-                        inputs.positionSize,
+                        direction:
+                            inputs.direction,
 
-                    exitPrice:
-                        inputs.exitPrice,
+                        entryPrice:
+                            inputs.entryPrice,
 
-                    fees:
-                        inputs.fees
-                }
-            });
+                        positionSize:
+                            inputs.positionSize,
+
+                        exitPrice:
+                            inputs.exitPrice,
+
+                        fees:
+                            inputs.fees
+                    }
+                });
+
+            currentSetupId =
+                setup.id;
+
+            setTradeContextSetupIdInUrl(
+                setup.id
+            );
+
+            updateSaveSetupButton();
 
             setText(
                 saveSetupMessage,
-                "Saved to Workspace."
+                "Setup saved to Workspace."
             );
 
             void trackProductEvent(
@@ -748,40 +789,41 @@ const saveSetup =
         }
     };
 
-const handleMarketSelection = (
-    event: Event
-): void => {
-    const customEvent =
-        event as CustomEvent<MarketSelectionDetail>;
+const handleMarketSelection =
+    (
+        event: Event
+    ): void => {
+        const customEvent =
+            event as CustomEvent<MarketSelectionDetail>;
 
-    const {
-        symbol,
-        price
-    } =
-        customEvent.detail;
-
-    if (symbolInput) {
-        symbolInput.value =
-            symbol;
-    }
-
-    setText(
-        marketReference,
-        `Live ${formatNumber(
+        const {
+            symbol,
             price
-        )}`
-    );
+        } =
+            customEvent.detail;
 
-    if (
-        exitInput &&
-        !exitInput.value
-    ) {
-        exitInput.value =
-            String(price);
-    }
+        if (symbolInput) {
+            symbolInput.value =
+                symbol;
+        }
 
-    calculate();
-};
+        setText(
+            marketReference,
+            `Live ${formatNumber(
+                price
+            )}`
+        );
+
+        if (
+            exitInput &&
+            !exitInput.value
+        ) {
+            exitInput.value =
+                String(price);
+        }
+
+        calculate();
+    };
 
 const reset = (): void => {
     if (symbolInput) {
@@ -840,6 +882,11 @@ const applyContextFromUrl =
     (): void => {
         const context =
             readTradeContextFromUrl();
+
+        currentSetupId =
+            context.setupId;
+
+        updateSaveSetupButton();
 
         if (
             context.symbol &&
@@ -982,6 +1029,7 @@ calculator?.addEventListener(
     "submit",
     (event) => {
         event.preventDefault();
+
         trackCompletedCalculation();
     }
 );

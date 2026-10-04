@@ -172,6 +172,12 @@ form?.addEventListener(
             return;
         }
 
+        const emailRedirectTo =
+            new URL(
+                "confirm-email.html",
+                window.location.origin
+            ).href;
+
         setSubmitting(true);
 
         setMessage(
@@ -190,6 +196,7 @@ form?.addEventListener(
                         email,
                         password,
                         options: {
+                            emailRedirectTo,
                             data: {
                                 age_confirmed:
                                     true,
@@ -234,7 +241,7 @@ form?.addEventListener(
             }
 
             setMessage(
-                "Account created. Check your email to confirm your account, then sign in.",
+                "Account created. Check your email and use the confirmation link to continue.",
                 "success"
             );
         } catch (error) {

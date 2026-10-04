@@ -16,6 +16,10 @@ import {
 
 import { supabaseClient } from "../data/supabase";
 
+import {
+    renderProductAnalytics
+} from "./admin-analytics";
+
 type AppRole =
     | "owner"
     | "administrator"
@@ -220,71 +224,6 @@ const formatRole =
                 (character) =>
                     character.toUpperCase()
             );
-
-const formatAuditAction =
-    (action: string): string =>
-        action
-            .replace(
-                /\./g,
-                " "
-            )
-            .replace(
-                /_/g,
-                " "
-            )
-            .replace(
-                /\b\w/g,
-                (character) =>
-                    character.toUpperCase()
-            );
-
-const formatAuditTime =
-    (value: string): string => {
-        const date =
-            new Date(value);
-
-        if (
-            Number.isNaN(
-                date.getTime()
-            )
-        ) {
-            return value;
-        }
-
-        return new Intl.DateTimeFormat(
-            undefined,
-            {
-                dateStyle: "medium",
-                timeStyle: "short"
-            }
-        ).format(date);
-    };
-
-const renderError = (
-    message: string
-): void => {
-    if (!panelView) {
-        return;
-    }
-
-    panelView.hidden =
-        false;
-
-    panelView.replaceChildren();
-
-    const error =
-        createElement(
-            "p",
-            "admin-error"
-        );
-
-    error.textContent =
-        message;
-
-    panelView.appendChild(
-        error
-    );
-};
 
 const renderRoleMatrix = async (
     container: HTMLElement
@@ -1420,9 +1359,16 @@ const renderAuditLogs = async (): Promise<void> => {
                         );
 
                     action.textContent =
-                        formatAuditAction(
-                            log.action
-                        );
+                        log.action
+                            .replace(
+                                /\./g,
+                                " "
+                            )
+                            .replace(
+                                /\b\w/g,
+                                (character) =>
+                                    character.toUpperCase()
+                            );
 
                     const time =
                         createElement(
@@ -1434,8 +1380,18 @@ const renderAuditLogs = async (): Promise<void> => {
                         log.created_at;
 
                     time.textContent =
-                        formatAuditTime(
-                            log.created_at
+                        new Intl.DateTimeFormat(
+                            undefined,
+                            {
+                                dateStyle:
+                                    "medium",
+                                timeStyle:
+                                    "short"
+                            }
+                        ).format(
+                            new Date(
+                                log.created_at
+                            )
                         );
 
                     header.append(
@@ -1760,6 +1716,19 @@ const renderPanels = (
                         return;
                     }
 
+                    if (
+                        panel.id ===
+                        "analytics"
+                    ) {
+                        if (panelView) {
+                            void renderProductAnalytics(
+                                panelView
+                            );
+                        }
+
+                        return;
+                    }
+
                     showPanelMessage(
                         panel
                     );
@@ -1885,6 +1854,16 @@ const handleInitialPanel =
             panel === "audit"
         ) {
             await renderAuditLogs();
+
+            return;
+        }
+
+        if (
+            panel === "analytics"
+        ) {
+            await renderProductAnalytics(
+                panelView
+            );
 
             return;
         }

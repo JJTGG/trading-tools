@@ -7,6 +7,7 @@ import {
     buildTradeContextUrl,
     readTradeContextFromUrl
 } from "../data/trade-context";
+import { trackProductEvent } from "../data/product-events";
 
 interface SupabaseError {
     message: string;
@@ -578,6 +579,22 @@ const calculate = (): void => {
     }
 };
 
+const trackCompletedCalculation = (): void => {
+    calculate();
+
+    if (!lastCalculation) {
+        return;
+    }
+
+    void trackProductEvent(
+        "calculation_completed",
+        "position-size",
+        {
+            tool: "position-size"
+        }
+    );
+};
+
 const setDirection = (
     direction: "long" | "short"
 ): void => {
@@ -930,7 +947,7 @@ directionButtons.forEach(
 
 calculateButton?.addEventListener(
     "click",
-    calculate
+    trackCompletedCalculation
 );
 
 resetButton?.addEventListener(
@@ -961,7 +978,7 @@ document
         "submit",
         (event) => {
             event.preventDefault();
-            calculate();
+            trackCompletedCalculation();
         }
     );
 
@@ -973,3 +990,11 @@ document.addEventListener(
 mountMarketStrip();
 
 applyContextFromUrl();
+
+void trackProductEvent(
+    "tool_opened",
+    "position-size",
+    {
+        tool: "position-size"
+    }
+);

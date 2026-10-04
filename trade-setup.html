@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Review and continue a Trading Tools trade setup."
+    >
+
+    <title>Trade Setup — Trading Tools</title>
+</head>
+
+<body class="trade-setup-page">
+
+    <header class="app-header">
+
+        <a href="index.html" class="brand">
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav class="app-nav" aria-label="Application">
+
+            <a
+                href="workspace.html"
+                class="active"
+            >
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+
+        </nav>
+
+        <div class="workspace-account">
+
+            <a href="settings.html">
+                Settings
+            </a>
+
+            <a href="preferences.html">
+                Preferences
+            </a>
+
+            <button
+                id="logout-button"
+                type="button"
+                class="account-action"
+            >
+                Sign out
+            </button>
+
+        </div>
+
+    </header>
+
+    <div
+        id="market-strip"
+        class="market-strip"
+        aria-label="Live market prices"
+    >
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
+
+        <div id="market-tickers">
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+        </div>
+    </div>
+
+    <main class="trade-setup-shell">
+
+        <a
+            href="workspace.html"
+            class="back-link"
+        >
+            ← Workspace
+        </a>
+
+        <section class="trade-setup-heading">
+
+            <div>
+
+                <p class="trade-setup-kicker">
+                    Trading Context / Trade Setup
+                </p>
+
+                <h1 id="setup-heading">
+                    Loading setup…
+                </h1>
+
+                <p id="setup-meta">
+                    Loading setup details…
+                </p>
+
+            </div>
+
+            <span
+                id="setup-direction"
+                class="setup-direction"
+            >
+                —
+            </span>
+
+        </section>
+
+        <section class="trade-setup-layout">
+
+            <div class="trade-setup-main">
+
+                <section class="setup-panel">
+
+                    <header class="setup-panel-header">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Context
+                            </span>
+
+                            <h2>
+                                Market & position
+                            </h2>
+
+                        </div>
+
+                    </header>
+
+                    <div class="setup-metrics">
+
+                        <div class="setup-metric">
+                            <span>Symbol</span>
+                            <strong id="setup-symbol">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Timeframe</span>
+                            <strong id="setup-timeframe">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Direction</span>
+                            <strong id="setup-direction-value">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Entry</span>
+                            <strong id="setup-entry">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Stop Loss</span>
+                            <strong id="setup-stop">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Target</span>
+                            <strong id="setup-target">—</strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="setup-panel">
+
+                    <header class="setup-panel-header">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Risk
+                            </span>
+
+                            <h2>
+                                Position & exposure
+                            </h2>
+
+                        </div>
+
+                    </header>
+
+                    <div class="setup-metrics">
+
+                        <div class="setup-metric">
+                            <span>Account Balance</span>
+                            <strong id="setup-account-balance">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Risk</span>
+                            <strong id="setup-risk-percent">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Position Size</span>
+                            <strong id="setup-position-size">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Exit</span>
+                            <strong id="setup-exit">—</strong>
+                        </div>
+
+                        <div class="setup-metric">
+                            <span>Fees</span>
+                            <strong id="setup-fees">—</strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="setup-panel">
+
+                    <header class="setup-panel-header">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Notes
+                            </span>
+
+                            <h2>
+                                Setup notes
+                            </h2>
+
+                        </div>
+
+                    </header>
+
+                    <div class="setup-notes">
+
+                        <textarea
+                            id="setup-notes"
+                            maxlength="5000"
+                            rows="8"
+                            placeholder="Record the reasoning, conditions, or context behind this setup."
+                        ></textarea>
+
+                        <div class="setup-notes-footer">
+
+                            <p
+                                id="setup-save-message"
+                                class="save-message"
+                                aria-live="polite"
+                            ></p>
+
+                            <button
+                                id="save-setup-button"
+                                type="button"
+                                class="action primary"
+                            >
+                                Save Notes
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            <aside class="trade-setup-side">
+
+                <section class="setup-panel">
+
+                    <header class="setup-panel-header">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Setup
+                            </span>
+
+                            <h2>
+                                Identity
+                            </h2>
+
+                        </div>
+
+                    </header>
+
+                    <div class="setup-identity">
+
+                        <label for="setup-title">
+                            Title
+                        </label>
+
+                        <input
+                            id="setup-title"
+                            type="text"
+                            maxlength="120"
+                            autocomplete="off"
+                        >
+
+                        <p
+                            id="setup-title-message"
+                            class="save-message"
+                            aria-live="polite"
+                        ></p>
+
+                        <button
+                            id="save-title-button"
+                            type="button"
+                            class="action primary"
+                        >
+                            Save Title
+                        </button>
+
+                    </div>
+
+                </section>
+
+                <section class="setup-panel">
+
+                    <header class="setup-panel-header">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Workflow
+                            </span>
+
+                            <h2>
+                                Continue
+                            </h2>
+
+                        </div>
+
+                    </header>
+
+                    <div class="workflow-list">
+
+                        <a
+                            id="position-size-link"
+                            class="workflow-item"
+                            href="#"
+                        >
+                            <span>
+                                <strong>Position Size</strong>
+                                <small>Define risk and size</small>
+                            </span>
+
+                            <span
+                                id="position-size-status"
+                                class="workflow-status"
+                            >
+                                Open
+                            </span>
+                        </a>
+
+                        <a
+                            id="risk-reward-link"
+                            class="workflow-item"
+                            href="#"
+                        >
+                            <span>
+                                <strong>Risk / Reward</strong>
+                                <small>Map stop and target</small>
+                            </span>
+
+                            <span
+                                id="risk-reward-status"
+                                class="workflow-status"
+                            >
+                                Open
+                            </span>
+                        </a>
+
+                        <a
+                            id="pnl-link"
+                            class="workflow-item"
+                            href="#"
+                        >
+                            <span>
+                                <strong>PnL</strong>
+                                <small>Review outcome and exit</small>
+                            </span>
+
+                            <span
+                                id="pnl-status"
+                                class="workflow-status"
+                            >
+                                Open
+                            </span>
+                        </a>
+
+                    </div>
+
+                </section>
+
+                <section class="setup-panel setup-next-panel">
+
+                    <span class="panel-kicker">
+                        Recommended
+                    </span>
+
+                    <strong id="next-step-title">
+                        Continue the setup
+                    </strong>
+
+                    <p id="next-step-description">
+                        Choose the next stage of the trading workflow.
+                    </p>
+
+                    <a
+                        id="next-step-link"
+                        class="action primary"
+                        href="#"
+                    >
+                        Continue
+                    </a>
+
+                </section>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+    <script
+        type="module"
+        src="/src/data/supabase.ts"
+    ></script>
+
+    <script
+        type="module"
+        src="/src/pages/trade-setup.ts"
+    ></script>
+
+</body>
+
+</html>

@@ -11,7 +11,9 @@ import {
 } from "../data/trade-context";
 import {
     getTradeSetup,
+    recordTradeDecision,
     updateTradeSetup,
+    type TradeDecision,
     type TradeSetup
 } from "../data/trade-setups";
 import {
@@ -189,6 +191,38 @@ const decisionDescription =
         "#decision-description"
     );
 
+const decisionControls =
+    document.querySelector<HTMLElement>(
+        "#decision-controls"
+    );
+
+const decisionReason =
+    document.querySelector<HTMLTextAreaElement>(
+        "#decision-reason"
+    );
+
+const decisionSaveMessage =
+    document.querySelector<HTMLElement>(
+        "#decision-save-message"
+    );
+
+const saveDecisionButton =
+    document.querySelector<HTMLButtonElement>(
+        "#save-decision-button"
+    );
+
+const decisionRecorded =
+    document.querySelector<HTMLElement>(
+        "#decision-recorded"
+    );
+
+const decisionButtons =
+    Array.from(
+        document.querySelectorAll<HTMLButtonElement>(
+            "[data-decision]"
+        )
+    );
+
 const nextStepTitle =
     document.querySelector<HTMLElement>(
         "#next-step-title"
@@ -211,6 +245,9 @@ const logoutButton =
 
 let currentSetup:
     TradeSetup | null = null;
+
+let selectedDecision:
+    TradeDecision | null = null;
 
 const setText = (
     element: HTMLElement | null,
@@ -434,12 +471,96 @@ const updateReviewItem =
         setText(
             status,
             recorded
-                ? "Recorded"
+                ? "Ready"
                 : "Open"
         );
     };
 
+const renderDecisionControls = (
+    setup: TradeSetup,
+    decisionReady: boolean
+): void => {
+    if (!decisionControls) {
+        return;
+    }
+
+    decisionControls.hidden =
+        !decisionReady;
+
+    selectedDecision =
+        setup.decision.decision;
+
+    decisionButtons.forEach(
+        (button) => {
+            const decision =
+                button.dataset.decision as
+                    | TradeDecision
+                    | undefined;
+
+            button.classList.toggle(
+                "primary",
+                decision ===
+                    selectedDecision
+            );
+
+            button.setAttribute(
+                "aria-pressed",
+                String(
+                    decision ===
+                        selectedDecision
+                )
+            );
+
+            button.disabled =
+                !decisionReady;
+        }
+    );
+
+    if (decisionReason) {
+        decisionReason.value =
+            setup.decision.reason ||
+            "";
+    }
+
+    if (saveDecisionButton) {
+        saveDecisionButton.disabled =
+            !decisionReady ||
+            !selectedDecision;
+    }
+
+    if (setup.decision.decision) {
+        setText(
+            decisionRecorded,
+            `${setup.decision.decision.toUpperCase()} recorded ${formatDate(
+                setup.decision.decidedAt ||
+                    setup.updatedAt
+            )}`
+        );
+
+        if (decisionRecorded) {
+            decisionRecorded.hidden =
+                false;
+        }
+
+        setText(
+            saveDecisionButton,
+            "Update Decision"
+        );
+    } else {
+        if (decisionRecorded) {
+            decisionRecorded.hidden =
+                true;
+        }
+
+        setText(
+            saveDecisionButton,
+            "Save Decision"
+        );
+    }
+};
+
 const renderDecisionState = (
+    setup: TradeSetup,
     positionReady: boolean,
     riskRewardReady: boolean,
     planningReady: boolean
@@ -450,14 +571,31 @@ const renderDecisionState = (
         planningReady;
 
     if (decisionReady) {
-        setText(
-            decisionStatus,
-            "Ready for decision"
-        );
+        if (setup.decision.decision) {
+            setText(
+                decisionStatus,
+                "Decision recorded"
+            );
 
-        setText(
-            decisionDescription,
-            "Context, risk, and plan are complete. Decide whether the setup meets your criteria; no trade is executed here."
+            setText(
+                decisionDescription,
+                "Your current decision is recorded below. You can update it as the setup develops."
+            );
+        } else {
+            setText(
+                decisionStatus,
+                "Ready for decision"
+            );
+
+            setText(
+                decisionDescription,
+                "Context, risk, and plan are complete. Record whether this setup meets your criteria; no trade is executed here."
+            );
+        }
+
+        renderDecisionControls(
+            setup,
+            true
         );
 
         return true;
@@ -466,6 +604,11 @@ const renderDecisionState = (
     setText(
         decisionStatus,
         "Not ready"
+    );
+
+    renderDecisionControls(
+        setup,
+        false
     );
 
     if (!positionReady) {
@@ -488,7 +631,7 @@ const renderDecisionState = (
 
     setText(
         decisionDescription,
-        "Complete the written trade plan before treating the setup as ready for a decision."
+        "Complete the written trade plan before recording a decision."
     );
 
     return false;
@@ -698,6 +841,7 @@ const renderSetup = (
 
     const decisionReady =
         renderDecisionState(
+            setup,
             positionReady,
             riskRewardReady,
             planningReady
@@ -781,26 +925,54 @@ const renderSetup = (
         return;
     }
 
-    if (decisionReady) {
+    if (
+        decisionReady &&
+        setup.decision.decision
+    ) {
         setText(
             nextStepTitle,
-            "Ready for decision"
+            "Review the outcome"
         );
 
         setText(
             nextStepDescription,
-            "The setup has defined risk, reward, and a written plan. Decide whether it meets your trading criteria."
+            "The decision is recorded. When the setup has an outcome, record the exit and review it through PnL."
         );
 
         setText(
             nextStepLink,
-            "Review readiness"
+            "Open PnL"
         );
 
         if (nextStepLink) {
             nextStepLink.href =
-                "#decision-readiness";
+                buildToolUrl(
+                    "pnl-calculator.html",
+                    setup
+                );
         }
+
+        return;
+    }
+
+    setText(
+        nextStepTitle,
+        "Record your decision"
+    );
+
+    setText(
+        nextStepDescription,
+        "The setup has defined risk, reward, and a written plan. Record whether it meets your trading criteria."
+    );
+
+    setText(
+        nextStepLink,
+        "Review decision"
+    );
+
+    if (nextStepLink) {
+        nextStepLink.href =
+            "#decision-readiness";
     }
 };
 
@@ -1002,6 +1174,108 @@ const saveSetup =
         }
     };
 
+const saveDecision =
+    async (): Promise<void> => {
+        if (
+            !currentSetup ||
+            !selectedDecision ||
+            !saveDecisionButton
+        ) {
+            return;
+        }
+
+        saveDecisionButton.disabled =
+            true;
+
+        setText(
+            decisionSaveMessage,
+            "Saving..."
+        );
+
+        try {
+            currentSetup =
+                await recordTradeDecision(
+                    currentSetup.id,
+                    selectedDecision,
+                    decisionReason?.value
+                        .trim() || null
+                );
+
+            renderSetup(
+                currentSetup
+            );
+
+            setText(
+                decisionSaveMessage,
+                "Decision saved."
+            );
+        } catch (error) {
+            console.error(
+                "Save trade decision error:",
+                error
+            );
+
+            setText(
+                decisionSaveMessage,
+                error instanceof Error
+                    ? error.message
+                    : "Unable to save decision."
+            );
+        } finally {
+            saveDecisionButton.disabled =
+                false;
+        }
+    };
+
+decisionButtons.forEach(
+    (button) => {
+        button.addEventListener(
+            "click",
+            () => {
+                const decision =
+                    button.dataset.decision as
+                        | TradeDecision
+                        | undefined;
+
+                if (!decision) {
+                    return;
+                }
+
+                selectedDecision =
+                    decision;
+
+                decisionButtons.forEach(
+                    (option) => {
+                        option.classList.toggle(
+                            "primary",
+                            option ===
+                                button
+                        );
+
+                        option.setAttribute(
+                            "aria-pressed",
+                            String(
+                                option ===
+                                    button
+                            )
+                        );
+                    }
+                );
+
+                if (saveDecisionButton) {
+                    saveDecisionButton.disabled =
+                        false;
+                }
+
+                setText(
+                    decisionSaveMessage,
+                    ""
+                );
+            }
+        );
+    }
+);
+
 logoutButton?.addEventListener(
     "click",
     async () => {
@@ -1051,6 +1325,13 @@ saveSetupButton?.addEventListener(
     "click",
     () => {
         void saveSetup();
+    }
+);
+
+saveDecisionButton?.addEventListener(
+    "click",
+    () => {
+        void saveDecision();
     }
 );
 

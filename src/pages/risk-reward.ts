@@ -3,6 +3,10 @@ import "../styles/base.css";
 import "./risk-reward.css";
 
 import { mountMarketStrip } from "../components/market-strip";
+import {
+    buildTradeContextUrl,
+    readTradeContextFromUrl
+} from "../data/trade-context";
 
 interface MarketSelectionDetail {
     symbol: string;
@@ -632,76 +636,58 @@ const setDirection = (
 };
 
 const applyContextFromUrl = (): void => {
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    const symbol =
-        params.get("symbol");
-
-    const timeframe =
-        params.get("timeframe");
-
-    const direction =
-        params.get("direction");
-
-    const entry =
-        params.get("entryPrice");
-
-    const stop =
-        params.get("stopLoss");
-
-    const target =
-        params.get("targetPrice");
+    const context =
+        readTradeContextFromUrl();
 
     if (
-        symbol &&
+        context.symbol &&
         symbolInput
     ) {
         symbolInput.value =
-            symbol;
+            context.symbol;
     }
 
     if (
-        timeframe &&
+        context.timeframe &&
         timeframeInput
     ) {
         timeframeInput.value =
-            timeframe;
+            context.timeframe;
     }
 
     if (
-        direction === "long" ||
-        direction === "short"
-    ) {
-        setDirection(
-            direction
-        );
-    }
-
-    if (
-        entry &&
+        context.entryPrice !== undefined &&
         entryInput
     ) {
         entryInput.value =
-            entry;
+            String(context.entryPrice);
     }
 
     if (
-        stop &&
+        context.stopLoss !== undefined &&
         stopInput
     ) {
         stopInput.value =
-            stop;
+            String(context.stopLoss);
     }
 
     if (
-        target &&
+        context.targetPrice !== undefined &&
         targetInput
     ) {
         targetInput.value =
-            target;
+            String(context.targetPrice);
+    }
+
+    if (
+        context.direction === "long" ||
+        context.direction === "short"
+    ) {
+        setDirection(
+            context.direction
+        );
+
+        return;
     }
 
     calculate();
@@ -779,44 +765,30 @@ const openPositionSize = (): void => {
     const inputs =
         getInputs();
 
-    const params =
-        new URLSearchParams();
-
-    if (inputs.symbol) {
-        params.set(
-            "symbol",
-            inputs.symbol
-        );
-    }
-
-    if (inputs.timeframe) {
-        params.set(
-            "timeframe",
-            inputs.timeframe
-        );
-    }
-
-    params.set(
-        "direction",
-        inputs.direction
-    );
-
-    if (Number.isFinite(inputs.entry)) {
-        params.set(
-            "entryPrice",
-            String(inputs.entry)
-        );
-    }
-
-    if (Number.isFinite(inputs.stop)) {
-        params.set(
-            "stopLoss",
-            String(inputs.stop)
-        );
-    }
-
     window.location.href =
-        `position-size.html?${params.toString()}`;
+        buildTradeContextUrl(
+            "position-size.html",
+            {
+                symbol:
+                    inputs.symbol,
+
+                timeframe:
+                    inputs.timeframe,
+
+                direction:
+                    inputs.direction,
+
+                entryPrice:
+                    Number.isFinite(inputs.entry)
+                        ? inputs.entry
+                        : undefined,
+
+                stopLoss:
+                    Number.isFinite(inputs.stop)
+                        ? inputs.stop
+                        : undefined
+            }
+        );
 };
 
 directionButtons.forEach(

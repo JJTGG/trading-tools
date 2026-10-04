@@ -59,6 +59,7 @@
     <main class="terminal-layout">
 
         <aside class="tool-rail">
+
             <div class="tool-rail-header">
                 Risk tools
             </div>
@@ -94,26 +95,33 @@
                 <span>Leverage</span>
                 <span class="tool-link-key">04</span>
             </a>
+
         </aside>
 
         <section class="workbench">
 
             <div class="page-heading">
+
                 <div>
+
                     <p class="page-heading-kicker">
                         Risk Engine / Trade Planning
                     </p>
 
-                    <h1>Risk / Reward</h1>
+                    <h1>
+                        Risk / Reward
+                    </h1>
 
                     <p>
                         Measure the distance between entry, invalidation, and target.
                     </p>
+
                 </div>
 
                 <span class="live-badge">
                     Live calculation
                 </span>
+
             </div>
 
             <div class="workspace-grid">
@@ -133,14 +141,17 @@
                         <div class="field-row">
 
                             <div>
+
                                 <label
                                     class="field-label"
                                     for="risk-reward-symbol"
                                 >
                                     Instrument
+
                                     <small id="market-reference">
                                         Market —
                                     </small>
+
                                 </label>
 
                                 <input
@@ -149,9 +160,11 @@
                                     autocomplete="off"
                                     placeholder="BTC/USD"
                                 >
+
                             </div>
 
                             <div>
+
                                 <label
                                     class="field-label"
                                     for="risk-reward-timeframe"
@@ -160,13 +173,34 @@
                                 </label>
 
                                 <select id="risk-reward-timeframe">
-                                    <option value="1m">1m</option>
-                                    <option value="5m">5m</option>
-                                    <option value="15m">15m</option>
-                                    <option value="1H" selected>1H</option>
-                                    <option value="4H">4H</option>
-                                    <option value="1D">1D</option>
+                                    <option value="1m">
+                                        1m
+                                    </option>
+
+                                    <option value="5m">
+                                        5m
+                                    </option>
+
+                                    <option value="15m">
+                                        15m
+                                    </option>
+
+                                    <option
+                                        value="1H"
+                                        selected
+                                    >
+                                        1H
+                                    </option>
+
+                                    <option value="4H">
+                                        4H
+                                    </option>
+
+                                    <option value="1D">
+                                        1D
+                                    </option>
                                 </select>
+
                             </div>
 
                         </div>
@@ -175,7 +209,11 @@
 
                             <div class="field-label">
                                 Direction
-                                <small>Position side</small>
+
+                                <small>
+                                    Position side
+                                </small>
+
                             </div>
 
                             <div class="direction-control">
@@ -213,6 +251,7 @@
                         <div class="field-row">
 
                             <div>
+
                                 <label
                                     class="field-label"
                                     for="risk-reward-entry"
@@ -228,15 +267,21 @@
                                     inputmode="decimal"
                                     placeholder="84841.08"
                                 >
+
                             </div>
 
                             <div>
+
                                 <label
                                     class="field-label"
                                     for="risk-reward-stop"
                                 >
                                     Stop
-                                    <small>Invalidation</small>
+
+                                    <small>
+                                        Invalidation
+                                    </small>
+
                                 </label>
 
                                 <input
@@ -247,6 +292,7 @@
                                     inputmode="decimal"
                                     placeholder="83500"
                                 >
+
                             </div>
 
                         </div>
@@ -254,6 +300,7 @@
                         <div class="field-row">
 
                             <div>
+
                                 <label
                                     class="field-label"
                                     for="risk-reward-target"
@@ -269,9 +316,11 @@
                                     inputmode="decimal"
                                     placeholder="87500"
                                 >
+
                             </div>
 
                             <div class="context-field">
+
                                 <span class="field-label">
                                     Context
                                 </span>
@@ -279,6 +328,7 @@
                                 <strong id="context-summary">
                                     Incomplete
                                 </strong>
+
                             </div>
 
                         </div>
@@ -286,16 +336,20 @@
                         <div class="level-map">
 
                             <div class="field-label">
+
                                 Price structure
+
                                 <small id="level-map-state">
                                     Entry / Stop / Target
                                 </small>
+
                             </div>
 
                             <div
                                 class="level-map-track"
                                 aria-hidden="true"
                             >
+
                                 <div
                                     id="level-map-risk"
                                     class="level-map-segment risk"
@@ -320,9 +374,11 @@
                                     id="level-map-target"
                                     class="level-marker target"
                                 ></span>
+
                             </div>
 
                             <div class="level-map-labels">
+
                                 <span id="level-map-stop-label">
                                     Stop
                                 </span>
@@ -334,6 +390,7 @@
                                 <span id="level-map-target-label">
                                     Target
                                 </span>
+
                             </div>
 
                         </div>
@@ -346,6 +403,15 @@
                                 class="action primary"
                             >
                                 Recalculate
+                            </button>
+
+                            <button
+                                id="save-risk-reward"
+                                type="button"
+                                class="action primary"
+                                disabled
+                            >
+                                Save Setup
                             </button>
 
                             <button
@@ -366,6 +432,12 @@
 
                         </div>
 
+                        <p
+                            id="risk-reward-save-message"
+                            class="save-message"
+                            aria-live="polite"
+                        ></p>
+
                     </form>
 
                 </section>
@@ -373,14 +445,19 @@
                 <section class="panel result-panel">
 
                     <div class="panel-header">
-                        <strong>Trade Structure</strong>
+
+                        <strong>
+                            Trade Structure
+                        </strong>
 
                         <span id="calculation-state">
                             Ready
                         </span>
+
                     </div>
 
                     <div class="primary-result">
+
                         <span class="primary-result-label">
                             Risk / Reward
                         </span>
@@ -395,11 +472,13 @@
                         <span class="primary-result-unit">
                             ratio
                         </span>
+
                     </div>
 
                     <div class="result-metrics">
 
                         <div class="metric-block">
+
                             <span class="metric-label">
                                 Risk / Unit
                             </span>
@@ -410,9 +489,11 @@
                             >
                                 —
                             </strong>
+
                         </div>
 
                         <div class="metric-block">
+
                             <span class="metric-label">
                                 Reward / Unit
                             </span>
@@ -423,9 +504,11 @@
                             >
                                 —
                             </strong>
+
                         </div>
 
                         <div class="metric-block">
+
                             <span class="metric-label">
                                 Break-even Win Rate
                             </span>
@@ -436,6 +519,7 @@
                             >
                                 —
                             </strong>
+
                         </div>
 
                     </div>
@@ -455,9 +539,11 @@
 
                 <span>
                     Planning context:
+
                     <strong id="footer-context">
                         Incomplete
                     </strong>
+
                 </span>
 
             </div>

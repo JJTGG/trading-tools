@@ -6,6 +6,7 @@ import "./currency.css";
 import {
     mountMarketStrip
 } from "../components/market-strip";
+import { trackProductEvent } from "../data/product-events";
 
 const form =
     document.querySelector<HTMLFormElement>(
@@ -294,3 +295,11 @@ resetButton?.addEventListener(
 );
 
 mountMarketStrip();
+
+void trackProductEvent(
+    "tool_opened",
+    "currency",
+    {
+        tool: "currency"
+    }
+);

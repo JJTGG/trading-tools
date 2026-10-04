@@ -20,6 +20,10 @@ import {
     renderProductAnalytics
 } from "./admin-analytics";
 
+import {
+    renderAdminTools
+} from "./admin-tools";
+
 type AppRole =
     | "owner"
     | "administrator"
@@ -816,80 +820,25 @@ const renderUserDirectory = async (
                     revokeButton.textContent =
                         "Revoke";
 
-                    const runRoleAction =
+                    const runRoleChange =
                         async (
                             enabled: boolean
                         ): Promise<void> => {
-                            const selectedRole =
-                                select.value as AppRole;
-
-                            if (
-                                selectedRole ===
-                                    "owner" &&
-                                !canManageOwner
-                            ) {
-                                setText(
-                                    status,
-                                    "Only owners can manage the owner role."
-                                );
-
-                                status.hidden =
-                                    false;
-
-                                return;
-                            }
-
-                            const actionLabel =
-                                enabled
-                                    ? "grant"
-                                    : "revoke";
-
-                            const confirmation =
-                                window.confirm(
-                                    `${
-                                        actionLabel
-                                            .charAt(
-                                                0
-                                            )
-                                            .toUpperCase() +
-                                        actionLabel.slice(
-                                            1
-                                        )
-                                    } ${formatRole(
-                                        selectedRole
-                                    )} ${
-                                        enabled
-                                            ? "to"
-                                            : "from"
-                                    } ${
-                                        user.display_name ||
-                                        user.email ||
-                                        "this user"
-                                    }?`
-                                );
-
-                            if (
-                                !confirmation
-                            ) {
-                                return;
-                            }
-
                             grantButton.disabled =
                                 true;
 
                             revokeButton.disabled =
                                 true;
 
-                            setText(
-                                status,
-                                "Applying role change…"
-                            );
-
                             status.hidden =
                                 false;
 
+                            status.textContent =
+                                enabled
+                                    ? "Granting role…"
+                                    : "Revoking role…";
+
                             const {
-                                data: changed,
                                 error
                             } =
                                 await supabaseClient
@@ -899,7 +848,7 @@ const renderUserDirectory = async (
                                             target_user_id:
                                                 user.user_id,
                                             target_role:
-                                                selectedRole,
+                                                select.value,
                                             enabled
                                         }
                                     );
@@ -912,29 +861,21 @@ const renderUserDirectory = async (
 
                             if (error) {
                                 console.error(
-                                    "Role change error:",
+                                    "Role update error:",
                                     error
                                 );
 
-                                setText(
-                                    status,
+                                status.textContent =
                                     error.message ||
-                                        "Unable to change the role."
-                                );
+                                    "Unable to update the user role.";
 
                                 return;
                             }
 
-                            setText(
-                                status,
-                                changed
-                                    ? `Role ${
-                                          enabled
-                                              ? "granted"
-                                              : "revoked"
-                                      } successfully.`
-                                    : "No role change was needed."
-                            );
+                            status.textContent =
+                                enabled
+                                    ? "Role granted successfully."
+                                    : "Role revoked successfully.";
 
                             await loadUsers(
                                 input.value.trim()
@@ -944,7 +885,7 @@ const renderUserDirectory = async (
                     grantButton.addEventListener(
                         "click",
                         () => {
-                            void runRoleAction(
+                            void runRoleChange(
                                 true
                             );
                         }
@@ -953,7 +894,7 @@ const renderUserDirectory = async (
                     revokeButton.addEventListener(
                         "click",
                         () => {
-                            void runRoleAction(
+                            void runRoleChange(
                                 false
                             );
                         }
@@ -1007,7 +948,7 @@ const renderStaffRoles = async (
     const wrapper =
         createElement(
             "div",
-            "admin-staff-panel"
+            "admin-roles-panel"
         );
 
     const heading =
@@ -1023,7 +964,7 @@ const renderStaffRoles = async (
         );
 
     kicker.textContent =
-        "Staff & Roles";
+        "Staff & roles";
 
     const title =
         createElement(
@@ -1031,7 +972,7 @@ const renderStaffRoles = async (
         );
 
     title.textContent =
-        "Staff management";
+        "Authorization model";
 
     const description =
         createElement(
@@ -1039,7 +980,7 @@ const renderStaffRoles = async (
         );
 
     description.textContent =
-        "Assign and revoke staff roles through the protected authorization layer.";
+        "Review platform roles, permissions, and staff assignments.";
 
     heading.append(
         kicker,
@@ -1047,74 +988,23 @@ const renderStaffRoles = async (
         description
     );
 
-    wrapper.appendChild(
-        heading
-    );
-
-    await renderUserDirectory(
-        authorization,
-        authorizationUserId,
-        wrapper,
-        true
-    );
-
-    const matrixSection =
-        createElement(
-            "section",
-            "admin-role-section"
-        );
-
-    const matrixHeading =
+    const directory =
         createElement(
             "div",
-            "admin-panel-view-heading"
+            "admin-role-directory"
         );
 
-    const matrixKicker =
-        createElement(
-            "span",
-            "panel-kicker"
-        );
-
-    matrixKicker.textContent =
-        "Authorization model";
-
-    const matrixTitle =
-        createElement(
-            "h2"
-        );
-
-    matrixTitle.textContent =
-        "Role permission matrix";
-
-    const matrixDescription =
-        createElement(
-            "p"
-        );
-
-    matrixDescription.textContent =
-        "These mappings determine which platform capabilities each role receives.";
-
-    matrixHeading.append(
-        matrixKicker,
-        matrixTitle,
-        matrixDescription
-    );
-
-    matrixSection.appendChild(
-        matrixHeading
-    );
-
-    await renderRoleMatrix(
-        matrixSection
-    );
-
-    wrapper.appendChild(
-        matrixSection
+    wrapper.append(
+        heading,
+        directory
     );
 
     panelView.appendChild(
         wrapper
+    );
+
+    await renderRoleMatrix(
+        directory
     );
 };
 
@@ -1709,6 +1599,19 @@ const renderPanels = (
 
                     if (
                         panel.id ===
+                        "tools"
+                    ) {
+                        if (panelView) {
+                            renderAdminTools(
+                                panelView
+                            );
+                        }
+
+                        return;
+                    }
+
+                    if (
+                        panel.id ===
                         "audit"
                     ) {
                         void renderAuditLogs();
@@ -1845,6 +1748,16 @@ const handleInitialPanel =
             await renderUsers(
                 authorization,
                 authorizationUserId
+            );
+
+            return;
+        }
+
+        if (
+            panel === "tools"
+        ) {
+            renderAdminTools(
+                panelView
             );
 
             return;

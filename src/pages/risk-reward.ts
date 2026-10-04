@@ -5,9 +5,12 @@ import "./risk-reward.css";
 import { mountMarketStrip } from "../components/market-strip";
 import {
     buildTradeContextUrl,
-    readTradeContextFromUrl
+    readTradeContextFromUrl,
+    setTradeContextSetupIdInUrl
 } from "../data/trade-context";
-import { createTradeSetup } from "../data/trade-setups";
+import {
+    saveTradeSetup
+} from "../data/trade-setups";
 import { trackProductEvent } from "../data/product-events";
 
 interface MarketSelectionDetail {
@@ -181,6 +184,9 @@ const levelMapTargetLabel =
         "#level-map-target-label"
     );
 
+let currentSetupId:
+    string | undefined;
+
 let lastCalculation:
     {
         inputs: RiskRewardInputs;
@@ -207,6 +213,18 @@ const setText = (
             value;
     }
 };
+
+const updateSaveButton =
+    (): void => {
+        if (!saveButton) {
+            return;
+        }
+
+        saveButton.textContent =
+            currentSetupId
+                ? "Update Setup"
+                : "Save Setup";
+    };
 
 const readNumber = (
     input: HTMLInputElement | null
@@ -335,7 +353,8 @@ const getValidationMessage = (
 const updateContext = (
     inputs: RiskRewardInputs
 ): void => {
-    const parts: string[] = [];
+    const parts: string[] =
+        [];
 
     if (inputs.symbol) {
         parts.push(
@@ -660,17 +679,14 @@ const calculate = (): void => {
         (1 / (1 + ratio)) *
         100;
 
-    const result:
-        RiskRewardResult = {
-        risk,
-        reward,
-        ratio,
-        breakevenWinRate
-    };
-
     lastCalculation = {
         inputs,
-        result
+        result: {
+            risk,
+            reward,
+            ratio,
+            breakevenWinRate
+        }
     };
 
     setText(
@@ -713,9 +729,11 @@ const calculate = (): void => {
             "long"
                 ? "Long"
                 : "Short"
-        } · ${formatNumber(
-            ratio
-        )}R`
+        } · ${
+            formatNumber(
+                ratio
+            )
+        }R`
     );
 
     resultState?.classList.remove(
@@ -760,7 +778,9 @@ const saveSetup =
 
         setText(
             saveMessage,
-            "Saving..."
+            currentSetupId
+                ? "Updating..."
+                : "Saving..."
         );
 
         try {
@@ -774,34 +794,48 @@ const saveSetup =
                     ? `${inputs.symbol} · Risk / Reward`
                     : "Risk / Reward setup";
 
-            await createTradeSetup({
-                title,
-                context: {
-                    symbol:
-                        inputs.symbol ||
-                        undefined,
+            const setup =
+                await saveTradeSetup({
+                    id:
+                        currentSetupId,
 
-                    timeframe:
-                        inputs.timeframe ||
-                        undefined,
+                    title,
 
-                    direction:
-                        inputs.direction,
+                    context: {
+                        symbol:
+                            inputs.symbol ||
+                            undefined,
 
-                    entryPrice:
-                        inputs.entry,
+                        timeframe:
+                            inputs.timeframe ||
+                            undefined,
 
-                    stopLoss:
-                        inputs.stop,
+                        direction:
+                            inputs.direction,
 
-                    targetPrice:
-                        inputs.target
-                }
-            });
+                        entryPrice:
+                            inputs.entry,
+
+                        stopLoss:
+                            inputs.stop,
+
+                        targetPrice:
+                            inputs.target
+                    }
+                });
+
+            currentSetupId =
+                setup.id;
+
+            setTradeContextSetupIdInUrl(
+                setup.id
+            );
+
+            updateSaveButton();
 
             setText(
                 saveMessage,
-                "Saved to Workspace."
+                "Setup saved to Workspace."
             );
 
             void trackProductEvent(
@@ -863,6 +897,11 @@ const applyContextFromUrl =
     (): void => {
         const context =
             readTradeContextFromUrl();
+
+        currentSetupId =
+            context.setupId;
+
+        updateSaveButton();
 
         if (
             context.symbol &&
@@ -929,40 +968,41 @@ const applyContextFromUrl =
         calculate();
     };
 
-const handleMarketSelection = (
-    event: Event
-): void => {
-    const customEvent =
-        event as CustomEvent<MarketSelectionDetail>;
+const handleMarketSelection =
+    (
+        event: Event
+    ): void => {
+        const customEvent =
+            event as CustomEvent<MarketSelectionDetail>;
 
-    const {
-        symbol,
-        price
-    } =
-        customEvent.detail;
-
-    if (symbolInput) {
-        symbolInput.value =
-            symbol;
-    }
-
-    setText(
-        marketReference,
-        `Live ${formatNumber(
+        const {
+            symbol,
             price
-        )}`
-    );
+        } =
+            customEvent.detail;
 
-    if (
-        entryInput &&
-        !entryInput.value
-    ) {
-        entryInput.value =
-            String(price);
-    }
+        if (symbolInput) {
+            symbolInput.value =
+                symbol;
+        }
 
-    calculate();
-};
+        setText(
+            marketReference,
+            `Live ${formatNumber(
+                price
+            )}`
+        );
+
+        if (
+            entryInput &&
+            !entryInput.value
+        ) {
+            entryInput.value =
+                String(price);
+        }
+
+        calculate();
+    };
 
 const reset = (): void => {
     if (symbolInput) {
@@ -1020,6 +1060,9 @@ const openPositionSize =
             buildTradeContextUrl(
                 "position-size.html",
                 {
+                    setupId:
+                        currentSetupId,
+
                     symbol:
                         inputs.symbol,
 
@@ -1117,6 +1160,7 @@ document
         "submit",
         (event) => {
             event.preventDefault();
+
             trackCompletedCalculation();
         }
     );

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Trading Tools administration and permission-controlled platform management."
+    >
+
+    <title>Administration — Trading Tools</title>
+</head>
+
+<body class="admin-page">
+
+    <header class="app-header">
+
+        <a
+            href="index.html"
+            class="brand"
+        >
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav
+            class="app-nav"
+            aria-label="Application"
+        >
+
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+
+        </nav>
+
+        <div class="admin-header-actions">
+
+            <span class="admin-header-label">
+                Administration
+            </span>
+
+            <a
+                href="workspace.html"
+                class="admin-back-link"
+            >
+                Workspace →
+            </a>
+
+        </div>
+
+    </header>
+
+    <main class="admin-shell">
+
+        <section class="admin-heading">
+
+            <div>
+
+                <p class="admin-kicker">
+                    Administration / Control Plane
+                </p>
+
+                <h1>
+                    System administration
+                </h1>
+
+                <p>
+                    Manage the parts of Trading Tools your account
+                    is authorized to control.
+                </p>
+
+            </div>
+
+            <div
+                id="admin-access-state"
+                class="admin-access-state"
+            >
+                Checking access
+            </div>
+
+        </section>
+
+        <section class="admin-summary">
+
+            <article class="admin-summary-card">
+
+                <span class="admin-summary-label">
+                    Current role
+                </span>
+
+                <strong id="admin-role">
+                    —
+                </strong>
+
+            </article>
+
+            <article class="admin-summary-card">
+
+                <span class="admin-summary-label">
+                    Permissions
+                </span>
+
+                <strong id="admin-permission-count">
+                    —
+                </strong>
+
+            </article>
+
+            <article class="admin-summary-card">
+
+                <span class="admin-summary-label">
+                    Access mode
+                </span>
+
+                <strong id="admin-access-mode">
+                    —
+                </strong>
+
+            </article>
+
+        </section>
+
+        <section class="admin-panel-section">
+
+            <div class="admin-section-heading">
+
+                <div>
+
+                    <span class="panel-kicker">
+                        Control areas
+                    </span>
+
+                    <h2>
+                        Available administration
+                    </h2>
+
+                </div>
+
+                <span id="admin-panel-count">
+                    —
+                </span>
+
+            </div>
+
+            <div
+                id="admin-panel-list"
+                class="admin-panel-list"
+            >
+
+                <p class="admin-loading">
+                    Loading authorized controls…
+                </p>
+
+            </div>
+
+        </section>
+
+        <section
+            id="admin-panel-view"
+            class="admin-panel-view"
+            hidden
+        ></section>
+
+        <section class="admin-boundary">
+
+            <div>
+
+                <span class="panel-kicker">
+                    Access model
+                </span>
+
+                <h2>
+                    Permissions control the interface.
+                </h2>
+
+            </div>
+
+            <p>
+                The interface hides unavailable controls,
+                but database authorization remains the actual
+                security boundary.
+            </p>
+
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+
+        <span>
+            Trading Tools
+        </span>
+
+        <span>
+            Administration · Permission controlled
+        </span>
+
+    </footer>
+
+    <script
+        type="module"
+        src="/src/pages/admin.ts"
+    ></script>
+
+</body>
+
+</html>

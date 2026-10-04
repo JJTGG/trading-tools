@@ -44,6 +44,17 @@ interface DirectoryUser {
     created_at: string;
 }
 
+interface AuditLogRecord {
+    id: number;
+    actor_user_id: string | null;
+    actor_email: string | null;
+    target_user_id: string | null;
+    target_email: string | null;
+    action: string;
+    details: Record<string, unknown>;
+    created_at: string;
+}
+
 interface AdminPanelDefinition {
     id: string;
     label: string;
@@ -209,6 +220,45 @@ const formatRole =
                 (character) =>
                     character.toUpperCase()
             );
+
+const formatAuditAction =
+    (action: string): string =>
+        action
+            .replace(
+                /\./g,
+                " "
+            )
+            .replace(
+                /_/g,
+                " "
+            )
+            .replace(
+                /\b\w/g,
+                (character) =>
+                    character.toUpperCase()
+            );
+
+const formatAuditTime =
+    (value: string): string => {
+        const date =
+            new Date(value);
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+            return value;
+        }
+
+        return new Intl.DateTimeFormat(
+            undefined,
+            {
+                dateStyle: "medium",
+                timeStyle: "short"
+            }
+        ).format(date);
+    };
 
 const renderError = (
     message: string
@@ -1153,6 +1203,369 @@ const renderUsers = async (
     );
 };
 
+const renderAuditLogs = async (): Promise<void> => {
+    if (!panelView) {
+        return;
+    }
+
+    panelView.hidden =
+        false;
+
+    panelView.replaceChildren();
+
+    const wrapper =
+        createElement(
+            "div",
+            "admin-audit-panel"
+        );
+
+    const heading =
+        createElement(
+            "div",
+            "admin-panel-view-heading"
+        );
+
+    const headingTop =
+        createElement(
+            "div",
+            "admin-audit-heading-top"
+        );
+
+    const headingCopy =
+        createElement(
+            "div"
+        );
+
+    const kicker =
+        createElement(
+            "span",
+            "panel-kicker"
+        );
+
+    kicker.textContent =
+        "Audit";
+
+    const title =
+        createElement(
+            "h2"
+        );
+
+    title.textContent =
+        "Administrative audit log";
+
+    const description =
+        createElement(
+            "p"
+        );
+
+    description.textContent =
+        "Read-only history of administrative actions recorded by the authorization layer.";
+
+    headingCopy.append(
+        kicker,
+        title,
+        description
+    );
+
+    const refreshButton =
+        createElement(
+            "button",
+            "admin-button"
+        );
+
+    refreshButton.type =
+        "button";
+
+    refreshButton.textContent =
+        "Refresh";
+
+    headingTop.append(
+        headingCopy,
+        refreshButton
+    );
+
+    heading.appendChild(
+        headingTop
+    );
+
+    const status =
+        createElement(
+            "p",
+            "admin-status"
+        );
+
+    status.hidden =
+        true;
+
+    const list =
+        createElement(
+            "div",
+            "admin-audit-list"
+        );
+
+    wrapper.append(
+        heading,
+        status,
+        list
+    );
+
+    panelView.appendChild(
+        wrapper
+    );
+
+    const loadAuditLogs =
+        async (): Promise<void> => {
+            refreshButton.disabled =
+                true;
+
+            status.hidden =
+                false;
+
+            status.textContent =
+                "Loading audit log…";
+
+            list.replaceChildren();
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .rpc(
+                        "get_admin_audit_logs",
+                        {
+                            result_limit:
+                                100
+                        }
+                    );
+
+            refreshButton.disabled =
+                false;
+
+            if (error) {
+                console.error(
+                    "Audit log load error:",
+                    error
+                );
+
+                status.textContent =
+                    "Unable to load the administrative audit log.";
+
+                return;
+            }
+
+            const logs =
+                (data ||
+                    []) as AuditLogRecord[];
+
+            status.textContent =
+                `${logs.length} ${
+                    logs.length === 1
+                        ? "entry"
+                        : "entries"
+                } shown`;
+
+            if (!logs.length) {
+                const empty =
+                    createElement(
+                        "div",
+                        "admin-panel-placeholder"
+                    );
+
+                const emptyTitle =
+                    createElement(
+                        "strong"
+                    );
+
+                emptyTitle.textContent =
+                    "No administrative actions recorded yet.";
+
+                const emptyText =
+                    createElement(
+                        "span"
+                    );
+
+                emptyText.textContent =
+                    "Successful staff-role changes will appear here automatically.";
+
+                empty.append(
+                    emptyTitle,
+                    emptyText
+                );
+
+                list.appendChild(
+                    empty
+                );
+
+                return;
+            }
+
+            logs.forEach(
+                (log) => {
+                    const entry =
+                        createElement(
+                            "article",
+                            "admin-audit-entry"
+                        );
+
+                    const header =
+                        createElement(
+                            "div",
+                            "admin-audit-entry-header"
+                        );
+
+                    const action =
+                        createElement(
+                            "strong"
+                        );
+
+                    action.textContent =
+                        formatAuditAction(
+                            log.action
+                        );
+
+                    const time =
+                        createElement(
+                            "time",
+                            "admin-audit-time"
+                        );
+
+                    time.dateTime =
+                        log.created_at;
+
+                    time.textContent =
+                        formatAuditTime(
+                            log.created_at
+                        );
+
+                    header.append(
+                        action,
+                        time
+                    );
+
+                    const actor =
+                        createElement(
+                            "div",
+                            "admin-audit-field"
+                        );
+
+                    const actorLabel =
+                        createElement(
+                            "span",
+                            "admin-audit-label"
+                        );
+
+                    actorLabel.textContent =
+                        "Administrator";
+
+                    const actorValue =
+                        createElement(
+                            "span"
+                        );
+
+                    actorValue.textContent =
+                        log.actor_email ||
+                        log.actor_user_id ||
+                        "Unknown actor";
+
+                    actor.append(
+                        actorLabel,
+                        actorValue
+                    );
+
+                    const target =
+                        createElement(
+                            "div",
+                            "admin-audit-field"
+                        );
+
+                    const targetLabel =
+                        createElement(
+                            "span",
+                            "admin-audit-label"
+                        );
+
+                    targetLabel.textContent =
+                        "Target";
+
+                    const targetValue =
+                        createElement(
+                            "span"
+                        );
+
+                    targetValue.textContent =
+                        log.target_email ||
+                        log.target_user_id ||
+                        "No target";
+
+                    target.append(
+                        targetLabel,
+                        targetValue
+                    );
+
+                    const details =
+                        createElement(
+                            "div",
+                            "admin-audit-details"
+                        );
+
+                    const detailLabel =
+                        createElement(
+                            "span",
+                            "admin-audit-label"
+                        );
+
+                    detailLabel.textContent =
+                        "Details";
+
+                    const detailValue =
+                        createElement(
+                            "span"
+                        );
+
+                    const role =
+                        typeof log.details
+                            ?.role ===
+                        "string"
+                            ? log.details.role
+                            : null;
+
+                    detailValue.textContent =
+                        role
+                            ? `Role: ${formatRole(
+                                  role
+                              )}`
+                            : "Recorded administrative action";
+
+                    details.append(
+                        detailLabel,
+                        detailValue
+                    );
+
+                    entry.append(
+                        header,
+                        actor,
+                        target,
+                        details
+                    );
+
+                    list.appendChild(
+                        entry
+                    );
+                }
+            );
+        };
+
+    refreshButton.addEventListener(
+        "click",
+        () => {
+            void loadAuditLogs();
+        }
+    );
+
+    await loadAuditLogs();
+};
+
 const showPanelMessage = (
     panel: AdminPanelDefinition
 ): void => {
@@ -1338,6 +1751,15 @@ const renderPanels = (
                         return;
                     }
 
+                    if (
+                        panel.id ===
+                        "audit"
+                    ) {
+                        void renderAuditLogs();
+
+                        return;
+                    }
+
                     showPanelMessage(
                         panel
                     );
@@ -1455,6 +1877,14 @@ const handleInitialPanel =
                 authorization,
                 authorizationUserId
             );
+
+            return;
+        }
+
+        if (
+            panel === "audit"
+        ) {
+            await renderAuditLogs();
 
             return;
         }

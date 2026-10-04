@@ -512,8 +512,91 @@
                     </strong>
 
                     <p id="decision-description">
-                        Complete the decision inputs before evaluating whether the setup should be taken.
+                        Complete the decision inputs before recording a decision.
                     </p>
+
+                    <div
+                        id="decision-controls"
+                        class="decision-controls"
+                        hidden
+                    >
+
+                        <div class="decision-options">
+
+                            <button
+                                type="button"
+                                class="action"
+                                data-decision="take"
+                                aria-pressed="false"
+                            >
+                                Take
+                            </button>
+
+                            <button
+                                type="button"
+                                class="action"
+                                data-decision="watch"
+                                aria-pressed="false"
+                            >
+                                Watch
+                            </button>
+
+                            <button
+                                type="button"
+                                class="action"
+                                data-decision="skip"
+                                aria-pressed="false"
+                            >
+                                Skip
+                            </button>
+
+                        </div>
+
+                        <div class="decision-reason">
+
+                            <label for="decision-reason">
+                                Decision Reason
+                            </label>
+
+                            <textarea
+                                id="decision-reason"
+                                maxlength="5000"
+                                rows="5"
+                                placeholder="Why are you taking, watching, or skipping this setup?"
+                            ></textarea>
+
+                        </div>
+
+                        <div class="decision-footer">
+
+                            <p
+                                id="decision-save-message"
+                                class="save-message"
+                                aria-live="polite"
+                            ></p>
+
+                            <button
+                                id="save-decision-button"
+                                type="button"
+                                class="action primary"
+                                disabled
+                            >
+                                Save Decision
+                            </button>
+
+                        </div>
+
+                        <p
+                            id="decision-recorded"
+                            class="decision-recorded"
+                            hidden
+                        ></p>
+
+                        <p class="decision-disclaimer">
+                            This records your decision for the setup. It does not place or execute a trade.
+                        </p>
+
+                    </div>
 
                 </section>
 

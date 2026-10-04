@@ -1,98 +1,164 @@
 # Trading Tools
 
-A practical toolkit for traders to calculate, evaluate, and understand their trades.
+Trading Tools is a trading decision-support workspace built to help traders move from market information to a defined, measurable trading decision.
 
-Trading Tools is being built as a decision-support platform rather than a trading or execution platform. The goal is to bring useful calculators, risk tools, market data, journaling, and trading utilities into one place.
+It is not a broker, exchange, signal-selling service, or trade execution platform. The product is focused on the work that happens around a trade: researching markets, calculating risk, planning positions, recording decisions, and eventually reviewing what happened.
 
-## Links
+## Product Direction
 
-- Live Demo: https://trading-tools-xi.vercel.app
-- Repository: https://github.com/JJTGG/trading-tools
+The core workflow is:
 
-## Current Tools
+**Learn → Calculate → Analyze → Plan → Manage Risk → Decide → Record → Review → Improve**
 
-**Trading Calculators**
-- PnL Calculator — Calculate potential profit or loss from a trade.
-- Position Size Calculator — Determine position size based on account risk, entry price, and stop-loss.
-- Options Calculator — Basic options payoff and outcome calculations.
+Trading Tools is being built around that workflow rather than as a collection of unrelated calculators. Individual tools handle specific parts of the process, while the workspace provides continuity between them.
 
-**Market & Conversion Tools**
-- Currency Converter — Convert between supported currencies using exchange-rate data.
-- Coin Viewer — View cryptocurrency information and market data.
-- Arbitrage Finder — Compare prices across supported markets.
+The long-term goal is a practical trading workspace where market context, calculations, trade plans, records, and analysis can live together without turning the product into an execution platform.
 
-**Strategy & Automation**
-- Algo Simulator — Experiment with algorithmic trading ideas without executing real trades.
+## Current Capabilities
+
+### Trading Tools
+
+The current tool registry includes:
+
+- **Position Size** — Convert defined account risk, entry, and stop-loss levels into a position size.
+- **Risk / Reward** — Evaluate the relationship between defined trade risk and potential reward.
+- **PnL** — Calculate trade profit or loss from price movement, position size, and fees.
+- **Leverage** — Measure exposure, effective leverage, and required margin.
+- **Currency Converter** — Convert between supported currencies using current exchange-rate data.
+- **Coin Viewer** — Inspect cryptocurrency information and market data.
+
+Additional tools are intentionally kept visible as planned work rather than presented as finished functionality.
+
+### Market Terminal
+
+The market area provides:
+
+- Live market prices
+- Crypto, stock, and forex market categories
+- Market search
+- Market detail views
+- Price changes and key market statistics
+- Historical chart intervals
+- Direct paths from market context into relevant trading tools
+
+### Workspace
+
+The workspace is the foundation for connecting individual tools into a persistent trading workflow.
+
+The application also includes account authentication, onboarding, preferences, settings, and user-specific workspace functionality backed by Supabase.
+
+## Architecture
+
+Trading Tools is currently a lightweight Vite application using TypeScript and JavaScript, with Supabase providing the backend services required for authentication and persistent user data.
+
+The codebase is organized around:
+
+- **Pages** — application entry points and user-facing workflows
+- **Components** — reusable interface elements
+- **Data** — shared data access and Supabase integration
+- **Auth** — authentication and session-related logic
+- **Styles** — application styling and page-specific presentation
+
+The project deliberately avoids unnecessary framework and infrastructure complexity while the product is being validated.
 
 ## Roadmap
 
-Trading Tools is planned as a multi-stage product.
+The roadmap is intentionally directional rather than tied to rigid version numbers.
 
-**V1 — Core Trading Toolkit**
-The first version focuses on practical tools for everyday trading decisions:
-- Trading calculators
-- Risk management tools
-- Currency and market data
-- Basic strategy utilities
-- Trading journal
+### Near Term
 
-**V2 — Smarter Analysis**
-- More advanced calculators
-- Strategy analysis
-- Portfolio-related tools
-- Improved market data
-- Trade analytics
+- Strengthen the core trading workflow
+- Expand risk and trade-planning tools
+- Improve workspace continuity between tools
+- Continue improving market data and market context
+- Refine authentication, profiles, preferences, and persistent user data
+- Establish a stronger foundation for trade records and review
 
-**V3 — Personal Trading Workspace**
-- User accounts
-- Saved calculations
-- Trading journal improvements
-- Personal dashboards
-- Historical trade analysis
+### Later
 
-**V4 — Intelligence & Automation**
-- Advanced strategy analysis
-- Automated data processing
-- AI-assisted trade analysis
-- More powerful simulations and backtesting
+- Advanced trade and strategy analysis
+- Portfolio and performance analysis
+- Historical trade analytics
+- More capable simulations and backtesting
+- Deeper research workflows
+- AI-assisted analysis where it provides genuine decision-support value
 
-**V5 — Full Trading Decision Platform**
-The long-term vision is to turn Trading Tools into a comprehensive environment for researching, calculating, analyzing, and documenting trading decisions.
+### Future TDS Integration
 
-> Trading Tools does not execute trades. It is designed to support the decision-making process.
+**Trading Signal Dropper (TDS)** is a separate project and is not currently integrated into Trading Tools.
 
-## Project Structure
+TDS is intended as a future integration point rather than something that should be forced into the current product prematurely.
 
-Trading Tools is developed as an independent product within the broader TGG HUB ecosystem.
+The intended relationship is:
 
-The product has its own codebase, deployment, roadmap, and development cycle.
+**TDS identifies or delivers a trading opportunity → Trading Tools provides the context, calculations, analysis, planning, risk management, decision, and record around it.**
+
+The integration will be designed when the existing products and their workflows provide enough evidence for a useful connection.
+
+## Product Boundaries
+
+Trading Tools supports trading decisions; it does not execute trades.
+
+The product is not intended to:
+
+- Place orders on exchanges or brokers
+- Custody user funds
+- Replace a broker or exchange
+- Present calculations as guaranteed trading outcomes
+- Turn every trading concept into an automated feature
+
+The product should remain useful because it improves the quality and consistency of a trader's process, not because it pretends to predict the market.
+
+### Age Restriction
+
+Trading Tools is intended for users aged **18 and older**.
+
+The product provides tools and information related to trading and financial decision-making and is not intended for minors.
 
 ## Development
 
-The project currently uses:
-- HTML
-- CSS
+Install dependencies:
+
+    npm install
+
+Start the development server:
+
+    npm run dev
+
+Build for production:
+
+    npm run build
+
+Typecheck:
+
+    npm run typecheck
+
+### Stack
+
 - TypeScript
 - JavaScript
+- HTML/CSS
+- Vite
+- Supabase
 
-The frontend is being developed with a focus on keeping the application lightweight, responsive, and easy to maintain.
+Node.js 20.19+ is required.
+
+
 
 ## Deployment
 
-The project is deployed independently from TGG HUB.
+Trading Tools is deployed independently from the broader TGG HUB ecosystem.
+
+Live application:
+
+https://trading-tools-xi.vercel.app
+
+
 
 ## Status
 
-In active development.
+**Active development.**
 
-The current focus is completing the core V1 tools and establishing the foundation for the later versions of the platform.
+The current priority is to strengthen the core decision-support workflow and turn the existing tools, market context, workspace, and user foundation into a coherent product.
 
-## License
-
-Copyright (c) 2026 JJTGG. All rights reserved.
-
-This repo is public so the code can be seen — for portfolio, reference, or just curiosity. That's what it's here for.
-
-You're welcome to read it. You're not welcome to copy it, reuse parts of it in another project, redeploy it, or sell it — as-is or modified. If you want to do something with this code beyond reading it, ask first.
-
-Provided "as is," no warranty of any kind. Anything you do with it (within what's allowed above) is on you — the author isn't liable for it.
+Trading Tools is being developed as an independent product within the broader TGG HUB ecosystem.

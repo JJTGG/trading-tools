@@ -6,6 +6,7 @@ import { mountMarketStrip } from "../components/market-strip";
 import {
     readTradeContextFromUrl
 } from "../data/trade-context";
+import { trackProductEvent } from "../data/product-events";
 
 interface SupabaseError {
     message: string;
@@ -548,6 +549,22 @@ const calculate = (): void => {
     }
 };
 
+const trackCompletedCalculation = (): void => {
+    calculate();
+
+    if (!lastCalculation) {
+        return;
+    }
+
+    void trackProductEvent(
+        "calculation_completed",
+        "pnl-calculator",
+        {
+            tool: "pnl-calculator"
+        }
+    );
+};
+
 const saveCalculation = async (): Promise<void> => {
     if (
         !lastCalculation ||
@@ -835,7 +852,7 @@ directionButtons.forEach(
 
 calculateButton?.addEventListener(
     "click",
-    calculate
+    trackCompletedCalculation
 );
 
 resetButton?.addEventListener(
@@ -852,7 +869,7 @@ calculator?.addEventListener(
     "submit",
     (event) => {
         event.preventDefault();
-        calculate();
+        trackCompletedCalculation();
     }
 );
 
@@ -864,3 +881,11 @@ document.addEventListener(
 mountMarketStrip();
 
 applyContextFromUrl();
+
+void trackProductEvent(
+    "tool_opened",
+    "pnl-calculator",
+    {
+        tool: "pnl-calculator"
+    }
+);

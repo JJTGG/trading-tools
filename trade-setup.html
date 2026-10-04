@@ -230,6 +230,111 @@
 
                 </section>
 
+                <section
+                    id="planning-panel"
+                    class="setup-panel"
+                >
+
+                    <header class="setup-panel-header">
+
+                        <div>
+
+                            <span class="panel-kicker">
+                                Plan
+                            </span>
+
+                            <h2>
+                                Trade plan
+                            </h2>
+
+                        </div>
+
+                    </header>
+
+                    <div class="setup-planning">
+
+                        <div class="planning-field">
+
+                            <label for="setup-thesis">
+                                Thesis
+                            </label>
+
+                            <textarea
+                                id="setup-thesis"
+                                maxlength="5000"
+                                rows="6"
+                                placeholder="Why does this setup make sense?"
+                            ></textarea>
+
+                        </div>
+
+                        <div class="planning-field">
+
+                            <label for="setup-entry-plan">
+                                Entry Plan
+                            </label>
+
+                            <textarea
+                                id="setup-entry-plan"
+                                maxlength="5000"
+                                rows="6"
+                                placeholder="What must happen before or at entry?"
+                            ></textarea>
+
+                        </div>
+
+                        <div class="planning-field">
+
+                            <label for="setup-invalidation">
+                                Invalidation
+                            </label>
+
+                            <textarea
+                                id="setup-invalidation"
+                                maxlength="5000"
+                                rows="6"
+                                placeholder="What would prove the thesis wrong?"
+                            ></textarea>
+
+                        </div>
+
+                        <div class="planning-field">
+
+                            <label for="setup-management-plan">
+                                Management Plan
+                            </label>
+
+                            <textarea
+                                id="setup-management-plan"
+                                maxlength="5000"
+                                rows="6"
+                                placeholder="How will the position be managed after entry?"
+                            ></textarea>
+
+                        </div>
+
+                        <div class="setup-planning-footer">
+
+                            <p
+                                id="setup-save-message"
+                                class="save-message"
+                                aria-live="polite"
+                            ></p>
+
+                            <button
+                                id="save-setup-button"
+                                type="button"
+                                class="action primary"
+                            >
+                                Save Setup
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
                 <section class="setup-panel">
 
                     <header class="setup-panel-header">
@@ -254,26 +359,8 @@
                             id="setup-notes"
                             maxlength="5000"
                             rows="8"
-                            placeholder="Record the reasoning, conditions, or context behind this setup."
+                            placeholder="Record additional reasoning, conditions, observations, or context."
                         ></textarea>
-
-                        <div class="setup-notes-footer">
-
-                            <p
-                                id="setup-save-message"
-                                class="save-message"
-                                aria-live="polite"
-                            ></p>
-
-                            <button
-                                id="save-setup-button"
-                                type="button"
-                                class="action primary"
-                            >
-                                Save Notes
-                            </button>
-
-                        </div>
 
                     </div>
 
@@ -382,6 +469,24 @@
 
                             <span
                                 id="risk-reward-status"
+                                class="workflow-status"
+                            >
+                                Open
+                            </span>
+                        </a>
+
+                        <a
+                            id="planning-link"
+                            class="workflow-item"
+                            href="#planning-panel"
+                        >
+                            <span>
+                                <strong>Planning</strong>
+                                <small>Define the trade plan</small>
+                            </span>
+
+                            <span
+                                id="planning-status"
                                 class="workflow-status"
                             >
                                 Open

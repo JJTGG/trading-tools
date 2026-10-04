@@ -12,6 +12,17 @@ export interface TradePlanning {
     managementPlan: string | null;
 }
 
+export type TradeDecision =
+    | "take"
+    | "skip"
+    | "watch";
+
+export interface TradeDecisionState {
+    decision: TradeDecision | null;
+    reason: string | null;
+    decidedAt: string | null;
+}
+
 export interface TradeSetup {
     id: string;
     userId: string;
@@ -28,6 +39,7 @@ export interface TradeSetup {
     exitPrice: number | null;
     fees: number | null;
     planning: TradePlanning;
+    decision: TradeDecisionState;
     notes: string | null;
     createdAt: string;
     updatedAt: string;
@@ -40,10 +52,17 @@ export interface TradePlanningInput {
     managementPlan?: string | null;
 }
 
+export interface TradeDecisionInput {
+    decision?: TradeDecision | null;
+    reason?: string | null;
+    decidedAt?: string | null;
+}
+
 export interface CreateTradeSetupInput {
     title?: string;
     context?: TradeContext;
     planning?: TradePlanningInput;
+    decision?: TradeDecisionInput;
     notes?: string;
 }
 
@@ -51,6 +70,7 @@ export interface UpdateTradeSetupInput {
     title?: string;
     context?: TradeContext;
     planning?: TradePlanningInput;
+    decision?: TradeDecisionInput;
     notes?: string | null;
 }
 
@@ -59,6 +79,7 @@ export interface SaveTradeSetupInput {
     title?: string;
     context?: TradeContext;
     planning?: TradePlanningInput;
+    decision?: TradeDecisionInput;
     notes?: string | null;
 }
 
@@ -105,6 +126,9 @@ interface TradeSetupRow {
     entry_plan: string | null;
     invalidation: string | null;
     management_plan: string | null;
+    decision: TradeDecision | null;
+    decision_reason: string | null;
+    decided_at: string | null;
     notes: string | null;
     created_at: string;
     updated_at: string;
@@ -211,6 +235,17 @@ const mapTradeSetup = (
 
             managementPlan:
                 row.management_plan
+        },
+
+        decision: {
+            decision:
+                row.decision,
+
+            reason:
+                row.decision_reason,
+
+            decidedAt:
+                row.decided_at
         },
 
         notes: row.notes,
@@ -441,6 +476,60 @@ const planningToUpdateRow = (
     return updates;
 };
 
+const decisionToInsertRow = (
+    decision: TradeDecisionInput = {}
+): Record<string, unknown> => {
+    return {
+        decision:
+            decision.decision ??
+            null,
+
+        decision_reason:
+            toNullableText(
+                decision.reason
+            ),
+
+        decided_at:
+            decision.decidedAt ??
+            null
+    };
+};
+
+const decisionToUpdateRow = (
+    decision: TradeDecisionInput
+): Record<string, unknown> => {
+    const updates:
+        Record<string, unknown> = {};
+
+    if (
+        decision.decision !==
+        undefined
+    ) {
+        updates.decision =
+            decision.decision;
+    }
+
+    if (
+        decision.reason !==
+        undefined
+    ) {
+        updates.decision_reason =
+            toNullableText(
+                decision.reason
+            );
+    }
+
+    if (
+        decision.decidedAt !==
+        undefined
+    ) {
+        updates.decided_at =
+            decision.decidedAt;
+    }
+
+    return updates;
+};
+
 const selectColumns = [
     "id",
     "user_id",
@@ -460,6 +549,9 @@ const selectColumns = [
     "entry_plan",
     "invalidation",
     "management_plan",
+    "decision",
+    "decision_reason",
+    "decided_at",
     "notes",
     "created_at",
     "updated_at"
@@ -512,6 +604,10 @@ export const createTradeSetup =
 
                     ...planningToInsertRow(
                         input.planning
+                    ),
+
+                    ...decisionToInsertRow(
+                        input.decision
                     ),
 
                     notes:
@@ -679,6 +775,18 @@ export const updateTradeSetup =
         }
 
         if (
+            input.decision !==
+            undefined
+        ) {
+            Object.assign(
+                updates,
+                decisionToUpdateRow(
+                    input.decision
+                )
+            );
+        }
+
+        if (
             input.notes !==
             undefined
         ) {
@@ -725,6 +833,25 @@ export const updateTradeSetup =
         );
     };
 
+export const recordTradeDecision =
+    async (
+        id: string,
+        decision: TradeDecision,
+        reason?: string | null
+    ): Promise<TradeSetup> => {
+        return updateTradeSetup(
+            id,
+            {
+                decision: {
+                    decision,
+                    reason,
+                    decidedAt:
+                        new Date().toISOString()
+                }
+            }
+        );
+    };
+
 export const saveTradeSetup =
     async (
         input: SaveTradeSetupInput
@@ -742,6 +869,9 @@ export const saveTradeSetup =
                     planning:
                         input.planning,
 
+                    decision:
+                        input.decision,
+
                     notes:
                         input.notes
                 }
@@ -757,6 +887,9 @@ export const saveTradeSetup =
 
             planning:
                 input.planning,
+
+            decision:
+                input.decision,
 
             notes:
                 input.notes ?? undefined

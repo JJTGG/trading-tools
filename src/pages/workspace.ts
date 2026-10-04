@@ -4,8 +4,15 @@ import "./workspace.css";
 
 import { mountMarketStrip } from "../components/market-strip";
 import {
-    buildTradeContextUrl
+    buildTradeContextUrl,
+    type TradeContext
 } from "../data/trade-context";
+import {
+    createTradeSetup,
+    deleteTradeSetup,
+    getTradeSetups,
+    type TradeSetup
+} from "../data/trade-setups";
 
 interface SupabaseError {
     message: string;
@@ -95,8 +102,9 @@ interface SupabaseQueryLike {
         error: SupabaseError | null;
     }>;
 
-    then: Promise<SavedCalculation[] | WatchlistItem[]>
-        ["then"];
+    then: Promise<
+        SavedCalculation[] | WatchlistItem[]
+    >["then"];
 }
 
 declare global {
@@ -123,6 +131,11 @@ const workspaceExperience =
         "#workspace-experience"
     );
 
+const tradeSetupCount =
+    document.querySelector<HTMLElement>(
+        "#workspace-trade-setup-count"
+    );
+
 const calculationCount =
     document.querySelector<HTMLElement>(
         "#workspace-calculation-count"
@@ -131,6 +144,11 @@ const calculationCount =
 const watchlistCount =
     document.querySelector<HTMLElement>(
         "#workspace-watchlist-count"
+    );
+
+const tradeSetups =
+    document.querySelector<HTMLElement>(
+        "#trade-setups"
     );
 
 const savedCalculations =
@@ -166,7 +184,8 @@ const setText = (
     value: string
 ): void => {
     if (element) {
-        element.textContent = value;
+        element.textContent =
+            value;
     }
 };
 
@@ -177,7 +196,8 @@ const formatToolName = (
         .replace(/[-_]/g, " ")
         .replace(
             /\b\w/g,
-            (letter) => letter.toUpperCase()
+            (letter) =>
+                letter.toUpperCase()
         );
 };
 
@@ -231,6 +251,52 @@ const formatValue = (
     return "—";
 };
 
+const hasValue = (
+    value: unknown
+): boolean => {
+    return (
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+    );
+};
+
+const toNumber = (
+    value: unknown
+): number | undefined => {
+    if (
+        typeof value === "number" &&
+        Number.isFinite(value)
+    ) {
+        return value;
+    }
+
+    if (
+        typeof value === "string" &&
+        value.trim()
+    ) {
+        const parsed =
+            Number(value);
+
+        return Number.isFinite(
+            parsed
+        )
+            ? parsed
+            : undefined;
+    }
+
+    return undefined;
+};
+
+const toDirection = (
+    value: unknown
+): TradeContext["direction"] => {
+    return value === "long" ||
+        value === "short"
+        ? value
+        : undefined;
+};
+
 const getCalculationSummary = (
     calculation: SavedCalculation
 ): string => {
@@ -270,7 +336,9 @@ const getCalculationSummary = (
 
         default: {
             const entries =
-                Object.entries(result);
+                Object.entries(
+                    result
+                );
 
             if (!entries.length) {
                 return "Saved calculation";
@@ -291,27 +359,169 @@ const getCalculationSummary = (
     }
 };
 
-const hasValue = (
-    value: unknown
-): boolean => {
-    return (
-        value !== undefined &&
-        value !== null &&
-        value !== ""
-    );
+const getTradeContextFromCalculation = (
+    calculation: SavedCalculation
+): TradeContext | null => {
+    const inputs =
+        calculation.inputs || {};
+
+    if (
+        calculation.tool ===
+        "position-size"
+    ) {
+        return {
+            symbol: hasValue(
+                inputs.symbol
+            )
+                ? String(
+                      inputs.symbol
+                  )
+                : undefined,
+
+            timeframe: hasValue(
+                inputs.timeframe
+            )
+                ? String(
+                      inputs.timeframe
+                  )
+                : undefined,
+
+            direction:
+                toDirection(
+                    inputs.direction
+                ),
+
+            accountBalance:
+                toNumber(
+                    inputs.accountBalance
+                ),
+
+            riskPercent:
+                toNumber(
+                    inputs.riskPercent
+                ),
+
+            entryPrice:
+                toNumber(
+                    inputs.entryPrice
+                ),
+
+            stopLoss:
+                toNumber(
+                    inputs.stopLoss
+                ),
+
+            positionSize:
+                toNumber(
+                    calculation.result
+                        ?.positionSize
+                )
+        };
+    }
+
+    if (
+        calculation.tool ===
+        "risk-reward"
+    ) {
+        return {
+            symbol: hasValue(
+                inputs.symbol
+            )
+                ? String(
+                      inputs.symbol
+                  )
+                : undefined,
+
+            timeframe: hasValue(
+                inputs.timeframe
+            )
+                ? String(
+                      inputs.timeframe
+                  )
+                : undefined,
+
+            direction:
+                toDirection(
+                    inputs.direction
+                ),
+
+            entryPrice:
+                toNumber(
+                    inputs.entryPrice
+                ),
+
+            stopLoss:
+                toNumber(
+                    inputs.stopLoss
+                ),
+
+            targetPrice:
+                toNumber(
+                    inputs.target
+                )
+        };
+    }
+
+    if (
+        calculation.tool ===
+        "pnl-calculator"
+    ) {
+        return {
+            symbol: hasValue(
+                inputs.symbol
+            )
+                ? String(
+                      inputs.symbol
+                  )
+                : undefined,
+
+            timeframe: hasValue(
+                inputs.timeframe
+            )
+                ? String(
+                      inputs.timeframe
+                  )
+                : undefined,
+
+            direction:
+                toDirection(
+                    inputs.direction
+                ),
+
+            entryPrice:
+                toNumber(
+                    inputs.entryPrice
+                ),
+
+            exitPrice:
+                toNumber(
+                    inputs.exitPrice
+                ),
+
+            positionSize:
+                toNumber(
+                    inputs.positionSize
+                ),
+
+            fees:
+                toNumber(
+                    inputs.fees
+                )
+        };
+    }
+
+    return null;
 };
 
-const createCalculationUrl = (
+const getCalculationContinueUrl = (
     calculation: SavedCalculation
 ): string | null => {
     const inputs =
         calculation.inputs || {};
 
-    const tool =
-        calculation.tool;
-
     if (
-        tool === "position-size" &&
+        calculation.tool ===
+        "position-size" &&
         [
             inputs.direction,
             inputs.accountBalance,
@@ -323,39 +533,53 @@ const createCalculationUrl = (
         return buildTradeContextUrl(
             "position-size.html",
             {
-                symbol:
-                    hasValue(inputs.symbol)
-                        ? String(inputs.symbol)
-                        : undefined,
+                symbol: hasValue(
+                    inputs.symbol
+                )
+                    ? String(
+                          inputs.symbol
+                      )
+                    : undefined,
 
-                timeframe:
-                    hasValue(inputs.timeframe)
-                        ? String(inputs.timeframe)
-                        : undefined,
+                timeframe: hasValue(
+                    inputs.timeframe
+                )
+                    ? String(
+                          inputs.timeframe
+                      )
+                    : undefined,
 
                 direction:
-                    inputs.direction === "long" ||
-                    inputs.direction === "short"
-                        ? inputs.direction
-                        : undefined,
+                    toDirection(
+                        inputs.direction
+                    ),
 
                 accountBalance:
-                    Number(inputs.accountBalance),
+                    Number(
+                        inputs.accountBalance
+                    ),
 
                 riskPercent:
-                    Number(inputs.riskPercent),
+                    Number(
+                        inputs.riskPercent
+                    ),
 
                 entryPrice:
-                    Number(inputs.entryPrice),
+                    Number(
+                        inputs.entryPrice
+                    ),
 
                 stopLoss:
-                    Number(inputs.stopLoss)
+                    Number(
+                        inputs.stopLoss
+                    )
             }
         );
     }
 
     if (
-        tool === "risk-reward" &&
+        calculation.tool ===
+        "risk-reward" &&
         [
             inputs.direction,
             inputs.entryPrice,
@@ -366,36 +590,48 @@ const createCalculationUrl = (
         return buildTradeContextUrl(
             "risk-reward.html",
             {
-                symbol:
-                    hasValue(inputs.symbol)
-                        ? String(inputs.symbol)
-                        : undefined,
+                symbol: hasValue(
+                    inputs.symbol
+                )
+                    ? String(
+                          inputs.symbol
+                      )
+                    : undefined,
 
-                timeframe:
-                    hasValue(inputs.timeframe)
-                        ? String(inputs.timeframe)
-                        : undefined,
+                timeframe: hasValue(
+                    inputs.timeframe
+                )
+                    ? String(
+                          inputs.timeframe
+                      )
+                    : undefined,
 
                 direction:
-                    inputs.direction === "long" ||
-                    inputs.direction === "short"
-                        ? inputs.direction
-                        : undefined,
+                    toDirection(
+                        inputs.direction
+                    ),
 
                 entryPrice:
-                    Number(inputs.entryPrice),
+                    Number(
+                        inputs.entryPrice
+                    ),
 
                 stopLoss:
-                    Number(inputs.stopLoss),
+                    Number(
+                        inputs.stopLoss
+                    ),
 
                 targetPrice:
-                    Number(inputs.target)
+                    Number(
+                        inputs.target
+                    )
             }
         );
     }
 
     if (
-        tool === "pnl-calculator" &&
+        calculation.tool ===
+        "pnl-calculator" &&
         [
             inputs.symbol,
             inputs.timeframe,
@@ -410,33 +646,228 @@ const createCalculationUrl = (
             "pnl-calculator.html",
             {
                 symbol:
-                    String(inputs.symbol),
+                    String(
+                        inputs.symbol
+                    ),
 
                 timeframe:
-                    String(inputs.timeframe),
+                    String(
+                        inputs.timeframe
+                    ),
 
                 direction:
-                    inputs.direction === "long" ||
-                    inputs.direction === "short"
-                        ? inputs.direction
-                        : undefined,
+                    toDirection(
+                        inputs.direction
+                    ),
 
                 entryPrice:
-                    Number(inputs.entryPrice),
+                    Number(
+                        inputs.entryPrice
+                    ),
 
                 exitPrice:
-                    Number(inputs.exitPrice),
+                    Number(
+                        inputs.exitPrice
+                    ),
 
                 positionSize:
-                    Number(inputs.positionSize),
+                    Number(
+                        inputs.positionSize
+                    ),
 
                 fees:
-                    Number(inputs.fees)
+                    Number(
+                        inputs.fees
+                    )
             }
         );
     }
 
     return null;
+};
+
+const getTradeSetupContext = (
+    setup: TradeSetup
+): TradeContext => {
+    return {
+        symbol:
+            setup.symbol ||
+            undefined,
+
+        timeframe:
+            setup.timeframe ||
+            undefined,
+
+        direction:
+            setup.direction ||
+            undefined,
+
+        entryPrice:
+            setup.entryPrice ??
+            undefined,
+
+        stopLoss:
+            setup.stopLoss ??
+            undefined,
+
+        targetPrice:
+            setup.targetPrice ??
+            undefined,
+
+        accountBalance:
+            setup.accountBalance ??
+            undefined,
+
+        riskPercent:
+            setup.riskPercent ??
+            undefined,
+
+        positionSize:
+            setup.positionSize ??
+            undefined,
+
+        exitPrice:
+            setup.exitPrice ??
+            undefined,
+
+        fees:
+            setup.fees ??
+            undefined
+    };
+};
+
+const getTradeSetupContinueUrl = (
+    setup: TradeSetup
+): string => {
+    const context =
+        getTradeSetupContext(
+            setup
+        );
+
+    if (
+        setup.entryPrice !==
+            null &&
+        setup.stopLoss !==
+            null &&
+        setup.targetPrice !==
+            null &&
+        setup.direction
+    ) {
+        return buildTradeContextUrl(
+            "risk-reward.html",
+            context
+        );
+    }
+
+    if (
+        setup.entryPrice !==
+            null &&
+        setup.stopLoss !==
+            null &&
+        setup.accountBalance !==
+            null &&
+        setup.riskPercent !==
+            null &&
+        setup.direction
+    ) {
+        return buildTradeContextUrl(
+            "position-size.html",
+            context
+        );
+    }
+
+    if (
+        setup.entryPrice !==
+            null &&
+        setup.exitPrice !==
+            null &&
+        setup.positionSize !==
+            null &&
+        setup.direction
+    ) {
+        return buildTradeContextUrl(
+            "pnl-calculator.html",
+            context
+        );
+    }
+
+    return buildTradeContextUrl(
+        "position-size.html",
+        context
+    );
+};
+
+const getTradeSetupSummary = (
+    setup: TradeSetup
+): string => {
+    const parts: string[] = [];
+
+    if (setup.symbol) {
+        parts.push(
+            setup.symbol
+        );
+    }
+
+    if (setup.direction) {
+        parts.push(
+            setup.direction ===
+            "long"
+                ? "Long"
+                : "Short"
+        );
+    }
+
+    if (
+        setup.entryPrice !==
+        null
+    ) {
+        parts.push(
+            `Entry ${formatValue(
+                setup.entryPrice
+            )}`
+        );
+    }
+
+    if (
+        setup.stopLoss !==
+        null
+    ) {
+        parts.push(
+            `Stop ${formatValue(
+                setup.stopLoss
+            )}`
+        );
+    }
+
+    if (
+        setup.targetPrice !==
+        null
+    ) {
+        parts.push(
+            `Target ${formatValue(
+                setup.targetPrice
+            )}`
+        );
+    }
+
+    if (
+        setup.positionSize !==
+        null
+    ) {
+        parts.push(
+            `Size ${formatValue(
+                setup.positionSize
+            )}`
+        );
+    }
+
+    if (!parts.length) {
+        return "Setup needs more context.";
+    }
+
+    return parts
+        .slice(0, 5)
+        .join(" · ");
 };
 
 const createElement = <
@@ -454,6 +885,156 @@ const createElement = <
     }
 
     return element;
+};
+
+const renderTradeSetups = (
+    setups: TradeSetup[]
+): void => {
+    if (!tradeSetups) {
+        return;
+    }
+
+    tradeSetups.replaceChildren();
+
+    setText(
+        tradeSetupCount,
+        String(
+            setups.length
+        )
+    );
+
+    if (!setups.length) {
+        const empty =
+            createElement(
+                "p",
+                "empty-state"
+            );
+
+        empty.textContent =
+            "No trade setups yet. Save a calculation as a setup to keep its trading context together.";
+
+        tradeSetups.appendChild(
+            empty
+        );
+
+        return;
+    }
+
+    setups.forEach(
+        (setup) => {
+            const row =
+                createElement(
+                    "article",
+                    "saved-calculation"
+                );
+
+            const main =
+                createElement(
+                    "div",
+                    "saved-calculation-main"
+                );
+
+            const topLine =
+                createElement(
+                    "div",
+                    "saved-calculation-title"
+                );
+
+            const title =
+                createElement(
+                    "strong"
+                );
+
+            title.textContent =
+                setup.title;
+
+            const date =
+                createElement(
+                    "span",
+                    "saved-calculation-date"
+                );
+
+            date.textContent =
+                formatDate(
+                    setup.updatedAt
+                );
+
+            topLine.append(
+                title,
+                date
+            );
+
+            const summary =
+                createElement(
+                    "span",
+                    "saved-calculation-summary"
+                );
+
+            summary.textContent =
+                getTradeSetupSummary(
+                    setup
+                );
+
+            main.append(
+                topLine,
+                summary
+            );
+
+            const actions =
+                createElement(
+                    "div",
+                    "saved-calculation-actions"
+                );
+
+            const continueLink =
+                createElement(
+                    "a"
+                );
+
+            continueLink.href =
+                getTradeSetupContinueUrl(
+                    setup
+                );
+
+            continueLink.textContent =
+                "Continue";
+
+            const deleteButton =
+                createElement(
+                    "button",
+                    "row-action"
+                );
+
+            deleteButton.type =
+                "button";
+
+            deleteButton.textContent =
+                "Delete";
+
+            deleteButton.addEventListener(
+                "click",
+                () => {
+                    void deleteTradeSetupById(
+                        setup.id
+                    );
+                }
+            );
+
+            actions.append(
+                continueLink,
+                deleteButton
+            );
+
+            row.append(
+                main,
+                actions
+            );
+
+            tradeSetups.appendChild(
+                row
+            );
+        }
+    );
 };
 
 const renderSavedCalculations = (
@@ -503,7 +1084,9 @@ const renderSavedCalculations = (
                 );
 
             const title =
-                createElement("strong");
+                createElement(
+                    "strong"
+                );
 
             title.textContent =
                 formatToolName(
@@ -549,13 +1132,15 @@ const renderSavedCalculations = (
                 );
 
             const continueUrl =
-                createCalculationUrl(
+                getCalculationContinueUrl(
                     calculation
                 );
 
             if (continueUrl) {
                 const continueLink =
-                    createElement("a");
+                    createElement(
+                        "a"
+                    );
 
                 continueLink.href =
                     continueUrl;
@@ -565,6 +1150,41 @@ const renderSavedCalculations = (
 
                 actions.append(
                     continueLink
+                );
+            }
+
+            if (
+                getTradeContextFromCalculation(
+                    calculation
+                )
+            ) {
+                const saveButton =
+                    createElement(
+                        "button",
+                        "row-action"
+                    );
+
+                saveButton.type =
+                    "button";
+
+                saveButton.textContent =
+                    "Save as setup";
+
+                saveButton.dataset.calculationId =
+                    calculation.id;
+
+                saveButton.addEventListener(
+                    "click",
+                    () => {
+                        void saveCalculationAsSetup(
+                            calculation,
+                            saveButton
+                        );
+                    }
+                );
+
+                actions.append(
+                    saveButton
                 );
             }
 
@@ -649,7 +1269,9 @@ const renderWatchlist = (
                 );
 
             const symbol =
-                createElement("strong");
+                createElement(
+                    "strong"
+                );
 
             symbol.textContent =
                 item.symbol;
@@ -676,7 +1298,9 @@ const renderWatchlist = (
                 );
 
             const marketLink =
-                createElement("a");
+                createElement(
+                    "a"
+                );
 
             marketLink.href =
                 `market.html?symbol=${encodeURIComponent(
@@ -733,11 +1357,16 @@ const loadWorkspaceProfile =
             error
         } =
             await supabaseClient
-                .from("profiles")
+                .from(
+                    "profiles"
+                )
                 .select(
                     "display_name, onboarding_completed, workspace_preferences, experience_level"
                 )
-                .eq("id", userId)
+                .eq(
+                    "id",
+                    userId
+                )
                 .maybeSingle();
 
         if (error) {
@@ -846,6 +1475,47 @@ const loadSavedCalculations =
         );
     };
 
+const loadTradeSetups =
+    async (): Promise<void> => {
+        try {
+            const setups =
+                await getTradeSetups(
+                    8
+                );
+
+            renderTradeSetups(
+                setups
+            );
+        } catch (error) {
+            console.error(
+                "Trade setups error:",
+                error
+            );
+
+            setText(
+                tradeSetupCount,
+                "—"
+            );
+
+            if (tradeSetups) {
+                tradeSetups.replaceChildren();
+
+                const errorState =
+                    createElement(
+                        "p",
+                        "empty-state"
+                    );
+
+                errorState.textContent =
+                    "Unable to load trade setups.";
+
+                tradeSetups.appendChild(
+                    errorState
+                );
+            }
+        }
+    };
+
 const loadWatchlist =
     async (
         userId: string
@@ -919,7 +1589,8 @@ const loadWorkspaceStats =
                     .select(
                         "id",
                         {
-                            count: "exact",
+                            count:
+                                "exact",
                             head: true
                         }
                     )
@@ -935,7 +1606,8 @@ const loadWorkspaceStats =
                     .select(
                         "id",
                         {
-                            count: "exact",
+                            count:
+                                "exact",
                             head: true
                         }
                     )
@@ -970,6 +1642,77 @@ const loadWorkspaceStats =
         }
     };
 
+const saveCalculationAsSetup =
+    async (
+        calculation: SavedCalculation,
+        button: HTMLButtonElement
+    ): Promise<void> => {
+        const context =
+            getTradeContextFromCalculation(
+                calculation
+            );
+
+        if (!context) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent =
+            "Saving...";
+
+        const symbol =
+            context.symbol;
+
+        const toolName =
+            formatToolName(
+                calculation.tool
+            );
+
+        const title =
+            symbol
+                ? `${symbol} · ${toolName}`
+                : `${toolName} setup`;
+
+        try {
+            await createTradeSetup({
+                title,
+                context
+            });
+
+            button.textContent =
+                "Saved";
+
+            await loadTradeSetups();
+        } catch (error) {
+            console.error(
+                "Save trade setup error:",
+                error
+            );
+
+            button.disabled = false;
+            button.textContent =
+                "Save as setup";
+        }
+    };
+
+const deleteTradeSetupById =
+    async (
+        id: string
+    ): Promise<void> => {
+        try {
+            await deleteTradeSetup(
+                id
+            );
+
+            await loadTradeSetups();
+        } catch (error) {
+            console.error(
+                "Delete trade setup error:",
+                error
+            );
+        }
+    };
+
 const addWatchlistItem =
     async (
         event: SubmitEvent
@@ -993,7 +1736,8 @@ const addWatchlistItem =
         const symbol =
             symbolInput?.value
                 .trim()
-                .toUpperCase() || "";
+                .toUpperCase() ||
+            "";
 
         const assetType =
             typeInput?.value ||
@@ -1247,6 +1991,7 @@ const loadWorkspace =
         }
 
         await Promise.all([
+            loadTradeSetups(),
             loadSavedCalculations(
                 data.user.id
             ),
@@ -1262,7 +2007,9 @@ const loadWorkspace =
 watchlistForm?.addEventListener(
     "submit",
     (event) => {
-        void addWatchlistItem(event);
+        void addWatchlistItem(
+            event
+        );
     }
 );
 

@@ -94,12 +94,32 @@ const setupNotes =
         "#setup-notes"
     );
 
+const setupThesis =
+    document.querySelector<HTMLTextAreaElement>(
+        "#setup-thesis"
+    );
+
+const setupEntryPlan =
+    document.querySelector<HTMLTextAreaElement>(
+        "#setup-entry-plan"
+    );
+
+const setupInvalidation =
+    document.querySelector<HTMLTextAreaElement>(
+        "#setup-invalidation"
+    );
+
+const setupManagementPlan =
+    document.querySelector<HTMLTextAreaElement>(
+        "#setup-management-plan"
+    );
+
 const setupTitle =
     document.querySelector<HTMLInputElement>(
         "#setup-title"
     );
 
-const saveNotesButton =
+const saveSetupButton =
     document.querySelector<HTMLButtonElement>(
         "#save-setup-button"
     );
@@ -129,6 +149,11 @@ const riskRewardLink =
         "#risk-reward-link"
     );
 
+const planningLink =
+    document.querySelector<HTMLAnchorElement>(
+        "#planning-link"
+    );
+
 const pnlLink =
     document.querySelector<HTMLAnchorElement>(
         "#pnl-link"
@@ -142,6 +167,11 @@ const positionSizeStatus =
 const riskRewardStatus =
     document.querySelector<HTMLElement>(
         "#risk-reward-status"
+    );
+
+const planningStatus =
+    document.querySelector<HTMLElement>(
+        "#planning-status"
     );
 
 const pnlStatus =
@@ -177,8 +207,7 @@ const setText = (
     value: string
 ): void => {
     if (element) {
-        element.textContent =
-            value;
+        element.textContent = value;
     }
 };
 
@@ -321,6 +350,22 @@ const hasRiskRewardContext = (
     ].every(
         (value) =>
             value !== null
+    );
+};
+
+const hasPlanningContext = (
+    setup: TradeSetup
+): boolean => {
+    return [
+        setup.planning.thesis,
+        setup.planning.entryPlan,
+        setup.planning.invalidation,
+        setup.planning.managementPlan
+    ].every(
+        (value) =>
+            Boolean(
+                value?.trim()
+            )
     );
 };
 
@@ -477,6 +522,30 @@ const renderSetup = (
             "";
     }
 
+    if (setupThesis) {
+        setupThesis.value =
+            setup.planning.thesis ||
+            "";
+    }
+
+    if (setupEntryPlan) {
+        setupEntryPlan.value =
+            setup.planning.entryPlan ||
+            "";
+    }
+
+    if (setupInvalidation) {
+        setupInvalidation.value =
+            setup.planning.invalidation ||
+            "";
+    }
+
+    if (setupManagementPlan) {
+        setupManagementPlan.value =
+            setup.planning.managementPlan ||
+            "";
+    }
+
     const positionReady =
         hasPositionSizeContext(
             setup
@@ -484,6 +553,11 @@ const renderSetup = (
 
     const riskRewardReady =
         hasRiskRewardContext(
+            setup
+        );
+
+    const planningReady =
+        hasPlanningContext(
             setup
         );
 
@@ -502,6 +576,12 @@ const renderSetup = (
         riskRewardLink,
         riskRewardStatus,
         riskRewardReady
+    );
+
+    updateWorkflowItem(
+        planningLink,
+        planningStatus,
+        planningReady
     );
 
     updateWorkflowItem(
@@ -524,6 +604,11 @@ const renderSetup = (
                 "risk-reward.html",
                 setup
             );
+    }
+
+    if (planningLink) {
+        planningLink.href =
+            "#planning-panel";
     }
 
     if (pnlLink) {
@@ -578,6 +663,25 @@ const renderSetup = (
         return;
     }
 
+    if (!planningReady) {
+        setText(
+            nextStepTitle,
+            "Complete the Trade Plan"
+        );
+
+        setText(
+            nextStepDescription,
+            "Define the thesis, entry conditions, invalidation, and management plan before treating the setup as planned."
+        );
+
+        if (nextStepLink) {
+            nextStepLink.href =
+                "#planning-panel";
+        }
+
+        return;
+    }
+
     if (!pnlReady) {
         setText(
             nextStepTitle,
@@ -607,15 +711,12 @@ const renderSetup = (
 
     setText(
         nextStepDescription,
-        "The main context is complete. Use any workflow stage to reassess or refine the setup."
+        "The main context, risk, plan, and outcome fields are complete. Reassess any stage as needed."
     );
 
     if (nextStepLink) {
         nextStepLink.href =
-            buildToolUrl(
-                "risk-reward.html",
-                setup
-            );
+            "#planning-panel";
     }
 };
 
@@ -740,17 +841,21 @@ const saveTitle =
         }
     };
 
-const saveNotes =
+const saveSetup =
     async (): Promise<void> => {
         if (
             !currentSetup ||
+            !saveSetupButton ||
             !setupNotes ||
-            !saveNotesButton
+            !setupThesis ||
+            !setupEntryPlan ||
+            !setupInvalidation ||
+            !setupManagementPlan
         ) {
             return;
         }
 
-        saveNotesButton.disabled =
+        saveSetupButton.disabled =
             true;
 
         setText(
@@ -765,7 +870,25 @@ const saveNotes =
                     {
                         notes:
                             setupNotes.value
-                                .trim()
+                                .trim(),
+
+                        planning: {
+                            thesis:
+                                setupThesis.value
+                                    .trim(),
+
+                            entryPlan:
+                                setupEntryPlan.value
+                                    .trim(),
+
+                            invalidation:
+                                setupInvalidation.value
+                                    .trim(),
+
+                            managementPlan:
+                                setupManagementPlan.value
+                                    .trim()
+                        }
                     }
                 );
 
@@ -775,11 +898,11 @@ const saveNotes =
 
             setText(
                 saveMessage,
-                "Notes saved."
+                "Setup saved."
             );
         } catch (error) {
             console.error(
-                "Save setup notes error:",
+                "Save trade setup error:",
                 error
             );
 
@@ -787,10 +910,10 @@ const saveNotes =
                 saveMessage,
                 error instanceof Error
                     ? error.message
-                    : "Unable to save notes."
+                    : "Unable to save setup."
             );
         } finally {
-            saveNotesButton.disabled =
+            saveSetupButton.disabled =
                 false;
         }
     };
@@ -840,10 +963,10 @@ saveTitleButton?.addEventListener(
     }
 );
 
-saveNotesButton?.addEventListener(
+saveSetupButton?.addEventListener(
     "click",
     () => {
-        void saveNotes();
+        void saveSetup();
     }
 );
 

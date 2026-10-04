@@ -7,6 +7,9 @@ import {
     redirectAfterAuthentication
 } from "../auth/runtime";
 
+const TERMS_VERSION = "2026-10-04";
+const PRIVACY_VERSION = "2026-10-04";
+
 const form =
     document.querySelector<HTMLFormElement>(
         "#signup-form"
@@ -21,6 +24,13 @@ const submitButton =
     document.querySelector<HTMLButtonElement>(
         "#signup-submit"
     );
+
+const getCheckboxValue = (
+    selector: string
+): boolean =>
+    document.querySelector<HTMLInputElement>(
+        selector
+    )?.checked === true;
 
 const setMessage = (
     text: string,
@@ -107,6 +117,40 @@ form?.addEventListener(
                 )
                 ?.value || "";
 
+        const ageConfirmed =
+            getCheckboxValue(
+                "#signup-age-confirmed"
+            );
+
+        const termsAccepted =
+            getCheckboxValue(
+                "#signup-terms-accepted"
+            );
+
+        const privacyAccepted =
+            getCheckboxValue(
+                "#signup-privacy-accepted"
+            );
+
+        const decisionSupportAcknowledged =
+            getCheckboxValue(
+                "#signup-decision-support"
+            );
+
+        if (
+            !ageConfirmed ||
+            !termsAccepted ||
+            !privacyAccepted ||
+            !decisionSupportAcknowledged
+        ) {
+            setMessage(
+                "Complete all required acknowledgements before creating your account.",
+                "error"
+            );
+
+            return;
+        }
+
         if (
             password !==
             confirmPassword
@@ -144,7 +188,23 @@ form?.addEventListener(
                     .auth
                     .signUp({
                         email,
-                        password
+                        password,
+                        options: {
+                            data: {
+                                age_confirmed:
+                                    true,
+                                terms_accepted:
+                                    true,
+                                privacy_accepted:
+                                    true,
+                                decision_support_acknowledged:
+                                    true,
+                                terms_version:
+                                    TERMS_VERSION,
+                                privacy_version:
+                                    PRIVACY_VERSION
+                            }
+                        }
                     });
 
             if (error) {

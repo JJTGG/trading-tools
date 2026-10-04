@@ -9,7 +9,7 @@
     >
     <meta
         name="description"
-        content="Continue trading work, review saved calculations, and manage your market watchlist."
+        content="Continue trade setups, review saved calculations, and manage your market watchlist."
     >
     <title>Workspace — Trading Tools</title>
 </head>
@@ -124,6 +124,21 @@
             <div class="summary-item">
 
                 <span class="summary-label">
+                    Trade setups
+                </span>
+
+                <strong
+                    id="workspace-trade-setup-count"
+                    class="summary-value"
+                >
+                    0
+                </strong>
+
+            </div>
+
+            <div class="summary-item">
+
+                <span class="summary-label">
                     Saved calculations
                 </span>
 
@@ -151,18 +166,6 @@
 
             </div>
 
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    Workspace state
-                </span>
-
-                <strong class="summary-value">
-                    Ready
-                </strong>
-
-            </div>
-
         </section>
 
         <section class="workspace-layout">
@@ -175,7 +178,37 @@
 
                         <div>
                             <span class="panel-kicker">
-                                Continuity
+                                Trading Context
+                            </span>
+
+                            <h2>
+                                Trade setups
+                            </h2>
+                        </div>
+
+                        <span class="panel-meta">
+                            Last 8
+                        </span>
+
+                    </div>
+
+                    <div id="trade-setups">
+
+                        <p class="empty-state">
+                            No trade setups yet.
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <section class="workspace-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-kicker">
+                                Calculations
                             </span>
 
                             <h2>

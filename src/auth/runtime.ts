@@ -72,6 +72,13 @@ interface SupabaseClientLike {
         signUp(values: {
             email: string;
             password: string;
+            options?: {
+                emailRedirectTo?: string;
+                data?: Record<
+                    string,
+                    string | boolean | null
+                >;
+            };
         }): Promise<{
             data: {
                 user: AuthUser | null;

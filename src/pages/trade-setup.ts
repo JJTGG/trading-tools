@@ -179,6 +179,16 @@ const pnlStatus =
         "#pnl-status"
     );
 
+const decisionStatus =
+    document.querySelector<HTMLElement>(
+        "#decision-status"
+    );
+
+const decisionDescription =
+    document.querySelector<HTMLElement>(
+        "#decision-description"
+    );
+
 const nextStepTitle =
     document.querySelector<HTMLElement>(
         "#next-step-title"
@@ -386,9 +396,7 @@ const hasPnlContext = (
 const updateWorkflowItem =
     (
         link: HTMLAnchorElement | null,
-        status:
-            | HTMLElement
-            | null,
+        status: HTMLElement | null,
         complete: boolean
     ): void => {
         if (!link) {
@@ -408,6 +416,84 @@ const updateWorkflowItem =
         );
     };
 
+const updateReviewItem =
+    (
+        link: HTMLAnchorElement | null,
+        status: HTMLElement | null,
+        recorded: boolean
+    ): void => {
+        if (!link) {
+            return;
+        }
+
+        link.classList.toggle(
+            "complete",
+            recorded
+        );
+
+        setText(
+            status,
+            recorded
+                ? "Recorded"
+                : "Open"
+        );
+    };
+
+const renderDecisionState = (
+    positionReady: boolean,
+    riskRewardReady: boolean,
+    planningReady: boolean
+): boolean => {
+    const decisionReady =
+        positionReady &&
+        riskRewardReady &&
+        planningReady;
+
+    if (decisionReady) {
+        setText(
+            decisionStatus,
+            "Ready for decision"
+        );
+
+        setText(
+            decisionDescription,
+            "Context, risk, and plan are complete. Decide whether the setup meets your criteria; no trade is executed here."
+        );
+
+        return true;
+    }
+
+    setText(
+        decisionStatus,
+        "Not ready"
+    );
+
+    if (!positionReady) {
+        setText(
+            decisionDescription,
+            "Complete Position Size first so the setup has defined entry risk and position size."
+        );
+
+        return false;
+    }
+
+    if (!riskRewardReady) {
+        setText(
+            decisionDescription,
+            "Complete Risk / Reward so the setup has a defined target alongside its entry and stop."
+        );
+
+        return false;
+    }
+
+    setText(
+        decisionDescription,
+        "Complete the written trade plan before treating the setup as ready for a decision."
+    );
+
+    return false;
+};
+
 const renderSetup = (
     setup: TradeSetup
 ): void => {
@@ -424,13 +510,11 @@ const renderSetup = (
     );
 
     const direction =
-        setup.direction ===
-        "short"
+        setup.direction === "short"
             ? "Short"
-            : setup.direction ===
-                "long"
-            ? "Long"
-            : "—";
+            : setup.direction === "long"
+                ? "Long"
+                : "—";
 
     setText(
         setupDirection,
@@ -444,14 +528,12 @@ const renderSetup = (
 
     setText(
         setupSymbol,
-        setup.symbol ||
-            "—"
+        setup.symbol || "—"
     );
 
     setText(
         setupTimeframe,
-        setup.timeframe ||
-            "—"
+        setup.timeframe || "—"
     );
 
     setText(
@@ -518,32 +600,27 @@ const renderSetup = (
 
     if (setupNotes) {
         setupNotes.value =
-            setup.notes ||
-            "";
+            setup.notes || "";
     }
 
     if (setupThesis) {
         setupThesis.value =
-            setup.planning.thesis ||
-            "";
+            setup.planning.thesis || "";
     }
 
     if (setupEntryPlan) {
         setupEntryPlan.value =
-            setup.planning.entryPlan ||
-            "";
+            setup.planning.entryPlan || "";
     }
 
     if (setupInvalidation) {
         setupInvalidation.value =
-            setup.planning.invalidation ||
-            "";
+            setup.planning.invalidation || "";
     }
 
     if (setupManagementPlan) {
         setupManagementPlan.value =
-            setup.planning.managementPlan ||
-            "";
+            setup.planning.managementPlan || "";
     }
 
     const positionReady =
@@ -584,7 +661,7 @@ const renderSetup = (
         planningReady
     );
 
-    updateWorkflowItem(
+    updateReviewItem(
         pnlLink,
         pnlStatus,
         pnlReady
@@ -619,6 +696,13 @@ const renderSetup = (
             );
     }
 
+    const decisionReady =
+        renderDecisionState(
+            positionReady,
+            riskRewardReady,
+            planningReady
+        );
+
     if (!positionReady) {
         setText(
             nextStepTitle,
@@ -628,6 +712,11 @@ const renderSetup = (
         setText(
             nextStepDescription,
             "Define the entry, stop, account risk, and position size for this setup."
+        );
+
+        setText(
+            nextStepLink,
+            "Open Position Size"
         );
 
         if (nextStepLink) {
@@ -652,6 +741,11 @@ const renderSetup = (
             "Add the target price and evaluate the setup's risk-to-reward relationship."
         );
 
+        setText(
+            nextStepLink,
+            "Open Risk / Reward"
+        );
+
         if (nextStepLink) {
             nextStepLink.href =
                 buildToolUrl(
@@ -674,6 +768,11 @@ const renderSetup = (
             "Define the thesis, entry conditions, invalidation, and management plan before treating the setup as planned."
         );
 
+        setText(
+            nextStepLink,
+            "Open Trade Plan"
+        );
+
         if (nextStepLink) {
             nextStepLink.href =
                 "#planning-panel";
@@ -682,41 +781,26 @@ const renderSetup = (
         return;
     }
 
-    if (!pnlReady) {
+    if (decisionReady) {
         setText(
             nextStepTitle,
-            "Review PnL"
+            "Ready for decision"
         );
 
         setText(
             nextStepDescription,
-            "Add the exit price and fees when you want to review the resulting outcome."
+            "The setup has defined risk, reward, and a written plan. Decide whether it meets your trading criteria."
+        );
+
+        setText(
+            nextStepLink,
+            "Review readiness"
         );
 
         if (nextStepLink) {
             nextStepLink.href =
-                buildToolUrl(
-                    "pnl-calculator.html",
-                    setup
-                );
+                "#decision-readiness";
         }
-
-        return;
-    }
-
-    setText(
-        nextStepTitle,
-        "Review the setup"
-    );
-
-    setText(
-        nextStepDescription,
-        "The main context, risk, plan, and outcome fields are complete. Reassess any stage as needed."
-    );
-
-    if (nextStepLink) {
-        nextStepLink.href =
-            "#planning-panel";
     }
 };
 

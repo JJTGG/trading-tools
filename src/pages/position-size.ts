@@ -5,9 +5,12 @@ import "./position-size.css";
 import { mountMarketStrip } from "../components/market-strip";
 import {
     buildTradeContextUrl,
-    readTradeContextFromUrl
+    readTradeContextFromUrl,
+    setTradeContextSetupIdInUrl
 } from "../data/trade-context";
-import { createTradeSetup } from "../data/trade-setups";
+import {
+    saveTradeSetup
+} from "../data/trade-setups";
 import { trackProductEvent } from "../data/product-events";
 
 interface MarketSelectionDetail {
@@ -172,8 +175,12 @@ const riskMapEntryLabel =
         "#risk-map-entry-label"
     );
 
+let currentSetupId:
+    string | undefined;
+
 let lastCalculation:
-    CalculationState | null = null;
+    CalculationState | null =
+    null;
 
 const formatNumber = (
     value: number
@@ -195,6 +202,18 @@ const setText = (
             value;
     }
 };
+
+const updateSaveButton =
+    (): void => {
+        if (!saveButton) {
+            return;
+        }
+
+        saveButton.textContent =
+            currentSetupId
+                ? "Update Setup"
+                : "Save Setup";
+    };
 
 const readNumberInput = (
     input: HTMLInputElement | null
@@ -277,7 +296,9 @@ const getValidationMessage = (
         stopLoss
     ].some(
         (value) =>
-            !Number.isFinite(value)
+            !Number.isFinite(
+                value
+            )
     );
 
     if (hasMissingValue) {
@@ -367,7 +388,8 @@ const clearResults = (
 const updateContextSummary = (
     inputs: PositionSizeInputs
 ): void => {
-    const parts: string[] = [];
+    const parts: string[] =
+        [];
 
     if (inputs.symbol) {
         parts.push(
@@ -376,7 +398,8 @@ const updateContextSummary = (
     }
 
     parts.push(
-        inputs.direction === "long"
+        inputs.direction ===
+            "long"
             ? "Long"
             : "Short"
     );
@@ -444,7 +467,9 @@ const updateRiskMap = (
 
     setText(
         riskDistanceLabel,
-        formatNumber(distance)
+        formatNumber(
+            distance
+        )
     );
 
     const isLong =
@@ -532,7 +557,7 @@ const calculate = (): void => {
         positionSize *
         inputs.entryPrice;
 
-    const result:
+    const calculationResult:
         PositionSizeResult = {
         riskAmount,
         riskPerUnit,
@@ -542,7 +567,8 @@ const calculate = (): void => {
 
     lastCalculation = {
         inputs,
-        result
+        result:
+            calculationResult
     };
 
     setText(
@@ -654,6 +680,11 @@ const applyContextFromUrl =
         const context =
             readTradeContextFromUrl();
 
+        currentSetupId =
+            context.setupId;
+
+        updateSaveButton();
+
         if (
             context.symbol &&
             symbolInput
@@ -684,8 +715,7 @@ const applyContextFromUrl =
             directionButtons.forEach(
                 (button) => {
                     const active =
-                        button.dataset
-                            .direction ===
+                        button.dataset.direction ===
                         context.direction;
 
                     button.classList.toggle(
@@ -814,7 +844,9 @@ const saveSetup =
 
         setText(
             saveMessage,
-            "Saving..."
+            currentSetupId
+                ? "Updating..."
+                : "Saving..."
         );
 
         try {
@@ -829,40 +861,56 @@ const saveSetup =
                     ? `${inputs.symbol} · Position Size`
                     : "Position Size setup";
 
-            await createTradeSetup({
-                title,
-                context: {
-                    symbol:
-                        inputs.symbol ||
-                        undefined,
+            const setup =
+                await saveTradeSetup({
+                    id:
+                        currentSetupId,
 
-                    timeframe:
-                        inputs.timeframe ||
-                        undefined,
+                    title,
 
-                    direction:
-                        inputs.direction,
+                    context: {
+                        symbol:
+                            inputs.symbol ||
+                            undefined,
 
-                    accountBalance:
-                        inputs.accountBalance,
+                        timeframe:
+                            inputs.timeframe ||
+                            undefined,
 
-                    riskPercent:
-                        inputs.riskPercent,
+                        direction:
+                            inputs.direction,
 
-                    entryPrice:
-                        inputs.entryPrice,
+                        accountBalance:
+                            inputs.accountBalance,
 
-                    stopLoss:
-                        inputs.stopLoss,
+                        riskPercent:
+                            inputs.riskPercent,
 
-                    positionSize:
-                        result.positionSize
-                }
-            });
+                        entryPrice:
+                            inputs.entryPrice,
+
+                        stopLoss:
+                            inputs.stopLoss,
+
+                        positionSize:
+                            result.positionSize
+                    }
+                });
+
+            currentSetupId =
+                setup.id;
+
+            setTradeContextSetupIdInUrl(
+                setup.id
+            );
+
+            updateSaveButton();
 
             setText(
                 saveMessage,
-                "Saved to Workspace."
+                currentSetupId
+                    ? "Setup saved to Workspace."
+                    : "Setup saved to Workspace."
             );
         } catch (error) {
             console.error(
@@ -903,6 +951,9 @@ const openRiskReward =
             buildTradeContextUrl(
                 "risk-reward.html",
                 {
+                    setupId:
+                        currentSetupId,
+
                     symbol,
                     timeframe,
                     direction,
@@ -918,40 +969,41 @@ const openWorkspace =
             "workspace.html";
     };
 
-const handleMarketSelection = (
-    event: Event
-): void => {
-    const customEvent =
-        event as CustomEvent<MarketSelectionDetail>;
+const handleMarketSelection =
+    (
+        event: Event
+    ): void => {
+        const customEvent =
+            event as CustomEvent<MarketSelectionDetail>;
 
-    const {
-        symbol,
-        price
-    } =
-        customEvent.detail;
-
-    if (symbolInput) {
-        symbolInput.value =
-            symbol;
-    }
-
-    setText(
-        marketReference,
-        `Live ${formatNumber(
+        const {
+            symbol,
             price
-        )}`
-    );
+        } =
+            customEvent.detail;
 
-    if (
-        entryPriceInput &&
-        !entryPriceInput.value
-    ) {
-        entryPriceInput.value =
-            String(price);
-    }
+        if (symbolInput) {
+            symbolInput.value =
+                symbol;
+        }
 
-    calculate();
-};
+        setText(
+            marketReference,
+            `Live ${formatNumber(
+                price
+            )}`
+        );
+
+        if (
+            entryPriceInput &&
+            !entryPriceInput.value
+        ) {
+            entryPriceInput.value =
+                String(price);
+        }
+
+        calculate();
+    };
 
 directionButtons.forEach(
     (button) => {
@@ -959,7 +1011,8 @@ directionButtons.forEach(
             "click",
             () => {
                 const direction =
-                    button.dataset.direction;
+                    button.dataset
+                        .direction;
 
                 if (
                     direction ===
@@ -1030,6 +1083,7 @@ document
         "submit",
         (event) => {
             event.preventDefault();
+
             trackCompletedCalculation();
         }
     );

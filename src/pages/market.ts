@@ -6,6 +6,9 @@ import {
     getMarketQuote,
     type MarketQuote
 } from "../data/market-data";
+import {
+    buildTradeContextUrl
+} from "../data/trade-context";
 
 interface MarketInstrument {
     symbol: string;
@@ -985,31 +988,38 @@ const renderDetail =
                 ? "long"
                 : "short";
 
+        const tradeContext = {
+            symbol: detail.symbol,
+            direction,
+            entryPrice: detail.price
+        };
+
         if (positionSizeLink) {
             positionSizeLink.href =
-                `position-size.html?symbol=${encodeURIComponent(
-                    detail.symbol
-                )}&entryPrice=${encodeURIComponent(
-                    detail.price
-                )}&direction=${direction}`;
+                buildTradeContextUrl(
+                    "position-size.html",
+                    tradeContext
+                );
         }
 
         if (riskRewardLink) {
             riskRewardLink.href =
-                `risk-reward.html?symbol=${encodeURIComponent(
-                    detail.symbol
-                )}&entryPrice=${encodeURIComponent(
-                    detail.price
-                )}&direction=${direction}`;
+                buildTradeContextUrl(
+                    "risk-reward.html",
+                    tradeContext
+                );
         }
 
         if (pnlLink) {
             pnlLink.href =
-                `pnl-calculator.html?symbol=${encodeURIComponent(
-                    detail.symbol
-                )}&exitPrice=${encodeURIComponent(
-                    detail.price
-                )}&direction=${direction}`;
+                buildTradeContextUrl(
+                    "pnl-calculator.html",
+                    {
+                        ...tradeContext,
+                        exitPrice:
+                            detail.price
+                    }
+                );
         }
     };
 

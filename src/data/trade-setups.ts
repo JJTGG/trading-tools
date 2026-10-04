@@ -37,6 +37,13 @@ export interface UpdateTradeSetupInput {
     notes?: string | null;
 }
 
+export interface SaveTradeSetupInput {
+    id?: string;
+    title?: string;
+    context?: TradeContext;
+    notes?: string | null;
+}
+
 interface TradeSetupRow {
     id: string;
     user_id: string;
@@ -44,21 +51,48 @@ interface TradeSetupRow {
     symbol: string | null;
     timeframe: string | null;
     direction: TradeDirection | null;
-    entry_price: string | number | null;
-    stop_loss: string | number | null;
-    target_price: string | number | null;
-    account_balance: string | number | null;
-    risk_percent: string | number | null;
-    position_size: string | number | null;
-    exit_price: string | number | null;
-    fees: string | number | null;
+    entry_price:
+        | string
+        | number
+        | null;
+    stop_loss:
+        | string
+        | number
+        | null;
+    target_price:
+        | string
+        | number
+        | null;
+    account_balance:
+        | string
+        | number
+        | null;
+    risk_percent:
+        | string
+        | number
+        | null;
+    position_size:
+        | string
+        | number
+        | null;
+    exit_price:
+        | string
+        | number
+        | null;
+    fees:
+        | string
+        | number
+        | null;
     notes: string | null;
     created_at: string;
     updated_at: string;
 }
 
 const toNullableNumber = (
-    value: string | number | null
+    value:
+        | string
+        | number
+        | null
 ): number | null => {
     if (value === null) {
         return null;
@@ -69,7 +103,9 @@ const toNullableNumber = (
             ? value
             : Number(value);
 
-    return Number.isFinite(parsed)
+    return Number.isFinite(
+        parsed
+    )
         ? parsed
         : null;
 };
@@ -84,45 +120,54 @@ const mapTradeSetup = (
         symbol: row.symbol,
         timeframe: row.timeframe,
         direction: row.direction,
+
         entryPrice:
             toNullableNumber(
                 row.entry_price
             ),
+
         stopLoss:
             toNullableNumber(
                 row.stop_loss
             ),
+
         targetPrice:
             toNullableNumber(
                 row.target_price
             ),
+
         accountBalance:
             toNullableNumber(
                 row.account_balance
             ),
+
         riskPercent:
             toNullableNumber(
                 row.risk_percent
             ),
+
         positionSize:
             toNullableNumber(
                 row.position_size
             ),
+
         exitPrice:
             toNullableNumber(
                 row.exit_price
             ),
+
         fees:
             toNullableNumber(
                 row.fees
             ),
+
         notes: row.notes,
         createdAt: row.created_at,
         updatedAt: row.updated_at
     };
 };
 
-const contextToRow = (
+const contextToInsertRow = (
     context: TradeContext = {}
 ): Record<string, unknown> => {
     return {
@@ -170,6 +215,103 @@ const contextToRow = (
             context.fees ??
             null
     };
+};
+
+const contextToUpdateRow = (
+    context: TradeContext
+): Record<string, unknown> => {
+    const updates:
+        Record<string, unknown> = {};
+
+    if (
+        context.symbol !==
+        undefined
+    ) {
+        updates.symbol =
+            context.symbol;
+    }
+
+    if (
+        context.timeframe !==
+        undefined
+    ) {
+        updates.timeframe =
+            context.timeframe;
+    }
+
+    if (
+        context.direction !==
+        undefined
+    ) {
+        updates.direction =
+            context.direction;
+    }
+
+    if (
+        context.entryPrice !==
+        undefined
+    ) {
+        updates.entry_price =
+            context.entryPrice;
+    }
+
+    if (
+        context.stopLoss !==
+        undefined
+    ) {
+        updates.stop_loss =
+            context.stopLoss;
+    }
+
+    if (
+        context.targetPrice !==
+        undefined
+    ) {
+        updates.target_price =
+            context.targetPrice;
+    }
+
+    if (
+        context.accountBalance !==
+        undefined
+    ) {
+        updates.account_balance =
+            context.accountBalance;
+    }
+
+    if (
+        context.riskPercent !==
+        undefined
+    ) {
+        updates.risk_percent =
+            context.riskPercent;
+    }
+
+    if (
+        context.positionSize !==
+        undefined
+    ) {
+        updates.position_size =
+            context.positionSize;
+    }
+
+    if (
+        context.exitPrice !==
+        undefined
+    ) {
+        updates.exit_price =
+            context.exitPrice;
+    }
+
+    if (
+        context.fees !==
+        undefined
+    ) {
+        updates.fees =
+            context.fees;
+    }
+
+    return updates;
 };
 
 const selectColumns = [
@@ -222,15 +364,21 @@ export const createTradeSetup =
             error
         } =
             await client
-                .from("trade_setups")
+                .from(
+                    "trade_setups"
+                )
                 .insert({
-                    user_id: user.id,
+                    user_id:
+                        user.id,
+
                     title:
                         input.title?.trim() ||
                         "Untitled setup",
-                    ...contextToRow(
+
+                    ...contextToInsertRow(
                         input.context
                     ),
+
                     notes:
                         input.notes?.trim() ||
                         null
@@ -264,7 +412,9 @@ export const getTradeSetups =
 
         let query =
             client
-                .from("trade_setups")
+                .from(
+                    "trade_setups"
+                )
                 .select(
                     selectColumns
                 )
@@ -279,12 +429,16 @@ export const getTradeSetups =
         if (
             typeof limit ===
                 "number" &&
-            Number.isFinite(limit) &&
+            Number.isFinite(
+                limit
+            ) &&
             limit > 0
         ) {
             query =
                 query.limit(
-                    Math.floor(limit)
+                    Math.floor(
+                        limit
+                    )
                 );
         }
 
@@ -299,7 +453,8 @@ export const getTradeSetups =
         }
 
         return (
-            (data || []) as TradeSetupRow[]
+            (data ||
+                []) as TradeSetupRow[]
         ).map(
             mapTradeSetup
         );
@@ -308,7 +463,9 @@ export const getTradeSetups =
 export const getTradeSetup =
     async (
         id: string
-    ): Promise<TradeSetup | null> => {
+    ): Promise<
+        TradeSetup | null
+    > => {
         const client =
             getClient();
 
@@ -317,7 +474,9 @@ export const getTradeSetup =
             error
         } =
             await client
-                .from("trade_setups")
+                .from(
+                    "trade_setups"
+                )
                 .select(
                     selectColumns
                 )
@@ -348,10 +507,8 @@ export const updateTradeSetup =
         const client =
             getClient();
 
-        const updates: Record<
-            string,
-            unknown
-        > = {};
+        const updates:
+            Record<string, unknown> = {};
 
         if (
             input.title !==
@@ -368,7 +525,7 @@ export const updateTradeSetup =
         ) {
             Object.assign(
                 updates,
-                contextToRow(
+                contextToUpdateRow(
                     input.context
                 )
             );
@@ -391,8 +548,12 @@ export const updateTradeSetup =
             error
         } =
             await client
-                .from("trade_setups")
-                .update(updates)
+                .from(
+                    "trade_setups"
+                )
+                .update(
+                    updates
+                )
                 .eq(
                     "id",
                     id
@@ -417,6 +578,36 @@ export const updateTradeSetup =
         );
     };
 
+export const saveTradeSetup =
+    async (
+        input: SaveTradeSetupInput
+    ): Promise<TradeSetup> => {
+        if (input.id) {
+            return updateTradeSetup(
+                input.id,
+                {
+                    title:
+                        input.title,
+                    context:
+                        input.context,
+                    notes:
+                        input.notes
+                }
+            );
+        }
+
+        return createTradeSetup({
+            title:
+                input.title,
+
+            context:
+                input.context,
+
+            notes:
+                input.notes ?? undefined
+        });
+    };
+
 export const deleteTradeSetup =
     async (
         id: string
@@ -428,7 +619,9 @@ export const deleteTradeSetup =
             error
         } =
             await client
-                .from("trade_setups")
+                .from(
+                    "trade_setups"
+                )
                 .delete()
                 .eq(
                     "id",

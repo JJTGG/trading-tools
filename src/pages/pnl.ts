@@ -8,7 +8,6 @@ import {
     setTradeContextSetupIdInUrl
 } from "../data/trade-context";
 import {
-    createTradeSetup,
     saveTradeSetup
 } from "../data/trade-setups";
 import { supabaseClient } from "../data/supabase";

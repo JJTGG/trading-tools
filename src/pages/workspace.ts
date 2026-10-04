@@ -735,67 +735,15 @@ const getCalculationContinueUrl = (
     return null;
 };
 
-const getTradeSetupContext = (
-    setup: TradeSetup
-): TradeContext => {
-    return {
-        setupId:
-            setup.id,
-
-        symbol:
-            setup.symbol ||
-            undefined,
-
-        timeframe:
-            setup.timeframe ||
-            undefined,
-
-        direction:
-            setup.direction ||
-            undefined,
-
-        entryPrice:
-            setup.entryPrice ??
-            undefined,
-
-        stopLoss:
-            setup.stopLoss ??
-            undefined,
-
-        targetPrice:
-            setup.targetPrice ??
-            undefined,
-
-        accountBalance:
-            setup.accountBalance ??
-            undefined,
-
-        riskPercent:
-            setup.riskPercent ??
-            undefined,
-
-        positionSize:
-            setup.positionSize ??
-            undefined,
-
-        exitPrice:
-            setup.exitPrice ??
-            undefined,
-
-        fees:
-            setup.fees ??
-            undefined
-    };
-};
-
 const getTradeSetupContinueUrl = (
     setup: TradeSetup
 ): string => {
     return buildTradeContextUrl(
-        "position-size.html",
-        getTradeSetupContext(
-            setup
-        )
+        "trade-setup.html",
+        {
+            setupId:
+                setup.id
+        }
     );
 };
 
@@ -1002,7 +950,11 @@ const renderTradeSetups = (
                 );
 
             continueLink.textContent =
-                "Continue";
+                "Open";
+
+            actions.append(
+                continueLink
+            );
 
             const deleteButton =
                 createElement(
@@ -1026,7 +978,6 @@ const renderTradeSetups = (
             );
 
             actions.append(
-                continueLink,
                 deleteButton
             );
 
@@ -1043,7 +994,8 @@ const renderTradeSetups = (
 };
 
 const renderSavedCalculations = (
-    calculations: SavedCalculation[]
+    calculations:
+        SavedCalculation[]
 ): void => {
     if (!savedCalculations) {
         return;

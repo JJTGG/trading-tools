@@ -7,32 +7,8 @@ import {
     buildTradeContextUrl,
     readTradeContextFromUrl
 } from "../data/trade-context";
+import { createTradeSetup } from "../data/trade-setups";
 import { trackProductEvent } from "../data/product-events";
-
-interface SupabaseError {
-    message: string;
-}
-
-interface SupabaseUser {
-    id: string;
-    email?: string;
-}
-
-interface SupabaseClientLike {
-    auth: {
-        getUser(): Promise<{
-            data: {
-                user: SupabaseUser | null;
-            };
-            error: SupabaseError | null;
-        }>;
-    };
-    from(table: string): {
-        insert(values: Record<string, unknown>): Promise<{
-            error: SupabaseError | null;
-        }>;
-    };
-}
 
 interface MarketSelectionDetail {
     symbol: string;
@@ -60,8 +36,6 @@ interface CalculationState {
     inputs: PositionSizeInputs;
     result: PositionSizeResult;
 }
-
-declare const supabaseClient: SupabaseClientLike;
 
 const symbolInput =
     document.querySelector<HTMLInputElement>(
@@ -198,15 +172,18 @@ const riskMapEntryLabel =
         "#risk-map-entry-label"
     );
 
-let lastCalculation: CalculationState | null =
-    null;
+let lastCalculation:
+    CalculationState | null = null;
 
 const formatNumber = (
     value: number
 ): string => {
-    return new Intl.NumberFormat(undefined, {
-        maximumFractionDigits: 8
-    }).format(value);
+    return new Intl.NumberFormat(
+        undefined,
+        {
+            maximumFractionDigits: 8
+        }
+    ).format(value);
 };
 
 const setText = (
@@ -214,7 +191,8 @@ const setText = (
     value: string
 ): void => {
     if (element) {
-        element.textContent = value;
+        element.textContent =
+            value;
     }
 };
 
@@ -240,42 +218,46 @@ const readNumberInput = (
         : Number.NaN;
 };
 
-const getInputs = (): PositionSizeInputs => {
-    return {
-        symbol:
-            symbolInput?.value
-                .trim()
-                .toUpperCase() || "",
+const getInputs =
+    (): PositionSizeInputs => {
+        return {
+            symbol:
+                symbolInput?.value
+                    .trim()
+                    .toUpperCase() ||
+                "",
 
-        timeframe:
-            timeframeInput?.value || "1H",
+            timeframe:
+                timeframeInput?.value ||
+                "1H",
 
-        direction:
-            directionInput?.value === "short"
-                ? "short"
-                : "long",
+            direction:
+                directionInput?.value ===
+                "short"
+                    ? "short"
+                    : "long",
 
-        accountBalance:
-            readNumberInput(
-                accountBalanceInput
-            ),
+            accountBalance:
+                readNumberInput(
+                    accountBalanceInput
+                ),
 
-        riskPercent:
-            readNumberInput(
-                riskPercentInput
-            ),
+            riskPercent:
+                readNumberInput(
+                    riskPercentInput
+                ),
 
-        entryPrice:
-            readNumberInput(
-                entryPriceInput
-            ),
+            entryPrice:
+                readNumberInput(
+                    entryPriceInput
+                ),
 
-        stopLoss:
-            readNumberInput(
-                stopLossInput
-            )
+            stopLoss:
+                readNumberInput(
+                    stopLossInput
+                )
+        };
     };
-};
 
 const getValidationMessage = (
     inputs: PositionSizeInputs
@@ -335,7 +317,8 @@ const getValidationMessage = (
 };
 
 const clearResults = (
-    message = "Enter account, risk, entry, and stop."
+    message =
+        "Enter account, risk, entry, and stop."
 ): void => {
     setText(
         positionSizeResult,
@@ -369,11 +352,13 @@ const clearResults = (
 
     positionSizeState?.classList.toggle(
         "invalid",
-        message !== "Enter account, risk, entry, and stop."
+        message !==
+            "Enter account, risk, entry, and stop."
     );
 
     if (saveButton) {
-        saveButton.disabled = true;
+        saveButton.disabled =
+            true;
     }
 
     lastCalculation = null;
@@ -385,7 +370,9 @@ const updateContextSummary = (
     const parts: string[] = [];
 
     if (inputs.symbol) {
-        parts.push(inputs.symbol);
+        parts.push(
+            inputs.symbol
+        );
     }
 
     parts.push(
@@ -394,7 +381,11 @@ const updateContextSummary = (
             : "Short"
     );
 
-    if (Number.isFinite(inputs.entryPrice)) {
+    if (
+        Number.isFinite(
+            inputs.entryPrice
+        )
+    ) {
         parts.push(
             `Entry ${formatNumber(
                 inputs.entryPrice
@@ -402,7 +393,11 @@ const updateContextSummary = (
         );
     }
 
-    if (Number.isFinite(inputs.stopLoss)) {
+    if (
+        Number.isFinite(
+            inputs.stopLoss
+        )
+    ) {
         parts.push(
             `Stop ${formatNumber(
                 inputs.stopLoss
@@ -422,8 +417,12 @@ const updateRiskMap = (
     inputs: PositionSizeInputs
 ): void => {
     if (
-        !Number.isFinite(inputs.entryPrice) ||
-        !Number.isFinite(inputs.stopLoss)
+        !Number.isFinite(
+            inputs.entryPrice
+        ) ||
+        !Number.isFinite(
+            inputs.stopLoss
+        )
     ) {
         return;
     }
@@ -440,7 +439,7 @@ const updateRiskMap = (
     const distance =
         Math.abs(
             inputs.entryPrice -
-            inputs.stopLoss
+                inputs.stopLoss
         );
 
     setText(
@@ -483,21 +482,34 @@ const updateRiskMap = (
 };
 
 const calculate = (): void => {
-    const inputs = getInputs();
+    const inputs =
+        getInputs();
 
-    updateContextSummary(inputs);
-    updateRiskMap(inputs);
+    updateContextSummary(
+        inputs
+    );
+
+    updateRiskMap(
+        inputs
+    );
 
     const validationMessage =
-        getValidationMessage(inputs);
+        getValidationMessage(
+            inputs
+        );
 
     if (validationMessage) {
         clearResults(
             validationMessage
         );
 
-        updateContextSummary(inputs);
-        updateRiskMap(inputs);
+        updateContextSummary(
+            inputs
+        );
+
+        updateRiskMap(
+            inputs
+        );
 
         return;
     }
@@ -509,7 +521,7 @@ const calculate = (): void => {
     const riskPerUnit =
         Math.abs(
             inputs.entryPrice -
-            inputs.stopLoss
+                inputs.stopLoss
         );
 
     const positionSize =
@@ -520,7 +532,8 @@ const calculate = (): void => {
         positionSize *
         inputs.entryPrice;
 
-    const result: PositionSizeResult = {
+    const result:
+        PositionSizeResult = {
         riskAmount,
         riskPerUnit,
         positionSize,
@@ -567,7 +580,14 @@ const calculate = (): void => {
 
     setText(
         positionSizeState,
-        `${inputs.direction === "long" ? "Long" : "Short"} · ${inputs.riskPercent}% account risk`
+        `${
+            inputs.direction ===
+            "long"
+                ? "Long"
+                : "Short"
+        } · ${
+            inputs.riskPercent
+        }% account risk`
     );
 
     positionSizeState?.classList.remove(
@@ -575,28 +595,33 @@ const calculate = (): void => {
     );
 
     if (saveButton) {
-        saveButton.disabled = false;
+        saveButton.disabled =
+            false;
     }
 };
 
-const trackCompletedCalculation = (): void => {
-    calculate();
+const trackCompletedCalculation =
+    (): void => {
+        calculate();
 
-    if (!lastCalculation) {
-        return;
-    }
-
-    void trackProductEvent(
-        "calculation_completed",
-        "position-size",
-        {
-            tool: "position-size"
+        if (!lastCalculation) {
+            return;
         }
-    );
-};
+
+        void trackProductEvent(
+            "calculation_completed",
+            "position-size",
+            {
+                tool:
+                    "position-size"
+            }
+        );
+    };
 
 const setDirection = (
-    direction: "long" | "short"
+    direction:
+        | "long"
+        | "short"
 ): void => {
     if (directionInput) {
         directionInput.value =
@@ -624,120 +649,134 @@ const setDirection = (
     calculate();
 };
 
-const applyContextFromUrl = (): void => {
-    const context =
-        readTradeContextFromUrl();
+const applyContextFromUrl =
+    (): void => {
+        const context =
+            readTradeContextFromUrl();
 
-    if (
-        context.symbol &&
-        symbolInput
-    ) {
-        symbolInput.value =
-            context.symbol;
-    }
-
-    if (
-        context.timeframe &&
-        timeframeInput
-    ) {
-        timeframeInput.value =
-            context.timeframe;
-    }
-
-    if (
-        context.direction === "long" ||
-        context.direction === "short"
-    ) {
-        if (directionInput) {
-            directionInput.value =
-                context.direction;
+        if (
+            context.symbol &&
+            symbolInput
+        ) {
+            symbolInput.value =
+                context.symbol;
         }
 
-        directionButtons.forEach(
-            (button) => {
-                const active =
-                    button.dataset.direction ===
+        if (
+            context.timeframe &&
+            timeframeInput
+        ) {
+            timeframeInput.value =
+                context.timeframe;
+        }
+
+        if (
+            context.direction ===
+                "long" ||
+            context.direction ===
+                "short"
+        ) {
+            if (directionInput) {
+                directionInput.value =
                     context.direction;
-
-                button.classList.toggle(
-                    "active",
-                    active
-                );
-
-                button.setAttribute(
-                    "aria-pressed",
-                    String(active)
-                );
             }
-        );
-    }
 
-    if (
-        context.accountBalance !== undefined &&
-        accountBalanceInput
-    ) {
-        accountBalanceInput.value =
-            String(
-                context.accountBalance
+            directionButtons.forEach(
+                (button) => {
+                    const active =
+                        button.dataset
+                            .direction ===
+                        context.direction;
+
+                    button.classList.toggle(
+                        "active",
+                        active
+                    );
+
+                    button.setAttribute(
+                        "aria-pressed",
+                        String(active)
+                    );
+                }
             );
-    }
+        }
 
-    if (
-        context.riskPercent !== undefined &&
-        riskPercentInput
-    ) {
-        riskPercentInput.value =
-            String(
-                context.riskPercent
-            );
-    }
+        if (
+            context.accountBalance !==
+                undefined &&
+            accountBalanceInput
+        ) {
+            accountBalanceInput.value =
+                String(
+                    context.accountBalance
+                );
+        }
 
-    if (
-        context.entryPrice !== undefined &&
-        entryPriceInput
-    ) {
-        entryPriceInput.value =
-            String(
-                context.entryPrice
-            );
-    }
+        if (
+            context.riskPercent !==
+                undefined &&
+            riskPercentInput
+        ) {
+            riskPercentInput.value =
+                String(
+                    context.riskPercent
+                );
+        }
 
-    if (
-        context.stopLoss !== undefined &&
-        stopLossInput
-    ) {
-        stopLossInput.value =
-            String(
-                context.stopLoss
-            );
-    }
+        if (
+            context.entryPrice !==
+                undefined &&
+            entryPriceInput
+        ) {
+            entryPriceInput.value =
+                String(
+                    context.entryPrice
+                );
+        }
 
-    calculate();
-};
+        if (
+            context.stopLoss !==
+                undefined &&
+            stopLossInput
+        ) {
+            stopLossInput.value =
+                String(
+                    context.stopLoss
+                );
+        }
+
+        calculate();
+    };
 
 const reset = (): void => {
     if (symbolInput) {
-        symbolInput.value = "";
+        symbolInput.value =
+            "";
     }
 
     if (timeframeInput) {
-        timeframeInput.value = "1H";
+        timeframeInput.value =
+            "1H";
     }
 
     if (accountBalanceInput) {
-        accountBalanceInput.value = "";
+        accountBalanceInput.value =
+            "";
     }
 
     if (riskPercentInput) {
-        riskPercentInput.value = "";
+        riskPercentInput.value =
+            "";
     }
 
     if (entryPriceInput) {
-        entryPriceInput.value = "";
+        entryPriceInput.value =
+            "";
     }
 
     if (stopLossInput) {
-        stopLossInput.value = "";
+        stopLossInput.value =
+            "";
     }
 
     setText(
@@ -745,7 +784,9 @@ const reset = (): void => {
         "Market —"
     );
 
-    setDirection("long");
+    setDirection(
+        "long"
+    );
 
     setText(
         saveMessage,
@@ -759,117 +800,123 @@ const reset = (): void => {
     );
 };
 
-const saveSetup = async (): Promise<void> => {
-    if (
-        !lastCalculation ||
-        !saveButton
-    ) {
-        return;
-    }
-
-    saveButton.disabled = true;
-
-    setText(
-        saveMessage,
-        "Saving..."
-    );
-
-    try {
-        const {
-            data: { user },
-            error: userError
-        } =
-            await supabaseClient.auth.getUser();
-
+const saveSetup =
+    async (): Promise<void> => {
         if (
-            userError ||
-            !user
+            !lastCalculation ||
+            !saveButton
         ) {
+            return;
+        }
+
+        saveButton.disabled =
+            true;
+
+        setText(
+            saveMessage,
+            "Saving..."
+        );
+
+        try {
+            const {
+                inputs,
+                result
+            } =
+                lastCalculation;
+
+            const title =
+                inputs.symbol
+                    ? `${inputs.symbol} · Position Size`
+                    : "Position Size setup";
+
+            await createTradeSetup({
+                title,
+                context: {
+                    symbol:
+                        inputs.symbol ||
+                        undefined,
+
+                    timeframe:
+                        inputs.timeframe ||
+                        undefined,
+
+                    direction:
+                        inputs.direction,
+
+                    accountBalance:
+                        inputs.accountBalance,
+
+                    riskPercent:
+                        inputs.riskPercent,
+
+                    entryPrice:
+                        inputs.entryPrice,
+
+                    stopLoss:
+                        inputs.stopLoss,
+
+                    positionSize:
+                        result.positionSize
+                }
+            });
+
             setText(
                 saveMessage,
-                "Sign in to save this setup."
+                "Saved to Workspace."
+            );
+        } catch (error) {
+            console.error(
+                "Save position size setup error:",
+                error
+            );
+
+            setText(
+                saveMessage,
+                "Unable to save setup."
             );
 
             saveButton.disabled =
                 false;
+        }
+    };
 
+const openRiskReward =
+    (): void => {
+        if (!lastCalculation) {
+            calculate();
+        }
+
+        if (!lastCalculation) {
             return;
         }
 
-        const { error } =
-            await supabaseClient
-                .from(
-                    "saved_calculations"
-                )
-                .insert({
-                    user_id: user.id,
-                    tool: "position-size",
-                    inputs:
-                        lastCalculation.inputs,
-                    result:
-                        lastCalculation.result
-                });
+        const {
+            symbol,
+            timeframe,
+            direction,
+            entryPrice,
+            stopLoss
+        } =
+            lastCalculation.inputs;
 
-        if (error) {
-            throw new Error(
-                error.message
+        window.location.href =
+            buildTradeContextUrl(
+                "risk-reward.html",
+                {
+                    symbol,
+                    timeframe,
+                    direction,
+                    entryPrice,
+                    stopLoss
+                }
             );
-        }
+    };
 
-        setText(
-            saveMessage,
-            "Saved to Workspace."
-        );
-    } catch (error) {
-        console.error(
-            "Save position size error:",
-            error
-        );
-
-        setText(
-            saveMessage,
-            "Unable to save setup."
-        );
-
-        saveButton.disabled =
-            false;
-    }
-};
-
-const openRiskReward = (): void => {
-    if (!lastCalculation) {
-        calculate();
-    }
-
-    if (!lastCalculation) {
-        return;
-    }
-
-    const {
-        symbol,
-        timeframe,
-        direction,
-        entryPrice,
-        stopLoss
-    } = lastCalculation.inputs;
-
-    window.location.href =
-        buildTradeContextUrl(
-            "risk-reward.html",
-            {
-                symbol,
-                timeframe,
-                direction,
-                entryPrice,
-                stopLoss
-            }
-        );
-};
-
-const openWorkspace = (): void => {
-    window.location.href =
-        "workspace.html";
-};
+const openWorkspace =
+    (): void => {
+        window.location.href =
+            "workspace.html";
+    };
 
 const handleMarketSelection = (
     event: Event
@@ -880,7 +927,8 @@ const handleMarketSelection = (
     const {
         symbol,
         price
-    } = customEvent.detail;
+    } =
+        customEvent.detail;
 
     if (symbolInput) {
         symbolInput.value =
@@ -889,7 +937,9 @@ const handleMarketSelection = (
 
     setText(
         marketReference,
-        `Live ${formatNumber(price)}`
+        `Live ${formatNumber(
+            price
+        )}`
     );
 
     if (
@@ -912,8 +962,10 @@ directionButtons.forEach(
                     button.dataset.direction;
 
                 if (
-                    direction === "long" ||
-                    direction === "short"
+                    direction ===
+                        "long" ||
+                    direction ===
+                        "short"
                 ) {
                     setDirection(
                         direction
@@ -995,6 +1047,7 @@ void trackProductEvent(
     "tool_opened",
     "position-size",
     {
-        tool: "position-size"
+        tool:
+            "position-size"
     }
 );

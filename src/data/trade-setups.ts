@@ -5,6 +5,13 @@ import type {
     TradeDirection
 } from "./trade-context";
 
+export interface TradePlanning {
+    thesis: string | null;
+    entryPlan: string | null;
+    invalidation: string | null;
+    managementPlan: string | null;
+}
+
 export interface TradeSetup {
     id: string;
     userId: string;
@@ -20,20 +27,30 @@ export interface TradeSetup {
     positionSize: number | null;
     exitPrice: number | null;
     fees: number | null;
+    planning: TradePlanning;
     notes: string | null;
     createdAt: string;
     updatedAt: string;
 }
 
+export interface TradePlanningInput {
+    thesis?: string | null;
+    entryPlan?: string | null;
+    invalidation?: string | null;
+    managementPlan?: string | null;
+}
+
 export interface CreateTradeSetupInput {
     title?: string;
     context?: TradeContext;
+    planning?: TradePlanningInput;
     notes?: string;
 }
 
 export interface UpdateTradeSetupInput {
     title?: string;
     context?: TradeContext;
+    planning?: TradePlanningInput;
     notes?: string | null;
 }
 
@@ -41,6 +58,7 @@ export interface SaveTradeSetupInput {
     id?: string;
     title?: string;
     context?: TradeContext;
+    planning?: TradePlanningInput;
     notes?: string | null;
 }
 
@@ -83,6 +101,10 @@ interface TradeSetupRow {
         | string
         | number
         | null;
+    thesis: string | null;
+    entry_plan: string | null;
+    invalidation: string | null;
+    management_plan: string | null;
     notes: string | null;
     created_at: string;
     updated_at: string;
@@ -108,6 +130,22 @@ const toNullableNumber = (
     )
         ? parsed
         : null;
+};
+
+const toNullableText = (
+    value:
+        | string
+        | null
+        | undefined
+): string | null => {
+    if (value === null || value === undefined) {
+        return null;
+    }
+
+    const trimmed =
+        value.trim();
+
+    return trimmed || null;
 };
 
 const mapTradeSetup = (
@@ -160,6 +198,20 @@ const mapTradeSetup = (
             toNullableNumber(
                 row.fees
             ),
+
+        planning: {
+            thesis:
+                row.thesis,
+
+            entryPlan:
+                row.entry_plan,
+
+            invalidation:
+                row.invalidation,
+
+            managementPlan:
+                row.management_plan
+        },
 
         notes: row.notes,
         createdAt: row.created_at,
@@ -314,6 +366,81 @@ const contextToUpdateRow = (
     return updates;
 };
 
+const planningToInsertRow = (
+    planning: TradePlanningInput = {}
+): Record<string, unknown> => {
+    return {
+        thesis:
+            toNullableText(
+                planning.thesis
+            ),
+
+        entry_plan:
+            toNullableText(
+                planning.entryPlan
+            ),
+
+        invalidation:
+            toNullableText(
+                planning.invalidation
+            ),
+
+        management_plan:
+            toNullableText(
+                planning.managementPlan
+            )
+    };
+};
+
+const planningToUpdateRow = (
+    planning: TradePlanningInput
+): Record<string, unknown> => {
+    const updates:
+        Record<string, unknown> = {};
+
+    if (
+        planning.thesis !==
+        undefined
+    ) {
+        updates.thesis =
+            toNullableText(
+                planning.thesis
+            );
+    }
+
+    if (
+        planning.entryPlan !==
+        undefined
+    ) {
+        updates.entry_plan =
+            toNullableText(
+                planning.entryPlan
+            );
+    }
+
+    if (
+        planning.invalidation !==
+        undefined
+    ) {
+        updates.invalidation =
+            toNullableText(
+                planning.invalidation
+            );
+    }
+
+    if (
+        planning.managementPlan !==
+        undefined
+    ) {
+        updates.management_plan =
+            toNullableText(
+                planning.managementPlan
+            );
+    }
+
+    return updates;
+};
+
 const selectColumns = [
     "id",
     "user_id",
@@ -329,6 +456,10 @@ const selectColumns = [
     "position_size",
     "exit_price",
     "fees",
+    "thesis",
+    "entry_plan",
+    "invalidation",
+    "management_plan",
     "notes",
     "created_at",
     "updated_at"
@@ -377,6 +508,10 @@ export const createTradeSetup =
 
                     ...contextToInsertRow(
                         input.context
+                    ),
+
+                    ...planningToInsertRow(
+                        input.planning
                     ),
 
                     notes:
@@ -532,6 +667,18 @@ export const updateTradeSetup =
         }
 
         if (
+            input.planning !==
+            undefined
+        ) {
+            Object.assign(
+                updates,
+                planningToUpdateRow(
+                    input.planning
+                )
+            );
+        }
+
+        if (
             input.notes !==
             undefined
         ) {
@@ -588,8 +735,13 @@ export const saveTradeSetup =
                 {
                     title:
                         input.title,
+
                     context:
                         input.context,
+
+                    planning:
+                        input.planning,
+
                     notes:
                         input.notes
                 }
@@ -602,6 +754,9 @@ export const saveTradeSetup =
 
             context:
                 input.context,
+
+            planning:
+                input.planning,
 
             notes:
                 input.notes ?? undefined

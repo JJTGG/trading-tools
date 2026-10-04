@@ -3,6 +3,10 @@ import "../styles/base.css";
 import "./position-size.css";
 
 import { mountMarketStrip } from "../components/market-strip";
+import {
+    buildTradeContextUrl,
+    readTradeContextFromUrl
+} from "../data/trade-context";
 
 interface SupabaseError {
     message: string;
@@ -604,59 +608,39 @@ const setDirection = (
 };
 
 const applyContextFromUrl = (): void => {
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+    const context =
+        readTradeContextFromUrl();
 
-    const symbol =
-        params.get("symbol");
-
-    const timeframe =
-        params.get("timeframe");
-
-    const direction =
-        params.get("direction");
-
-    const accountBalance =
-        params.get("accountBalance");
-
-    const riskPercent =
-        params.get("riskPercent");
-
-    const entryPrice =
-        params.get("entryPrice");
-
-    const stopLoss =
-        params.get("stopLoss");
-
-    if (symbol && symbolInput) {
+    if (
+        context.symbol &&
+        symbolInput
+    ) {
         symbolInput.value =
-            symbol;
+            context.symbol;
     }
 
     if (
-        timeframe &&
+        context.timeframe &&
         timeframeInput
     ) {
         timeframeInput.value =
-            timeframe;
+            context.timeframe;
     }
 
     if (
-        direction === "long" ||
-        direction === "short"
+        context.direction === "long" ||
+        context.direction === "short"
     ) {
         if (directionInput) {
             directionInput.value =
-                direction;
+                context.direction;
         }
 
         directionButtons.forEach(
             (button) => {
                 const active =
                     button.dataset.direction ===
-                    direction;
+                    context.direction;
 
                 button.classList.toggle(
                     "active",
@@ -672,35 +656,43 @@ const applyContextFromUrl = (): void => {
     }
 
     if (
-        accountBalance &&
+        context.accountBalance !== undefined &&
         accountBalanceInput
     ) {
         accountBalanceInput.value =
-            accountBalance;
+            String(
+                context.accountBalance
+            );
     }
 
     if (
-        riskPercent &&
+        context.riskPercent !== undefined &&
         riskPercentInput
     ) {
         riskPercentInput.value =
-            riskPercent;
+            String(
+                context.riskPercent
+            );
     }
 
     if (
-        entryPrice &&
+        context.entryPrice !== undefined &&
         entryPriceInput
     ) {
         entryPriceInput.value =
-            entryPrice;
+            String(
+                context.entryPrice
+            );
     }
 
     if (
-        stopLoss &&
+        context.stopLoss !== undefined &&
         stopLossInput
     ) {
         stopLossInput.value =
-            stopLoss;
+            String(
+                context.stopLoss
+            );
     }
 
     calculate();
@@ -836,29 +828,25 @@ const openRiskReward = (): void => {
         return;
     }
 
-    const params =
-        new URLSearchParams({
-            direction:
-                lastCalculation
-                    .inputs.direction,
-
-            entryPrice:
-                String(
-                    lastCalculation
-                        .inputs
-                        .entryPrice
-                ),
-
-            stopLoss:
-                String(
-                    lastCalculation
-                        .inputs
-                        .stopLoss
-                )
-        });
+    const {
+        symbol,
+        timeframe,
+        direction,
+        entryPrice,
+        stopLoss
+    } = lastCalculation.inputs;
 
     window.location.href =
-        `risk-reward.html?${params.toString()}`;
+        buildTradeContextUrl(
+            "risk-reward.html",
+            {
+                symbol,
+                timeframe,
+                direction,
+                entryPrice,
+                stopLoss
+            }
+        );
 };
 
 const openWorkspace = (): void => {

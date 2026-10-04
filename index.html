@@ -10,166 +10,249 @@
     >
 
     <meta
-        name="description"
-        content="Trading Tools — a decision-support workspace for trading research, calculation, analysis, planning, and review."
+        name="google-site-verification"
+        content="OJdnuEykow_C3HX6YgwzUyCKk6EOIIFkvcUXz3Bo19U"
     >
 
-    <title>Trading Tools</title>
+    <meta
+        name="description"
+        content="Trading Tools turns market information and trade ideas into measurable decisions."
+    >
 
-    <link rel="stylesheet" href="/src/styles/tokens.css">
-    <link rel="stylesheet" href="/src/styles/base.css">
-    <link rel="stylesheet" href="/src/styles/app-shell.css">
-    <link rel="stylesheet" href="/src/pages/home.css">
+    <title>Trading Tools — Make the trade measurable</title>
 </head>
 
-<body>
+<body class="home-page">
 
-    <header class="app-header">
+    <header class="home-header">
 
-        <a href="index.html" class="brand">
-            <span class="brand-mark"></span>
+        <a
+            href="index.html"
+            class="home-brand"
+        >
             Trading Tools
         </a>
 
         <nav
-            class="app-nav"
-            aria-label="Application"
+            class="home-nav"
+            aria-label="Primary"
         >
-            <a href="workspace.html">
-                Workspace
+            <a href="tools.html">
+                Tools
             </a>
 
             <a href="market.html">
                 Markets
             </a>
 
-            <a href="tools.html">
-                Tools
-            </a>
-
             <a href="guide.html">
                 Guide
             </a>
+
+            <a
+                href="workspace.html"
+                class="home-nav-workspace"
+            >
+                Workspace
+            </a>
         </nav>
-
-        <div class="header-actions">
-
-            <a
-                href="login.html"
-                class="button button-secondary"
-            >
-                Sign in
-            </a>
-
-            <a
-                href="signup.html"
-                class="button button-primary"
-            >
-                Create account
-            </a>
-
-        </div>
 
     </header>
 
+    <div
+        id="market-strip"
+        class="home-market-strip"
+        aria-label="Live market prices"
+    >
+
+        <span
+            id="market-connection-state"
+            class="market-strip-status"
+            data-state="connecting"
+        >
+            Market Data · Connecting
+        </span>
+
+        <div id="market-tickers">
+
+            <span class="market-strip-loading">
+                Loading markets…
+            </span>
+
+        </div>
+
+    </div>
+
     <main>
 
-        <section class="hero">
+        <section class="home-hero">
 
-            <div class="hero-content">
+            <div class="home-hero-copy">
 
-                <p class="eyebrow">
+                <p class="home-eyebrow">
                     Trading decision support
                 </p>
 
                 <h1>
-                    Think through the trade
-                    <span>before you take it.</span>
+                    Make the trade
+                    measurable.
                 </h1>
 
-                <p class="hero-description">
-                    Trading Tools brings market context, calculations,
-                    planning, risk management, and trade review into
-                    one workspace.
+                <p class="home-lead">
+                    Trading Tools helps you move from market information
+                    to a defined trade idea, measurable risk, and a clearer
+                    decision.
                 </p>
 
-                <div class="hero-actions">
-
-                    <a
-                        href="signup.html"
-                        class="button button-primary"
-                    >
-                        Create your workspace
-                    </a>
+                <div class="home-hero-actions">
 
                     <a
                         href="tools.html"
-                        class="button button-secondary"
+                        class="home-button home-button-primary"
                     >
                         Explore tools
                     </a>
 
+                    <a
+                        href="market.html"
+                        class="home-button home-button-secondary"
+                    >
+                        Open market terminal
+                    </a>
+
+                </div>
+
+                <div class="home-note">
+                    Built for thinking through a trade,
+                    not executing one.
                 </div>
 
             </div>
 
-            <div
-                class="hero-panel"
-                aria-label="Trading workflow"
-            >
+            <div class="home-hero-workflow">
 
-                <div class="hero-panel-header">
+                <div class="workflow-window">
 
-                    <span>
-                        Decision workflow
-                    </span>
+                    <div class="workflow-window-bar">
 
-                    <span>
-                        01 — 08
-                    </span>
+                        <span>
+                            TRADE CONTEXT
+                        </span>
 
-                </div>
+                        <span>
+                            01
+                        </span>
 
-                <div class="workflow-list">
-
-                    <div class="workflow-item is-active">
-                        <span>01</span>
-                        <strong>Learn</strong>
                     </div>
 
-                    <div class="workflow-item">
-                        <span>02</span>
-                        <strong>Calculate</strong>
+                    <div class="workflow-market">
+
+                        <span>
+                            BTC / USD
+                        </span>
+
+                        <strong>
+                            LONG
+                        </strong>
+
                     </div>
 
-                    <div class="workflow-item">
-                        <span>03</span>
-                        <strong>Analyze</strong>
+                    <div class="workflow-levels">
+
+                        <div class="workflow-level">
+                            <span>
+                                ENTRY
+                            </span>
+
+                            <strong>
+                                84,000
+                            </strong>
+                        </div>
+
+                        <div class="workflow-level">
+                            <span>
+                                STOP
+                            </span>
+
+                            <strong>
+                                82,800
+                            </strong>
+                        </div>
+
+                        <div class="workflow-level">
+                            <span>
+                                TARGET
+                            </span>
+
+                            <strong>
+                                87,600
+                            </strong>
+                        </div>
+
                     </div>
 
-                    <div class="workflow-item">
-                        <span>04</span>
-                        <strong>Plan</strong>
+                    <div class="workflow-path">
+
+                        <div>
+                            <span>
+                                RISK
+                            </span>
+
+                            <strong>
+                                1,200 / unit
+                            </strong>
+                        </div>
+
+                        <div class="workflow-path-line"></div>
+
+                        <div>
+                            <span>
+                                REWARD
+                            </span>
+
+                            <strong>
+                                3,600 / unit
+                            </strong>
+                        </div>
+
                     </div>
 
-                    <div class="workflow-item">
-                        <span>05</span>
-                        <strong>Manage Risk</strong>
+                    <div class="workflow-results">
+
+                        <div>
+                            <span>
+                                POSITION SIZE
+                            </span>
+
+                            <strong>
+                                0.42
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                R:R
+                            </span>
+
+                            <strong>
+                                3.00
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                RISK
+                            </span>
+
+                            <strong>
+                                1.5%
+                            </strong>
+                        </div>
+
                     </div>
 
-                    <div class="workflow-item">
-                        <span>06</span>
-                        <strong>Decide</strong>
-                    </div>
-
-                    <div class="workflow-item">
-                        <span>07</span>
-                        <strong>Record</strong>
-                    </div>
-
-                    <div class="workflow-item">
-                        <span>08</span>
-                        <strong>Review</strong>
+                    <div class="workflow-footer">
+                        Context → Calculate → Analyze → Decide
                     </div>
 
                 </div>
@@ -178,169 +261,269 @@
 
         </section>
 
-        <section class="feature-section">
+        <section class="home-intro">
 
-            <div class="section-heading">
+            <div class="home-section-label">
+                THE IDEA
+            </div>
 
-                <p class="eyebrow">
-                    Built for the process
-                </p>
+            <div class="home-intro-copy">
 
                 <h2>
-                    Less guesswork.
-                    More deliberate decisions.
+                    Trading is easier to reason about
+                    when the pieces stay connected.
                 </h2>
 
                 <p>
-                    Trading Tools is designed around the work that
-                    happens before, during, and after a trading decision.
+                    Entry, stop, target, position size, leverage, fees,
+                    market conditions, and the eventual outcome are not
+                    isolated numbers. They are parts of the same decision.
                 </p>
 
-            </div>
-
-            <div class="feature-grid">
-
-                <article class="feature-card">
-
-                    <span class="feature-index">
-                        01
-                    </span>
-
-                    <h3>
-                        Calculate
-                    </h3>
-
-                    <p>
-                        Work through position sizing, risk/reward,
-                        PnL, leverage, currency conversion, and other
-                        trading calculations without rebuilding the
-                        math every time.
-                    </p>
-
-                </article>
-
-                <article class="feature-card">
-
-                    <span class="feature-index">
-                        02
-                    </span>
-
-                    <h3>
-                        Analyze
-                    </h3>
-
-                    <p>
-                        Bring market information and instrument context
-                        into the same workflow instead of switching
-                        between disconnected tools.
-                    </p>
-
-                </article>
-
-                <article class="feature-card">
-
-                    <span class="feature-index">
-                        03
-                    </span>
-
-                    <h3>
-                        Plan
-                    </h3>
-
-                    <p>
-                        Turn a market idea into a defined plan with
-                        entries, exits, risk, targets, and the context
-                        needed to evaluate the setup.
-                    </p>
-
-                </article>
-
-                <article class="feature-card">
-
-                    <span class="feature-index">
-                        04
-                    </span>
-
-                    <h3>
-                        Review
-                    </h3>
-
-                    <p>
-                        Keep your calculations and workspace information
-                        available so you can review decisions instead of
-                        relying entirely on memory.
-                    </p>
-
-                </article>
+                <p>
+                    Trading Tools is built around that connection.
+                    Calculate one thing, carry the context forward,
+                    and keep the work you already started.
+                </p>
 
             </div>
 
         </section>
 
-        <section class="market-section">
+        <section class="home-loop">
 
-            <div class="market-copy">
+            <div class="home-section-label">
+                THE WORKFLOW
+            </div>
 
-                <p class="eyebrow">
-                    Market context
-                </p>
+            <div class="home-loop-track">
 
-                <h2>
-                    Start with the market.
-                    Build from there.
-                </h2>
+                <div class="home-loop-step active">
+                    <span>01</span>
+                    <strong>Learn</strong>
+                </div>
 
-                <p>
-                    Search instruments, inspect market information,
-                    view charts, and move directly into the tools
-                    needed to analyze the setup.
-                </p>
+                <div class="home-loop-step">
+                    <span>02</span>
+                    <strong>Calculate</strong>
+                </div>
 
-                <a
-                    href="market.html"
-                    class="text-link"
-                >
-                    Open Market Terminal
-                    <span aria-hidden="true">→</span>
+                <div class="home-loop-step">
+                    <span>03</span>
+                    <strong>Analyze</strong>
+                </div>
+
+                <div class="home-loop-step">
+                    <span>04</span>
+                    <strong>Plan</strong>
+                </div>
+
+                <div class="home-loop-step">
+                    <span>05</span>
+                    <strong>Manage Risk</strong>
+                </div>
+
+                <div class="home-loop-step">
+                    <span>06</span>
+                    <strong>Decide</strong>
+                </div>
+
+                <div class="home-loop-step">
+                    <span>07</span>
+                    <strong>Record</strong>
+                </div>
+
+                <div class="home-loop-step">
+                    <span>08</span>
+                    <strong>Review</strong>
+                </div>
+
+                <div class="home-loop-step">
+                    <span>09</span>
+                    <strong>Improve</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="home-tools">
+
+            <div class="home-section-heading">
+
+                <div class="home-section-label">
+                    CORE TOOLS
+                </div>
+
+                <a href="tools.html">
+                    View all tools →
                 </a>
 
             </div>
 
-            <div class="market-stat-panel">
+            <div class="home-tool-list">
 
-                <div class="market-stat">
+                <a
+                    href="position-size.html"
+                    class="home-tool-row"
+                >
+                    <span class="home-tool-index">
+                        01
+                    </span>
+
+                    <span class="home-tool-name">
+                        Position Size
+                    </span>
+
+                    <span class="home-tool-purpose">
+                        Turn account risk and stop distance into position size.
+                    </span>
+
+                    <span class="home-tool-arrow">
+                        →
+                    </span>
+                </a>
+
+                <a
+                    href="risk-reward.html"
+                    class="home-tool-row"
+                >
+                    <span class="home-tool-index">
+                        02
+                    </span>
+
+                    <span class="home-tool-name">
+                        Risk / Reward
+                    </span>
+
+                    <span class="home-tool-purpose">
+                        Measure the structure between entry, invalidation, and target.
+                    </span>
+
+                    <span class="home-tool-arrow">
+                        →
+                    </span>
+                </a>
+
+                <a
+                    href="pnl-calculator.html"
+                    class="home-tool-row"
+                >
+                    <span class="home-tool-index">
+                        03
+                    </span>
+
+                    <span class="home-tool-name">
+                        PnL
+                    </span>
+
+                    <span class="home-tool-purpose">
+                        Review gross and net trade performance after fees.
+                    </span>
+
+                    <span class="home-tool-arrow">
+                        →
+                    </span>
+                </a>
+
+                <a
+                    href="leverage.html"
+                    class="home-tool-row"
+                >
+                    <span class="home-tool-index">
+                        04
+                    </span>
+
+                    <span class="home-tool-name">
+                        Leverage
+                    </span>
+
+                    <span class="home-tool-purpose">
+                        Understand exposure relative to the capital behind it.
+                    </span>
+
+                    <span class="home-tool-arrow">
+                        →
+                    </span>
+                </a>
+
+            </div>
+
+        </section>
+
+        <section class="home-market-feature">
+
+            <div class="home-market-copy">
+
+                <div class="home-section-label">
+                    MARKETS
+                </div>
+
+                <h2>
+                    Start with the market.
+                    Carry context into the decision.
+                </h2>
+
+                <p>
+                    Search instruments, inspect price action, compare
+                    market conditions, and move directly into the tool
+                    that belongs to the idea you're working on.
+                </p>
+
+                <a
+                    href="market.html"
+                    class="home-text-link"
+                >
+                    Open Market Terminal →
+                </a>
+
+            </div>
+
+            <div class="home-market-diagram">
+
+                <div class="market-diagram-header">
+                    <span>
+                        MARKET CONTEXT
+                    </span>
 
                     <span>
-                        Market Terminal
+                        LIVE
+                    </span>
+                </div>
+
+                <div class="market-diagram-main">
+
+                    <span>
+                        BTC / USD
                     </span>
 
                     <strong>
-                        Live context
+                        84,6xx
                     </strong>
+
+                    <em>
+                        Market → Trade Idea
+                    </em>
 
                 </div>
 
-                <div class="market-stat">
+                <div class="market-diagram-path">
 
                     <span>
-                        Calculators
+                        PRICE
                     </span>
-
-                    <strong>
-                        Decision support
-                    </strong>
-
-                </div>
-
-                <div class="market-stat">
 
                     <span>
-                        Workspace
+                        STRUCTURE
                     </span>
 
-                    <strong>
-                        Persistent
-                    </strong>
+                    <span>
+                        RISK
+                    </span>
+
+                    <span>
+                        DECISION
+                    </span>
 
                 </div>
 
@@ -348,58 +531,72 @@
 
         </section>
 
-        <section class="cta-section">
+        <section class="home-workspace">
 
             <div>
 
-                <p class="eyebrow">
-                    Your workflow
-                </p>
+                <div class="home-section-label">
+                    WORKSPACE
+                </div>
 
                 <h2>
-                    Build a better decision process.
+                    Continue the work
+                    you already started.
                 </h2>
-
-                <p>
-                    Use Trading Tools to structure the work behind
-                    your trading decisions.
-                </p>
 
             </div>
 
-            <a
-                href="signup.html"
-                class="button button-primary"
-            >
-                Create account
-            </a>
+            <div class="home-workspace-copy">
+
+                <p>
+                    Save calculations, keep watchlists, reopen previous
+                    work, and carry trade context forward instead of
+                    rebuilding the same setup every time.
+                </p>
+
+                <a
+                    href="workspace.html"
+                    class="home-text-link"
+                >
+                    Open Workspace →
+                </a>
+
+            </div>
 
         </section>
 
     </main>
 
-    <footer class="app-footer">
+    <footer class="home-footer">
 
-        <div class="footer-brand">
+        <div>
 
-            <span class="brand">
-                <span class="brand-mark"></span>
+            <strong>
                 Trading Tools
-            </span>
+            </strong>
 
             <span>
-                Decision support for deliberate traders.
+                Understand. Calculate. Evaluate. Improve.
             </span>
 
         </div>
 
-        <nav
-            aria-label="Footer"
-            class="footer-nav"
-        >
+        <nav aria-label="Footer">
 
             <a href="guide.html">
                 Guide
+            </a>
+
+            <a href="contact.html">
+                Contact
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+
+            <a href="market.html">
+                Markets
             </a>
 
             <a href="terms.html">
@@ -410,25 +607,26 @@
                 Privacy
             </a>
 
-            <a href="contact.html">
-                Contact
-            </a>
-
         </nav>
 
-        <div class="footer-meta">
+        <div>
 
             <span>
                 18+ only
             </span>
 
             <span>
-                Trading Tools does not execute trades.
+                Decision support · No trade execution
             </span>
 
         </div>
 
     </footer>
+
+    <script
+        type="module"
+        src="/src/pages/home.ts"
+    ></script>
 
 </body>
 

@@ -1,8 +1,8 @@
 import {
     BillingHttpError,
+    getNowPaymentsBaseUrl,
     getProviderAmount,
     getProviderCurrency,
-    getProviderEmail,
     getProviderPaymentId,
     getProviderPaymentStatus,
     getProviderPeriodEnd,
@@ -10,38 +10,99 @@ import {
     getProviderSubscriptionId,
     getRequestJson,
     getSupabaseAdmin,
-    isOpenBillingStatus,
     verifyNowPaymentsSignature
 } from "../_lib/billing.js";
 
-const json = (
-    response,
-    status,
-    body
-) => {
-    return response
-        .status(status)
-        .json(body);
+const sendJson = (response, status, body) => {
+    response.status(status).json(body);
 };
 
-const findSubscription = async (
-    supabase,
-    payload
-) => {
-    const providerSubscriptionId =
-        getProviderSubscriptionId(
-            payload
-        );
+const getSignature = (request) =>
+    request.headers["x-nowpayments-sig"] ||
+    request.headers["X-NOWPayments-Sig"] ||
+    request.headers["X-Nowpayments-Sig"] ||
+    null;
 
-    if (providerSubscriptionId) {
-        const {
-            data,
-            error
-        } =
+export default async function handler(request, response) {
+    if (request.method !== "POST") {
+        response.setHeader("Allow", "POST");
+
+        return sendJson(response, 405, {
+            error: "Method not allowed."
+        });
+    }
+
+    try {
+        const signature = getSignature(request);
+
+        if (
+            typeof signature !== "string" ||
+            !signature.trim()
+        ) {
+            throw new BillingHttpError(
+                401,
+                "Invalid payment notification."
+            );
+        }
+
+        const payload = await getRequestJson(request);
+
+        if (!verifyNowPaymentsSignature(payload, signature)) {
+            throw new BillingHttpError(
+                401,
+                "Invalid payment notification."
+            );
+        }
+
+        const providerSubscriptionId =
+            getProviderSubscriptionId(payload);
+
+        if (!providerSubscriptionId) {
+            throw new BillingHttpError(
+                400,
+                "Payment notification is missing its subscription id."
+            );
+        }
+
+        const providerPaymentStatus =
+            getProviderPaymentStatus(payload);
+
+        if (!providerPaymentStatus) {
+            throw new BillingHttpError(
+                400,
+                "Payment notification is missing its payment status."
+            );
+        }
+
+        const providerPaymentId =
+            getProviderPaymentId(payload);
+
+        const amount =
+            getProviderAmount(payload);
+
+        const currency =
+            getProviderCurrency(payload);
+
+        const periodEnd =
+            getProviderPeriodEnd(payload);
+
+        const providerPlanId =
+            getProviderPlanId(payload);
+
+        const supabase = getSupabaseAdmin();
+
+        const { data: subscription, error: lookupError } =
             await supabase
                 .from("subscriptions")
                 .select(
-                    "id, user_id, plan, provider"
+                    [
+                        "id",
+                        "plan",
+                        "provider",
+                        "provider_plan_id",
+                        "provider_subscription_id",
+                        "status"
+                    ].join(",")
                 )
                 .eq(
                     "provider",
@@ -53,250 +114,123 @@ const findSubscription = async (
                 )
                 .maybeSingle();
 
-        if (error) {
-            throw error;
-        }
-
-        if (data) {
-            return data;
-        }
-    }
-
-    const email =
-        getProviderEmail(
-            payload
-        );
-
-    const providerPlanId =
-        getProviderPlanId(
-            payload
-        );
-
-    if (!email) {
-        return null;
-    }
-
-    let query =
-        supabase
-            .from("subscriptions")
-            .select(
-                [
-                    "id",
-                    "user_id",
-                    "plan",
-                    "provider",
-                    "provider_plan_id",
-                    "status",
-                    "updated_at"
-                ].join(", ")
-            )
-            .eq(
-                "provider",
-                "nowpayments"
-            )
-            .eq(
-                "provider_customer_id",
-                email
-            )
-            .order(
-                "updated_at",
-                {
-                    ascending: false
-                }
-            )
-            .limit(25);
-
-    if (providerPlanId) {
-        query =
-            query.eq(
-                "provider_plan_id",
-                providerPlanId
-            );
-    }
-
-    const {
-        data,
-        error
-    } = await query;
-
-    if (error) {
-        throw error;
-    }
-
-    if (!data?.length) {
-        return null;
-    }
-
-    const open =
-        data.find((row) =>
-            isOpenBillingStatus(
-                row.status
-            )
-        );
-
-    return open || data[0];
-};
-
-export default async function handler(
-    request,
-    response
-) {
-    if (request.method !== "POST") {
-        response.setHeader(
-            "Allow",
-            "POST"
-        );
-
-        return json(
-            response,
-            405,
-            {
-                error:
-                    "Method not allowed."
-            }
-        );
-    }
-
-    try {
-        const payload =
-            await getRequestJson(
-                request
+        if (lookupError) {
+            console.error(
+                "Failed to find NOWPayments subscription",
+                lookupError
             );
 
-        const signature =
-            request.headers[
-                "x-nowpayments-sig"
-            ] ||
-            request.headers[
-                "X-NOWPayments-Sig"
-            ];
-
-        if (
-            !verifyNowPaymentsSignature(
-                payload,
-                signature
-            )
-        ) {
             throw new BillingHttpError(
-                401,
-                "Invalid payment notification signature."
+                500,
+                "Unable to process the payment notification."
             );
         }
-
-        const supabase =
-            getSupabaseAdmin();
-
-        const subscription =
-            await findSubscription(
-                supabase,
-                payload
-            );
 
         if (!subscription) {
-            throw new BillingHttpError(
-                422,
-                "The payment notification could not be matched to a billing subscription."
-            );
-        }
-
-        const providerPaymentId =
-            getProviderPaymentId(
-                payload
-            );
-
-        const providerStatus =
-            payload?.payment_status ??
-            payload?.status ??
-            null;
-
-        const paymentStatus =
-            getProviderPaymentStatus(
-                payload
-            );
-
-        const amount =
-            getProviderAmount(
-                payload
-            );
-
-        const currency =
-            getProviderCurrency(
-                payload
-            );
-
-        const periodEnd =
-            getProviderPeriodEnd(
-                payload
-            );
-
-        const {
-            data,
-            error
-        } = await supabase.rpc(
-            "apply_nowpayments_subscription_event",
-            {
-                p_subscription_id:
-                    subscription.id,
-                p_provider_payment_id:
-                    providerPaymentId,
-                p_provider_status:
-                    providerStatus
-                        ? String(
-                              providerStatus
-                          )
-                        : null,
-                p_payment_status:
-                    paymentStatus,
-                p_amount:
-                    amount,
-                p_currency:
-                    currency,
-                p_period_end:
-                    periodEnd,
-                p_provider_payload:
-                    payload
-            }
-        );
-
-        if (error) {
-            throw error;
-        }
-
-        return json(
-            response,
-            200,
-            {
-                received: true,
-                result: data
-            }
-        );
-    } catch (error) {
-        const status =
-            error instanceof
-            BillingHttpError
-                ? error.status
-                : 500;
-
-        if (
-            !(error instanceof
-                BillingHttpError)
-        ) {
             console.error(
-                "NOWPayments webhook failed",
-                error
+                "NOWPayments subscription was not found",
+                {
+                    providerSubscriptionId
+                }
+            );
+
+            throw new BillingHttpError(
+                404,
+                "Subscription was not found."
             );
         }
 
-        return json(
-            response,
-            status,
-            {
-                error:
-                    error instanceof
-                    BillingHttpError
-                        ? error.message
-                        : "Unable to process the payment notification."
+        if (providerPlanId !== null) {
+            const localPlanId =
+                subscription.provider_plan_id === null
+                    ? null
+                    : String(
+                        subscription.provider_plan_id
+                    );
+
+            if (
+                localPlanId !== null &&
+                localPlanId !== providerPlanId
+            ) {
+                console.error(
+                    "NOWPayments plan mismatch",
+                    {
+                        subscriptionId:
+                            subscription.id,
+                        localPlanId,
+                        providerPlanId
+                    }
+                );
+
+                throw new BillingHttpError(
+                    400,
+                    "Payment notification does not match the subscription plan."
+                );
             }
+        }
+
+        const { data: result, error: rpcError } =
+            await supabase.rpc(
+                "apply_nowpayments_subscription_event",
+                {
+                    p_subscription_id:
+                        subscription.id,
+                    p_provider_payment_id:
+                        providerPaymentId,
+                    p_provider_status:
+                        providerPaymentStatus,
+                    p_payment_status:
+                        providerPaymentStatus,
+                    p_amount:
+                        amount,
+                    p_currency:
+                        currency,
+                    p_period_end:
+                        periodEnd,
+                    p_provider_payload:
+                        payload
+                }
+            );
+
+        if (rpcError) {
+            console.error(
+                "Failed to apply NOWPayments subscription event",
+                {
+                    subscriptionId:
+                        subscription.id,
+                    rpcError
+                }
+            );
+
+            throw new BillingHttpError(
+                500,
+                "Unable to apply the payment notification."
+            );
+        }
+
+        return sendJson(response, 200, {
+            received: true,
+            result
+        });
+    } catch (error) {
+        if (error instanceof BillingHttpError) {
+            return sendJson(
+                response,
+                error.status,
+                {
+                    error: error.message
+                }
+            );
+        }
+
+        console.error(
+            "Unexpected NOWPayments webhook error",
+            error
         );
+
+        return sendJson(response, 500, {
+            error:
+                "Unable to process the payment notification."
+        });
     }
 }

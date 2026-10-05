@@ -1,6 +1,6 @@
 import {
     BillingHttpError,
-    getNowPaymentsBaseUrl,
+    getNowPaymentsSubscription,
     getProviderAmount,
     getProviderCurrency,
     getProviderPaymentId,
@@ -83,11 +83,36 @@ export default async function handler(request, response) {
         const currency =
             getProviderCurrency(payload);
 
-        const periodEnd =
+        let periodEnd =
             getProviderPeriodEnd(payload);
 
         const providerPlanId =
             getProviderPlanId(payload);
+
+        if (
+            (
+                providerPaymentStatus === "paid" ||
+                providerPaymentStatus === "finished"
+            ) &&
+            !periodEnd
+        ) {
+            const providerSubscription =
+                await getNowPaymentsSubscription(
+                    providerSubscriptionId
+                );
+
+            periodEnd =
+                getProviderPeriodEnd(
+                    providerSubscription
+                );
+
+            if (!periodEnd) {
+                throw new BillingHttpError(
+                    502,
+                    "The payment provider did not return a subscription period end."
+                );
+            }
+        }
 
         const supabase = getSupabaseAdmin();
 

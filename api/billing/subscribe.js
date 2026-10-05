@@ -135,7 +135,7 @@ export default async function handler(request, response) {
                         provider_subscription_id:
                             providerSubscription.providerSubscriptionId,
                         provider_customer_id:
-                            email,
+                            null,
                         status: "pending"
                     })
                     .eq("id", subscription.id)

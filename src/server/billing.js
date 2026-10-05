@@ -8,6 +8,12 @@ const PLAN_ENV_NAMES = {
 
 const PLAN_NAMES = new Set(["lite", "pro"]);
 
+const NOWPAYMENTS_JWT_TTL_MS = 4 * 60 * 1000;
+
+let nowPaymentsJwt = null;
+let nowPaymentsJwtExpiresAt = 0;
+let nowPaymentsAuthPromise = null;
+
 export class BillingHttpError extends Error {
     constructor(status, message) {
         super(message);
@@ -156,29 +162,189 @@ const parseProviderResponse = async (response) => {
     }
 };
 
+const getNowPaymentsCredentials = () => ({
+    email: getRequiredEnv("NOWPAYMENTS_EMAIL"),
+    password: getRequiredEnv("NOWPAYMENTS_PASSWORD")
+});
+
+const clearNowPaymentsJwt = () => {
+    nowPaymentsJwt = null;
+    nowPaymentsJwtExpiresAt = 0;
+};
+
+const getNowPaymentsJwt = async ({
+    forceRefresh = false
+} = {}) => {
+    if (
+        !forceRefresh &&
+        nowPaymentsJwt &&
+        Date.now() < nowPaymentsJwtExpiresAt
+    ) {
+        return nowPaymentsJwt;
+    }
+
+    if (nowPaymentsAuthPromise) {
+        return nowPaymentsAuthPromise;
+    }
+
+    nowPaymentsAuthPromise = (async () => {
+        const {
+            email,
+            password
+        } = getNowPaymentsCredentials();
+
+        const response = await fetch(
+            `${getNowPaymentsBaseUrl()}/v1/auth`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            }
+        );
+
+        const data = await parseProviderResponse(response);
+
+        if (!response.ok) {
+            console.error(
+                "NOWPayments authentication failed",
+                {
+                    status: response.status,
+                    data
+                }
+            );
+
+            throw new BillingHttpError(
+                502,
+                "The payment provider authentication failed."
+            );
+        }
+
+        const token = data?.token;
+
+        if (
+            typeof token !== "string" ||
+            !token.trim()
+        ) {
+            console.error(
+                "NOWPayments authentication response did not contain a token"
+            );
+
+            throw new BillingHttpError(
+                502,
+                "The payment provider returned an invalid authentication response."
+            );
+        }
+
+        nowPaymentsJwt = token.trim();
+        nowPaymentsJwtExpiresAt =
+            Date.now() + NOWPAYMENTS_JWT_TTL_MS;
+
+        return nowPaymentsJwt;
+    })();
+
+    try {
+        return await nowPaymentsAuthPromise;
+    } finally {
+        nowPaymentsAuthPromise = null;
+    }
+};
+
+const executeNowPaymentsRequest = async ({
+    path,
+    method = "GET",
+    body
+}) => {
+    const apiKey = getRequiredEnv("NOWPAYMENTS_API_KEY");
+    const jwt = await getNowPaymentsJwt();
+
+    return fetch(
+        `${getNowPaymentsBaseUrl()}${path}`,
+        {
+            method,
+            headers: {
+                "x-api-key": apiKey,
+                "Authorization": `Bearer ${jwt}`,
+                ...(body === undefined
+                    ? {}
+                    : {
+                        "Content-Type": "application/json"
+                    })
+            },
+            ...(body === undefined
+                ? {}
+                : {
+                    body: JSON.stringify(body)
+                })
+        }
+    );
+};
+
+const executeNowPaymentsRequestWithRefresh = async ({
+    path,
+    method = "GET",
+    body
+}) => {
+    let response = await executeNowPaymentsRequest({
+        path,
+        method,
+        body
+    });
+
+    if (!response.ok) {
+        const firstData = await parseProviderResponse(response);
+
+        const shouldRefresh =
+            response.status === 401 ||
+            (
+                response.status === 403 &&
+                firstData?.code === "INVALID_AUTH_TOKEN"
+            );
+
+        if (shouldRefresh) {
+            clearNowPaymentsJwt();
+            await getNowPaymentsJwt({
+                forceRefresh: true
+            });
+
+            response = await executeNowPaymentsRequest({
+                path,
+                method,
+                body
+            });
+        } else {
+            return {
+                response,
+                data: firstData
+            };
+        }
+    }
+
+    return {
+        response,
+        data: await parseProviderResponse(response)
+    };
+};
+
 export const createNowPaymentsSubscription = async ({
     planNumber,
     email
 }) => {
-    const apiKey = getRequiredEnv("NOWPAYMENTS_API_KEY");
-
-    const response = await fetch(
-        `${getNowPaymentsBaseUrl()}/v1/subscriptions`,
-        {
-            method: "POST",
-            headers: {
-                "x-api-key": apiKey,
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                subscription_plan_id: planNumber,
-                email
-            })
+    const {
+        response,
+        data
+    } = await executeNowPaymentsRequestWithRefresh({
+        path: "/v1/subscriptions",
+        method: "POST",
+        body: {
+            subscription_plan_id: planNumber,
+            email
         }
-    );
-
-    const data = await parseProviderResponse(response);
+    });
 
     if (!response.ok) {
         console.error(
@@ -225,8 +391,6 @@ export const createNowPaymentsSubscription = async ({
 export const getNowPaymentsSubscription = async (
     subscriptionId
 ) => {
-    const apiKey = getRequiredEnv("NOWPAYMENTS_API_KEY");
-
     const providerSubscriptionId =
         String(subscriptionId || "").trim();
 
@@ -237,20 +401,15 @@ export const getNowPaymentsSubscription = async (
         );
     }
 
-    const response = await fetch(
-        `${getNowPaymentsBaseUrl()}/v1/subscriptions/${encodeURIComponent(
+    const {
+        response,
+        data
+    } = await executeNowPaymentsRequestWithRefresh({
+        path: `/v1/subscriptions/${encodeURIComponent(
             providerSubscriptionId
         )}`,
-        {
-            method: "GET",
-            headers: {
-                "x-api-key": apiKey,
-                "Authorization": `Bearer ${apiKey}`
-            }
-        }
-    );
-
-    const data = await parseProviderResponse(response);
+        method: "GET"
+    });
 
     if (!response.ok) {
         console.error(

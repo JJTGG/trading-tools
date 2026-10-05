@@ -25,7 +25,7 @@ The current tool registry includes:
 - **PnL** — Calculate trade profit or loss from price movement, position size, and fees.
 - **Leverage** — Measure exposure, effective leverage, and required margin.
 - **Currency Converter** — Convert between supported currencies using current exchange-rate data.
-- **Coin Viewer** — Inspect cryptocurrency information and market data.
+- **Coin Viewer** — Inspect cryptocurrency information and market data
 
 Additional tools are intentionally kept visible as planned work rather than presented as finished functionality.
 

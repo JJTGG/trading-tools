@@ -8,12 +8,6 @@ const PLAN_ENV_NAMES = {
 
 const PLAN_NAMES = new Set(["lite", "pro"]);
 
-const OPEN_STATUSES = new Set([
-    "pending",
-    "active",
-    "past_due"
-]);
-
 export class BillingHttpError extends Error {
     constructor(status, message) {
         super(message);
@@ -25,17 +19,14 @@ const getRequiredEnv = (name) => {
     const value = process.env[name]?.trim();
 
     if (!value) {
-        throw new BillingHttpError(
-            500,
-            "Billing is not configured."
-        );
+        throw new BillingHttpError(500, "Billing is not configured.");
     }
 
     return value;
 };
 
-export const getSupabaseAdmin = () => {
-    return createClient(
+export const getSupabaseAdmin = () =>
+    createClient(
         getRequiredEnv("SUPABASE_URL"),
         getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY"),
         {
@@ -45,13 +36,9 @@ export const getSupabaseAdmin = () => {
             }
         }
     );
-};
 
-export const normalizeEmail = (email) => {
-    return String(email || "")
-        .trim()
-        .toLowerCase();
-};
+export const normalizeEmail = (email) =>
+    String(email || "").trim().toLowerCase();
 
 export const authenticateRequest = async (request) => {
     const authorization =
@@ -144,12 +131,11 @@ export const getLaunchPlan = (plan) => {
     };
 };
 
-export const getNowPaymentsBaseUrl = () => {
-    return (
+export const getNowPaymentsBaseUrl = () =>
+    (
         process.env.NOWPAYMENTS_API_BASE_URL?.trim() ||
         "https://api.nowpayments.io"
     ).replace(/\/$/, "");
-};
 
 const parseProviderResponse = async (response) => {
     const text = await response.text();
@@ -171,9 +157,7 @@ export const createNowPaymentsSubscription = async ({
     planNumber,
     email
 }) => {
-    const apiKey = getRequiredEnv(
-        "NOWPAYMENTS_API_KEY"
-    );
+    const apiKey = getRequiredEnv("NOWPAYMENTS_API_KEY");
 
     const response = await fetch(
         `${getNowPaymentsBaseUrl()}/v1/subscriptions`,
@@ -190,8 +174,7 @@ export const createNowPaymentsSubscription = async ({
         }
     );
 
-    const data =
-        await parseProviderResponse(response);
+    const data = await parseProviderResponse(response);
 
     if (!response.ok) {
         console.error(
@@ -208,8 +191,7 @@ export const createNowPaymentsSubscription = async ({
         );
     }
 
-    const result =
-        data?.result || data;
+    const result = data?.result || data;
 
     const providerSubscriptionId =
         result?.id ??
@@ -229,8 +211,9 @@ export const createNowPaymentsSubscription = async ({
     }
 
     return {
-        providerSubscriptionId:
-            String(providerSubscriptionId),
+        providerSubscriptionId: String(
+            providerSubscriptionId
+        ),
         providerPayload: result
     };
 };
@@ -263,44 +246,29 @@ export const verifyNowPaymentsSignature = (
         "NOWPAYMENTS_IPN_SECRET"
     );
 
-    const received =
-        String(signature || "")
-            .trim()
-            .toLowerCase();
+    const received = String(signature || "")
+        .trim()
+        .toLowerCase();
 
     if (!/^[a-f0-9]{128}$/.test(received)) {
         return false;
     }
 
     const canonicalPayload =
-        JSON.stringify(
-            sortObject(payload)
-        );
+        JSON.stringify(sortObject(payload));
 
-    const expected =
-        crypto
-            .createHmac(
-                "sha512",
-                secret
-            )
-            .update(canonicalPayload)
-            .digest("hex");
+    const expected = crypto
+        .createHmac("sha512", secret)
+        .update(canonicalPayload)
+        .digest("hex");
 
     return crypto.timingSafeEqual(
-        Buffer.from(
-            expected,
-            "hex"
-        ),
-        Buffer.from(
-            received,
-            "hex"
-        )
+        Buffer.from(expected, "hex"),
+        Buffer.from(received, "hex")
     );
 };
 
-export const getRequestJson = async (
-    request
-) => {
+export const getRequestJson = async (request) => {
     if (
         request.body !== undefined &&
         request.body !== null
@@ -312,13 +280,9 @@ export const getRequestJson = async (
             return request.body;
         }
 
-        if (
-            typeof request.body === "string"
-        ) {
+        if (typeof request.body === "string") {
             try {
-                return JSON.parse(
-                    request.body
-                );
+                return JSON.parse(request.body);
             } catch {
                 throw new BillingHttpError(
                     400,
@@ -351,118 +315,81 @@ export const getRequestJson = async (
     }
 };
 
-export const getProviderPlanId = (
-    payload
-) => {
+export const getProviderPlanId = (payload) => {
     const value =
         payload?.subscription_plan_id ??
         payload?.plan_id;
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return null;
-    }
-
-    return String(value);
+    return value === null || value === undefined
+        ? null
+        : String(value);
 };
 
-export const getProviderSubscriptionId = (
-    payload
-) => {
+export const getProviderSubscriptionId = (payload) => {
     const value =
         payload?.subscription_id ??
         payload?.sub_id ??
         payload?.subscription?.id;
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return null;
-    }
-
-    return String(value);
+    return value === null || value === undefined
+        ? null
+        : String(value);
 };
 
-export const getProviderEmail = (
-    payload
-) => {
+export const getProviderEmail = (payload) => {
     const value =
         payload?.email ??
         payload?.subscriber?.email;
 
-    if (!value) {
-        return null;
-    }
-
-    return normalizeEmail(value);
+    return value
+        ? normalizeEmail(value)
+        : null;
 };
 
-export const getProviderPaymentId = (
-    payload
-) => {
+export const getProviderPaymentId = (payload) => {
     const value =
         payload?.payment_id ??
         payload?.invoice_id;
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return null;
-    }
-
-    return String(value);
+    return value === null || value === undefined
+        ? null
+        : String(value);
 };
 
 export const getProviderPaymentStatus = (
     payload
-) => {
-    const value =
+) =>
+    String(
         payload?.payment_status ??
-        payload?.status;
-
-    return String(value || "")
+        payload?.status ??
+        ""
+    )
         .trim()
         .toLowerCase();
-};
 
-export const getProviderAmount = (
-    payload
-) => {
+export const getProviderAmount = (payload) => {
     const value =
         payload?.price_amount ??
         payload?.amount;
 
     const amount = Number(value);
 
-    return Number.isFinite(amount) &&
-        amount > 0
+    return Number.isFinite(amount) && amount > 0
         ? amount
         : null;
 };
 
-export const getProviderCurrency = (
-    payload
-) => {
+export const getProviderCurrency = (payload) => {
     const value =
         payload?.price_currency ??
         payload?.currency;
 
-    if (!value) {
-        return null;
-    }
-
-    return String(value)
-        .trim()
-        .toLowerCase();
+    return value
+        ? String(value).trim().toLowerCase()
+        : null;
 };
 
-export const getProviderPeriodEnd = (
-    payload
-) => {
+export const getProviderPeriodEnd = (payload) => {
     const value =
         payload?.expire_date ??
         payload?.subscription_expire_date ??
@@ -474,15 +401,14 @@ export const getProviderPeriodEnd = (
 
     const date = new Date(value);
 
-    return Number.isNaN(
-        date.getTime()
-    )
+    return Number.isNaN(date.getTime())
         ? null
         : date.toISOString();
 };
 
-export const isOpenBillingStatus = (
-    status
-) => {
-    return OPEN_STATUSES.has(status);
-};
+export const isOpenBillingStatus = (status) =>
+    new Set([
+        "pending",
+        "active",
+        "past_due"
+    ]).has(status);

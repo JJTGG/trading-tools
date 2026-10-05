@@ -2,7 +2,7 @@ import {
     BillingHttpError,
     getLaunchPlan,
     getNowPaymentsBaseUrl
-} from "./_lib/billing.js";
+} from "../../src/server/billing.js";
 
 const parseProviderResponse = async (
     response

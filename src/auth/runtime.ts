@@ -234,6 +234,7 @@ const getSafeNext = (
                 "workspace.html",
                 "settings.html",
                 "preferences.html",
+                "billing.html",
                 "onboarding.html",
                 "tools.html"
             ]);

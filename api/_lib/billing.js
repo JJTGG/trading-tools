@@ -221,16 +221,67 @@ export const createNowPaymentsSubscription = async ({
     };
 };
 
+export const getNowPaymentsSubscription = async (
+    subscriptionId
+) => {
+    const apiKey = getRequiredEnv("NOWPAYMENTS_API_KEY");
+
+    const providerSubscriptionId =
+        String(subscriptionId || "").trim();
+
+    if (!providerSubscriptionId) {
+        throw new BillingHttpError(
+            502,
+            "The payment provider subscription ID is missing."
+        );
+    }
+
+    const response = await fetch(
+        `${getNowPaymentsBaseUrl()}/v1/subscriptions/${encodeURIComponent(
+            providerSubscriptionId
+        )}`,
+        {
+            method: "GET",
+            headers: {
+                "x-api-key": apiKey
+            }
+        }
+    );
+
+    const data = await parseProviderResponse(response);
+
+    if (!response.ok) {
+        console.error(
+            "NOWPayments subscription lookup failed",
+            {
+                status: response.status,
+                subscriptionId: providerSubscriptionId,
+                data
+            }
+        );
+
+        throw new BillingHttpError(
+            502,
+            "The payment provider subscription could not be verified."
+        );
+    }
+
+    return data?.result || data;
+};
+
 const sortObject = (value) => {
+    if (Array.isArray(value)) {
+        return value.map(sortObject);
+    }
+
     if (
         value !== null &&
-        typeof value === "object" &&
-        !Array.isArray(value)
+        typeof value === "object"
     ) {
         return Object.keys(value)
             .sort()
             .reduce((result, key) => {
-                result[key] = value[key];
+                result[key] = sortObject(value[key]);
                 return result;
             }, {});
     }

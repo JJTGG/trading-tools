@@ -6,312 +6,202 @@ import {
     getSupabaseAdmin
 } from "../_lib/billing.js";
 
-const json = (
-    response,
-    status,
-    body
-) => {
-    return response
-        .status(status)
-        .json(body);
+const sendJson = (response, status, body) => {
+    response.status(status).json(body);
 };
 
-export default async function handler(
-    request,
-    response
-) {
+export default async function handler(request, response) {
     if (request.method !== "POST") {
-        response.setHeader(
-            "Allow",
-            "POST"
-        );
-
-        return json(
-            response,
-            405,
-            {
-                error:
-                    "Method not allowed."
-            }
-        );
+        response.setHeader("Allow", "POST");
+        return sendJson(response, 405, {
+            error: "Method not allowed."
+        });
     }
 
     try {
-        const {
-            user,
-            email
-        } =
-            await authenticateRequest(
-                request
-            );
+        const { user, email } =
+            await authenticateRequest(request);
 
-        const body =
-            request.body &&
-            typeof request.body === "object"
-                ? request.body
-                : {};
+        const plan = request.body?.plan;
+        const launchPlan = getLaunchPlan(plan);
+        const supabase = getSupabaseAdmin();
 
-        const selectedPlan =
-            getLaunchPlan(
-                body.plan
-            );
-
-        const supabase =
-            getSupabaseAdmin();
-
-        const {
-            data: existingRows,
-            error: existingError
-        } = await supabase
-            .from("subscriptions")
-            .select(
-                [
-                    "id",
-                    "plan",
-                    "status",
-                    "provider_subscription_id",
-                    "current_period_end"
-                ].join(", ")
-            )
-            .eq(
-                "user_id",
-                user.id
-            )
-            .in(
-                "status",
-                [
+        const { data: existingSubscription, error: existingError } =
+            await supabase
+                .from("subscriptions")
+                .select(
+                    [
+                        "id",
+                        "plan",
+                        "provider",
+                        "provider_subscription_id",
+                        "status",
+                        "current_period_end"
+                    ].join(",")
+                )
+                .eq("user_id", user.id)
+                .in("status", [
                     "pending",
                     "active",
                     "past_due"
-                ]
-            )
-            .order(
-                "created_at",
-                {
+                ])
+                .order("updated_at", {
                     ascending: false
-                }
-            )
-            .limit(1);
+                })
+                .limit(1)
+                .maybeSingle();
 
         if (existingError) {
-            throw existingError;
-        }
+            console.error(
+                "Failed to check existing subscription",
+                existingError
+            );
 
-        const existing =
-            existingRows?.[0] ||
-            null;
-
-        if (existing) {
-            if (
-                String(
-                    existing.plan
-                ) !== selectedPlan.plan
-            ) {
-                throw new BillingHttpError(
-                    409,
-                    "You already have an open billing subscription."
-                );
-            }
-
-            return json(
-                response,
-                200,
-                {
-                    subscriptionId:
-                        existing.id,
-                    status:
-                        existing.status,
-                    plan:
-                        existing.plan,
-                    providerSubscriptionId:
-                        existing.provider_subscription_id,
-                    currentPeriodEnd:
-                        existing.current_period_end
-                }
+            throw new BillingHttpError(
+                500,
+                "Unable to check your current subscription."
             );
         }
 
-        const {
-            data: createdRows,
-            error: createError
-        } =
+        if (existingSubscription) {
+            if (
+                existingSubscription.plan ===
+                launchPlan.plan
+            ) {
+                return sendJson(response, 200, {
+                    subscriptionId:
+                        existingSubscription.id,
+                    status:
+                        existingSubscription.status,
+                    plan:
+                        existingSubscription.plan,
+                    providerSubscriptionId:
+                        existingSubscription.provider_subscription_id,
+                    currentPeriodEnd:
+                        existingSubscription.current_period_end
+                });
+            }
+
+            throw new BillingHttpError(
+                409,
+                "You already have an open subscription. Cancel it before changing plans."
+            );
+        }
+
+        const { data: subscription, error: insertError } =
             await supabase
                 .from("subscriptions")
                 .insert({
-                    user_id:
-                        user.id,
-                    plan:
-                        selectedPlan.plan,
-                    provider:
-                        "nowpayments",
-                    provider_customer_id:
-                        email,
+                    user_id: user.id,
+                    plan: launchPlan.plan,
+                    provider: "nowpayments",
                     provider_plan_id:
-                        selectedPlan.providerPlanId,
-                    status:
-                        "pending"
+                        launchPlan.providerPlanId,
+                    status: "pending"
                 })
                 .select(
                     [
                         "id",
                         "plan",
                         "status"
-                    ].join(", ")
-                );
+                    ].join(",")
+                )
+                .single();
 
-        if (createError) {
-            if (
-                createError.code ===
-                "23505"
-            ) {
-                throw new BillingHttpError(
-                    409,
-                    "A billing subscription is already being started."
-                );
-            }
+        if (insertError || !subscription) {
+            console.error(
+                "Failed to create pending subscription",
+                insertError
+            );
 
-            throw createError;
-        }
-
-        const created =
-            createdRows?.[0];
-
-        if (!created) {
             throw new BillingHttpError(
                 500,
-                "The billing subscription could not be created."
+                "Unable to start your subscription."
             );
         }
 
-        let provider;
-
         try {
-            provider =
-                await createNowPaymentsSubscription(
-                    {
-                        planNumber:
-                            selectedPlan.providerPlanNumber,
-                        email
-                    }
+            const providerSubscription =
+                await createNowPaymentsSubscription({
+                    planNumber:
+                        launchPlan.providerPlanNumber,
+                    email
+                });
+
+            const { data: updatedSubscription, error: updateError } =
+                await supabase
+                    .from("subscriptions")
+                    .update({
+                        provider_subscription_id:
+                            providerSubscription.providerSubscriptionId,
+                        provider_customer_id:
+                            email,
+                        status: "pending"
+                    })
+                    .eq("id", subscription.id)
+                    .eq("user_id", user.id)
+                    .select(
+                        [
+                            "id",
+                            "plan",
+                            "status",
+                            "provider_subscription_id",
+                            "current_period_end"
+                        ].join(",")
+                    )
+                    .single();
+
+            if (updateError || !updatedSubscription) {
+                console.error(
+                    "Failed to link provider subscription",
+                    updateError
                 );
+
+                throw new BillingHttpError(
+                    502,
+                    "The payment provider subscription was created, but we could not finish linking it."
+                );
+            }
+
+            return sendJson(response, 200, {
+                subscriptionId:
+                    updatedSubscription.id,
+                status:
+                    updatedSubscription.status,
+                plan:
+                    updatedSubscription.plan,
+                providerSubscriptionId:
+                    updatedSubscription.provider_subscription_id,
+                currentPeriodEnd:
+                    updatedSubscription.current_period_end
+            });
         } catch (error) {
             await supabase
                 .from("subscriptions")
                 .update({
-                    status:
-                        "failed",
-                    ended_at:
-                        new Date()
-                            .toISOString(),
-                    updated_at:
-                        new Date()
-                            .toISOString()
+                    status: "failed",
+                    ended_at: new Date().toISOString()
                 })
-                .eq(
-                    "id",
-                    created.id
-                )
-                .eq(
-                    "user_id",
-                    user.id
-                )
-                .eq(
-                    "status",
-                    "pending"
-                );
+                .eq("id", subscription.id)
+                .eq("user_id", user.id)
+                .eq("status", "pending");
 
             throw error;
         }
-
-        const {
-            data: updatedRows,
-            error: updateError
-        } =
-            await supabase
-                .from("subscriptions")
-                .update({
-                    provider_subscription_id:
-                        provider.providerSubscriptionId,
-                    updated_at:
-                        new Date()
-                            .toISOString()
-                })
-                .eq(
-                    "id",
-                    created.id
-                )
-                .eq(
-                    "user_id",
-                    user.id
-                )
-                .select(
-                    [
-                        "id",
-                        "plan",
-                        "status",
-                        "provider_subscription_id",
-                        "current_period_end"
-                    ].join(", ")
-                );
-
-        if (updateError) {
-            console.error(
-                "Local billing subscription could not store provider id",
-                updateError
-            );
-
-            throw new BillingHttpError(
-                500,
-                "The billing subscription could not be finalized."
-            );
-        }
-
-        const updated =
-            updatedRows?.[0];
-
-        return json(
-            response,
-            201,
-            {
-                subscriptionId:
-                    updated.id,
-                status:
-                    updated.status,
-                plan:
-                    updated.plan,
-                providerSubscriptionId:
-                    updated.provider_subscription_id,
-                currentPeriodEnd:
-                    updated.current_period_end
-            }
-        );
     } catch (error) {
-        const status =
-            error instanceof
-            BillingHttpError
-                ? error.status
-                : 500;
-
-        if (
-            !(error instanceof
-                BillingHttpError)
-        ) {
-            console.error(
-                "Billing subscription endpoint failed",
-                error
-            );
+        if (error instanceof BillingHttpError) {
+            return sendJson(response, error.status, {
+                error: error.message
+            });
         }
 
-        return json(
-            response,
-            status,
-            {
-                error:
-                    error instanceof
-                    BillingHttpError
-                        ? error.message
-                        : "Unable to start your paid subscription."
-            }
+        console.error(
+            "Unexpected billing subscription error",
+            error
         );
+
+        return sendJson(response, 500, {
+            error: "Unable to start your subscription."
+        });
     }
 }

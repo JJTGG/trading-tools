@@ -4,7 +4,7 @@ import {
     createNowPaymentsSubscription,
     getLaunchPlan,
     getSupabaseAdmin
-} from "../_lib/billing.js";
+} from "../../src/server/billing.js";
 
 const sendJson = (response, status, body) => {
     response.status(status).json(body);

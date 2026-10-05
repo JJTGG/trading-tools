@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Manage your Trading Tools subscription and plan."
+    >
+
+    <title>Billing — Trading Tools</title>
+</head>
+
+<body class="account-page billing-page">
+
+    <header class="app-header">
+
+        <a
+            href="index.html"
+            class="brand"
+        >
+            <span class="brand-mark"></span>
+            Trading Tools
+        </a>
+
+        <nav
+            class="app-nav"
+            aria-label="Application"
+        >
+
+            <a href="workspace.html">
+                Workspace
+            </a>
+
+            <a href="market.html">
+                Markets
+            </a>
+
+            <a href="tools.html">
+                Tools
+            </a>
+
+        </nav>
+
+        <div class="workspace-account">
+
+            <a href="settings.html">
+                Settings
+            </a>
+
+            <a href="preferences.html">
+                Preferences
+            </a>
+
+            <button
+                id="logout-button"
+                type="button"
+                class="account-action"
+            >
+                Sign out
+            </button>
+
+        </div>
+
+    </header>
+
+    <main class="account-shell billing-shell">
+
+        <section class="account-heading">
+
+            <div>
+
+                <p class="account-kicker">
+                    Account / Billing
+                </p>
+
+                <h1>
+                    Plans
+                </h1>
+
+                <p>
+                    Choose the Trading Tools experience that fits
+                    how you work.
+                </p>
+
+            </div>
+
+            <span
+                id="billing-status"
+                class="account-heading-meta"
+            >
+                Loading
+            </span>
+
+        </section>
+
+        <section
+            id="billing-message"
+            class="billing-message"
+            aria-live="polite"
+            hidden
+        ></section>
+
+        <section
+            id="current-plan"
+            class="account-panel billing-current"
+            hidden
+        >
+
+            <header class="account-panel-header">
+
+                <h2>
+                    Current plan
+                </h2>
+
+                <span id="current-plan-status">
+                    —
+                </span>
+
+            </header>
+
+            <div class="billing-current-grid">
+
+                <div>
+                    <span class="billing-label">
+                        Plan
+                    </span>
+
+                    <strong id="current-plan-name">
+                        —
+                    </strong>
+                </div>
+
+                <div>
+                    <span class="billing-label">
+                        Status
+                    </span>
+
+                    <strong id="current-subscription-status">
+                        —
+                    </strong>
+                </div>
+
+                <div>
+                    <span class="billing-label">
+                        Period ends
+                    </span>
+
+                    <strong id="current-period-end">
+                        —
+                    </strong>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section
+            id="plan-grid"
+            class="billing-plans"
+            aria-label="Available plans"
+        >
+
+            <p class="billing-loading">
+                Loading plans…
+            </p>
+
+        </section>
+
+    </main>
+
+    <script
+        type="module"
+        src="/src/data/supabase.ts"
+    ></script>
+
+    <script
+        type="module"
+        src="/src/pages/billing.ts"
+    ></script>
+
+</body>
+
+</html>

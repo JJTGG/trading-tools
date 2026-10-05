@@ -19,7 +19,10 @@ const getRequiredEnv = (name) => {
     const value = process.env[name]?.trim();
 
     if (!value) {
-        throw new BillingHttpError(500, "Billing is not configured.");
+        throw new BillingHttpError(
+            500,
+            "Billing is not configured."
+        );
     }
 
     return value;
@@ -219,18 +222,15 @@ export const createNowPaymentsSubscription = async ({
 };
 
 const sortObject = (value) => {
-    if (Array.isArray(value)) {
-        return value.map(sortObject);
-    }
-
     if (
         value !== null &&
-        typeof value === "object"
+        typeof value === "object" &&
+        !Array.isArray(value)
     ) {
         return Object.keys(value)
             .sort()
             .reduce((result, key) => {
-                result[key] = sortObject(value[key]);
+                result[key] = value[key];
                 return result;
             }, {});
     }

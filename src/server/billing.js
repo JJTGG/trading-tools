@@ -168,6 +168,7 @@ export const createNowPaymentsSubscription = async ({
             method: "POST",
             headers: {
                 "x-api-key": apiKey,
+                "Authorization": `Bearer ${apiKey}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -243,7 +244,8 @@ export const getNowPaymentsSubscription = async (
         {
             method: "GET",
             headers: {
-                "x-api-key": apiKey
+                "x-api-key": apiKey,
+                "Authorization": `Bearer ${apiKey}`
             }
         }
     );

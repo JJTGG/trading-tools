@@ -214,7 +214,7 @@ const getNowPaymentsJwt = async ({
                 "NOWPayments authentication failed",
                 {
                     status: response.status,
-                    data
+                    code: data?.code
                 }
             );
 
@@ -307,6 +307,7 @@ const executeNowPaymentsRequestWithRefresh = async ({
 
         if (shouldRefresh) {
             clearNowPaymentsJwt();
+
             await getNowPaymentsJwt({
                 forceRefresh: true
             });
@@ -330,6 +331,150 @@ const executeNowPaymentsRequestWithRefresh = async ({
     };
 };
 
+const getProviderResultItems = (data) => {
+    const result =
+        data?.result ??
+        data?.subscriptions ??
+        data?.items ??
+        data;
+
+    if (Array.isArray(result)) {
+        return result.filter(
+            (item) =>
+                item &&
+                typeof item === "object"
+        );
+    }
+
+    if (
+        result &&
+        typeof result === "object"
+    ) {
+        return [result];
+    }
+
+    return [];
+};
+
+const getProviderPlanIdFromPayload = (payload) => {
+    const value =
+        payload?.subscription_plan_id ??
+        payload?.plan_id ??
+        payload?.subscription?.subscription_plan_id ??
+        payload?.subscription?.plan_id;
+
+    return value === null || value === undefined
+        ? null
+        : String(value);
+};
+
+const getProviderSubscriptionIdFromPayload = (
+    payload
+) => {
+    const value =
+        payload?.id ??
+        payload?.subscription_id ??
+        payload?.sub_id ??
+        payload?.subscription?.id;
+
+    return value === null || value === undefined
+        ? null
+        : String(value);
+};
+
+const getProviderEmailFromPayload = (payload) => {
+    const value =
+        payload?.email ??
+        payload?.subscriber_email ??
+        payload?.subscriber?.email;
+
+    return value
+        ? normalizeEmail(value)
+        : null;
+};
+
+const findProviderSubscriptionCandidate = ({
+    data,
+    planNumber,
+    email
+}) => {
+    const expectedPlanId = String(planNumber);
+    const expectedEmail = normalizeEmail(email);
+
+    const candidates =
+        getProviderResultItems(data);
+
+    return candidates.find((candidate) => {
+        const candidatePlanId =
+            getProviderPlanIdFromPayload(candidate);
+
+        const candidateEmail =
+            getProviderEmailFromPayload(candidate);
+
+        const candidateSubscriptionId =
+            getProviderSubscriptionIdFromPayload(
+                candidate
+            );
+
+        return (
+            candidatePlanId === expectedPlanId &&
+            candidateEmail === expectedEmail &&
+            Boolean(candidateSubscriptionId)
+        );
+    }) || null;
+};
+
+const findNowPaymentsSubscription = async ({
+    planNumber,
+    email
+}) => {
+    const params = new URLSearchParams({
+        subscription_plan_id: String(planNumber),
+        limit: "100",
+        offset: "0"
+    });
+
+    const {
+        response,
+        data
+    } = await executeNowPaymentsRequestWithRefresh({
+        path: `/v1/subscriptions?${params.toString()}`,
+        method: "GET"
+    });
+
+    if (!response.ok) {
+        console.error(
+            "NOWPayments subscription reconciliation lookup failed",
+            {
+                status: response.status,
+                code: data?.code,
+                planNumber
+            }
+        );
+
+        throw new BillingHttpError(
+            502,
+            "The payment provider subscription could not be reconciled."
+        );
+    }
+
+    return findProviderSubscriptionCandidate({
+        data,
+        planNumber,
+        email
+    });
+};
+
+const isDuplicateSubscriptionError = ({
+    response,
+    data
+}) =>
+    response.status === 500 &&
+    data?.code === "INTERNAL_ERROR" &&
+    /already subscribed/i.test(
+        String(data?.message || "")
+    );
+
 export const createNowPaymentsSubscription = async ({
     planNumber,
     email
@@ -347,11 +492,46 @@ export const createNowPaymentsSubscription = async ({
     });
 
     if (!response.ok) {
+        if (
+            isDuplicateSubscriptionError({
+                response,
+                data
+            })
+        ) {
+            const existingSubscription =
+                await findNowPaymentsSubscription({
+                    planNumber,
+                    email
+                });
+
+            if (existingSubscription) {
+                const providerSubscriptionId =
+                    getProviderSubscriptionIdFromPayload(
+                        existingSubscription
+                    );
+
+                console.info(
+                    "Recovered existing NOWPayments subscription",
+                    {
+                        providerSubscriptionId,
+                        planNumber
+                    }
+                );
+
+                return {
+                    providerSubscriptionId,
+                    providerPayload:
+                        existingSubscription
+                };
+            }
+        }
+
         console.error(
             "NOWPayments subscription creation failed",
             {
                 status: response.status,
-                data
+                code: data?.code,
+                planNumber
             }
         );
 
@@ -361,17 +541,26 @@ export const createNowPaymentsSubscription = async ({
         );
     }
 
-    const result = data?.result || data;
+    const result = getProviderResultItems(data).find(
+        (item) =>
+            getProviderSubscriptionIdFromPayload(
+                item
+            )
+    );
 
     const providerSubscriptionId =
-        result?.id ??
-        result?.subscription_id ??
-        result?.sub_id;
+        getProviderSubscriptionIdFromPayload(
+            result
+        );
 
     if (!providerSubscriptionId) {
         console.error(
             "NOWPayments subscription response did not contain an id",
-            { data }
+            {
+                resultShape: Array.isArray(data?.result)
+                    ? "array"
+                    : typeof data?.result
+            }
         );
 
         throw new BillingHttpError(
@@ -381,9 +570,7 @@ export const createNowPaymentsSubscription = async ({
     }
 
     return {
-        providerSubscriptionId: String(
-            providerSubscriptionId
-        ),
+        providerSubscriptionId,
         providerPayload: result
     };
 };
@@ -417,7 +604,7 @@ export const getNowPaymentsSubscription = async (
             {
                 status: response.status,
                 subscriptionId: providerSubscriptionId,
-                data
+                code: data?.code
             }
         );
 
@@ -427,7 +614,10 @@ export const getNowPaymentsSubscription = async (
         );
     }
 
-    return data?.result || data;
+    const items =
+        getProviderResultItems(data);
+
+    return items[0] || data;
 };
 
 const sortObject = (value) => {
@@ -527,36 +717,14 @@ export const getRequestJson = async (request) => {
     }
 };
 
-export const getProviderPlanId = (payload) => {
-    const value =
-        payload?.subscription_plan_id ??
-        payload?.plan_id;
+export const getProviderPlanId = (payload) =>
+    getProviderPlanIdFromPayload(payload);
 
-    return value === null || value === undefined
-        ? null
-        : String(value);
-};
+export const getProviderSubscriptionId = (payload) =>
+    getProviderSubscriptionIdFromPayload(payload);
 
-export const getProviderSubscriptionId = (payload) => {
-    const value =
-        payload?.subscription_id ??
-        payload?.sub_id ??
-        payload?.subscription?.id;
-
-    return value === null || value === undefined
-        ? null
-        : String(value);
-};
-
-export const getProviderEmail = (payload) => {
-    const value =
-        payload?.email ??
-        payload?.subscriber?.email;
-
-    return value
-        ? normalizeEmail(value)
-        : null;
-};
+export const getProviderEmail = (payload) =>
+    getProviderEmailFromPayload(payload);
 
 export const getProviderPaymentId = (payload) => {
     const value =
